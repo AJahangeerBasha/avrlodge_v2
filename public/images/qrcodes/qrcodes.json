@@ -1,0 +1,12 @@
+[
+    {
+        "id": "1",
+        "name": "Jubair QR Code",
+        "qr_code": "../images/qrcodes/jubair.png"
+    },
+    {
+        "id": "2",
+        "name": "Basha QR Code",
+        "qr_code": "../images/qrcodes/basha.png"
+    }
+]
