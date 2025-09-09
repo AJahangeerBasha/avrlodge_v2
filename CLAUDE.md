@@ -58,6 +58,61 @@ This file contains project-specific information for Claude Code to better unders
      - `createdAt/updatedAt: timestamp`
      - `createdBy/updatedBy: string` (user uid)
 
+   - **Special Charges Collection** (`/specialCharges/{id}`)
+     - `chargeName: string` (e.g., "Kitchen", "Campfire")
+     - `defaultRate: number`
+     - `rateType: 'per_day' | 'per_person' | 'fixed'`
+     - `description?: string`
+     - `isActive: boolean`
+     - `createdAt/updatedAt: timestamp`
+     - `createdBy/updatedBy: string` (user uid)
+
+   - **Reservations Collection** (`/reservations/{id}`)
+     - `referenceNumber: string` (auto-generated: MMYYYY-XXX)
+     - `guestName: string`
+     - `guestEmail: string`
+     - `guestPhone: string`
+     - `guestType: 'walk_in' | 'online' | 'agent' | 'corporate'`
+     - `checkInDate: timestamp`
+     - `checkOutDate: timestamp`
+     - `guestCount: number`
+     - `totalPrice: number`
+     - `status: 'reservation' | 'booking' | 'checked_in' | 'checked_out' | 'cancelled'`
+     - `paymentStatus: 'pending' | 'partial' | 'paid' | 'refunded'`
+     - `isActive: boolean`
+     - `createdAt/updatedAt: timestamp`
+     - `createdBy/updatedBy: string` (user uid)
+
+   - **Reservation Rooms Collection** (`/reservationRooms/{id}`)
+     - `reservationId: string` (reference to reservations)
+     - `roomId: string` (reference to rooms)
+     - `roomNumber: string`
+     - `roomType: string`
+     - `roomStatus: 'pending' | 'checked_in' | 'checked_out' | 'cancelled' | 'no_show'`
+     - `checkInTime?: timestamp`
+     - `checkOutTime?: timestamp`
+     - `checkedInBy?: string` (user uid)
+     - `checkedOutBy?: string` (user uid)
+     - `createdAt/updatedAt: timestamp`
+     - `createdBy/updatedBy: string` (user uid)
+
+   - **Reservation Special Charges Collection** (`/reservationSpecialCharges/{id}`)
+     - `reservationId: string` (reference to reservations)
+     - `specialChargeId: string` (reference to specialCharges)
+     - `quantity: number`
+     - `customRate?: number` (overrides defaultRate if provided)
+     - `customDescription?: string`
+     - `totalAmount: number`
+     - `createdAt/updatedAt: timestamp`
+     - `createdBy/updatedBy: string` (user uid)
+     - `deletedAt?: timestamp` (soft delete)
+     - `deletedBy?: string` (user uid)
+
+   - **Reference Number Counters Collection** (`/referenceNumberCounters/{id}`)
+     - `id: string` (format: MMYYYY, e.g., "012025")
+     - `counter: number` (incremental counter)
+     - `createdAt/updatedAt: timestamp`
+
 3. **Role-Based Access Control**
    - **Roles**: guest (default), manager, admin
    - **Role Management**: Firestore-based (no Custom Claims)
@@ -77,6 +132,7 @@ This file contains project-specific information for Claude Code to better unders
 - **Lint**: `npm run lint`
 - **Import Room Types**: `npm run import-room-types`
 - **Import Rooms**: `npm run import-rooms`
+- **Import Special Charges**: `npm run import-special-charges`
 
 ## Project Structure
 ```
@@ -105,12 +161,24 @@ src/
 │   ├── redirects.ts    # Role-based redirect utilities
 │   ├── roomTypes.ts    # Room types CRUD operations
 │   ├── rooms.ts        # Rooms CRUD operations
+│   ├── specialCharges.ts # Special charges CRUD operations
+│   ├── reservations.ts # Reservations CRUD operations
+│   ├── reservationRooms.ts # Reservation rooms CRUD operations
+│   ├── reservationSpecialCharges.ts # Reservation special charges CRUD operations
 │   ├── types/
 │   │   ├── auth.ts     # Authentication types
 │   │   ├── roomTypes.ts # Room types interfaces
-│   │   └── rooms.ts    # Rooms interfaces
+│   │   ├── rooms.ts    # Rooms interfaces
+│   │   ├── specialCharges.ts # Special charges interfaces
+│   │   ├── reservations.ts # Reservations interfaces
+│   │   ├── reservationRooms.ts # Reservation rooms interfaces
+│   │   └── reservationSpecialCharges.ts # Reservation special charges interfaces
 │   └── utils/
-│       └── roomStatus.ts # Room status utilities
+│       ├── roomStatus.ts # Room status utilities
+│       ├── referenceNumber.ts # Reference number generation
+│       ├── reservationRoomValidation.ts # Reservation room validation
+│       ├── reservationSpecialChargeValidation.ts # Special charges validation
+│       └── reservationSpecialChargeManagement.ts # Special charges management
 ├── pages/
 │   ├── admin/          # Admin dashboard pages
 │   ├── auth/           # Authentication pages
@@ -118,7 +186,8 @@ src/
 │   └── ...
 ├── scripts/
 │   ├── importRoomTypes.ts # Import room types data to Firestore
-│   └── importRooms.ts  # Import rooms data to Firestore
+│   ├── importRooms.ts  # Import rooms data to Firestore
+│   └── importSpecialCharges.ts # Import special charges data to Firestore
 └── router/
     └── AppRouter.tsx   # Application routing with nested routes
 ```
@@ -203,6 +272,31 @@ Since we're using Firebase Spark plan (free), role management is handled via Fir
   - Room status: available, occupied, maintenance, reserved
   - Floor assignments and room number organization
 
+- **Special Charges**: Converted 4 special charges from PostgreSQL to Firestore
+  - Kitchen (₹350/fixed, dining facility access)
+  - Campfire (₹150/person, outdoor activity)
+  - Conference Hall (₹500/day, meeting space)
+  - Extra Person (₹300/person, additional guest charge)
+
+- **Reservations System**: Complete reservation management system
+  - Auto-generated reference numbers (format: MMYYYY-XXX)
+  - Guest information management with contact details
+  - Check-in/check-out date tracking
+  - Multi-status workflow (reservation → booking → checked_in → checked_out)
+  - Payment status tracking (pending → partial → paid → refunded)
+
+- **Reservation Rooms**: One-to-many relationship with reservations
+  - Room assignment and status tracking
+  - Check-in/check-out time logging
+  - Staff tracking (who checked in/out guests)
+  - Room-specific status management
+
+- **Reservation Special Charges**: Additional charges system
+  - Link special charges to specific reservations
+  - Custom rates and descriptions
+  - Quantity-based calculations
+  - Soft delete functionality for charge removal
+
 ### Admin Management Features
 - **Room Types Management** (`/admin/room-types`)
   - Full CRUD operations with real-time updates
@@ -218,6 +312,12 @@ Since we're using Firebase Spark plan (free), role management is handled via Fir
   - Search by room number and room type
   - Filter by status and floor
 
+- **Special Charges Management** (`/admin/special-charges`)
+  - CRUD operations for additional service charges
+  - Rate type management (per_day, per_person, fixed)
+  - Usage analytics and popular charges tracking
+  - Real-time updates with validation
+
 ### Room Status System
 - **Available**: Ready for check-in (green indicator)
 - **Occupied**: Guest currently staying (red indicator) 
@@ -226,13 +326,55 @@ Since we're using Firebase Spark plan (free), role management is handled via Fir
 - Smart status transitions with validation rules
 - Real-time occupancy rate calculations
 
+## Backend Infrastructure
+### Reservation Management System
+- **Reference Number Generation**: Transaction-safe auto-increment system (MMYYYY-XXX format)
+- **Guest Management**: Comprehensive guest information tracking with multiple contact methods
+- **Multi-Status Workflow**: Advanced status transitions (reservation → booking → checked_in → checked_out → cancelled)
+- **Payment Tracking**: Complete payment status management (pending → partial → paid → refunded)
+- **Date Management**: Check-in/check-out date validation and conflict detection
+
+### Room Assignment System  
+- **Dynamic Room Assignment**: Link multiple rooms to single reservation
+- **Check-in/Check-out Workflow**: Time-stamped entry/exit with staff tracking
+- **Room Status Management**: Real-time status updates (pending → checked_in → checked_out)
+- **Conflict Detection**: Prevent double-booking and status conflicts
+- **Batch Operations**: Efficient multi-room check-in/check-out processes
+
+### Special Charges System
+- **Flexible Charging**: Support for fixed, per-person, and per-day rates
+- **Custom Rates**: Override default rates with validation
+- **Calculation Engine**: Automatic total calculation with consistency checks
+- **Bulk Operations**: Batch creation and management of charges
+- **Usage Analytics**: Track popular charges and revenue insights
+- **Soft Delete**: Preserve audit trail while removing charges
+
+### Validation & Business Rules
+- **Comprehensive Validation**: Multi-layer validation for all entities
+- **Business Rule Enforcement**: Prevent invalid state transitions and data inconsistencies
+- **Rate Consistency**: Validate custom rates against reasonable limits
+- **Calculation Verification**: Ensure mathematical accuracy in all charge calculations
+- **Duplicate Prevention**: Block duplicate charges and conflicting reservations
+
+### Real-time Operations
+- **Live Updates**: Real-time Firestore subscriptions for all collections
+- **Fallback Filtering**: Client-side filtering when Firestore indexes are insufficient
+- **Transaction Safety**: Atomic operations for critical data modifications
+- **Batch Processing**: Efficient bulk operations with transaction guarantees
+- **Error Handling**: Comprehensive error handling with fallback strategies
+
 ## Recent Updates
-- **Database Migration**: Successfully migrated PostgreSQL room_types and rooms tables to Firestore
-- **Admin Panel Enhancement**: Added room types and rooms management with full CRUD operations
+- **Complete Backend Infrastructure**: Built full reservation management system with PostgreSQL to Firestore migration
+- **Database Migration**: Successfully migrated 5 PostgreSQL tables (room_types, rooms, special_charges_master, reservations, reservation_rooms, reservation_special_charges) to Firestore
+- **Admin Panel Enhancement**: Added room types, rooms, and special charges management with full CRUD operations
 - **Real-time Updates**: Implemented live status tracking and occupancy analytics
+- **Reference Number System**: Created transaction-safe auto-increment reference number generation (MMYYYY-XXX format)
+- **Validation Framework**: Comprehensive validation system for all entities with business rule enforcement
+- **Relationship Management**: Complete one-to-many relationship handling (reservations → rooms, reservations → charges)
+- **Status Workflows**: Advanced status management for reservations and rooms with enforced transitions
+- **Special Charges Engine**: Flexible charging system with custom rates, bulk operations, and usage analytics
+- **Firestore Optimization**: Updated indexes for efficient querying and deployed via Firebase CLI
 - **Role-based Routing**: Comprehensive admin/manager/guest access control system
-- **Data Import Scripts**: Created automated migration scripts for PostgreSQL to Firestore
-- **Status Management**: Advanced room status workflow with visual indicators
 - **Authentication Flow**: Redirect logic based on user roles
 - **Navigation System**: Complete admin and manager panel navigation
 - **Firestore Rules**: Extended development period until Dec 31, 2025
