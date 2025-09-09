@@ -1,8 +1,8 @@
-import { Outlet, Navigate } from 'react-router-dom'
+import { Outlet, Navigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { ROLES } from '../lib/types/auth'
 import { Button } from '../components/ui/button'
-import { LogOut, Calendar, Users, BarChart3 } from 'lucide-react'
+import { LogOut, Calendar, Users, BarChart3, BookOpen, Settings } from 'lucide-react'
 
 export function ManagerLayout() {
   const { currentUser, userRole, logout, loading } = useAuth()
@@ -75,28 +75,35 @@ export function ManagerLayout() {
       {/* Navigation */}
       <div className="bg-green-600 text-white">
         <div className="px-4 py-3">
-          <nav className="flex space-x-6">
-            <a
-              href="/manager"
+          <nav className="flex flex-wrap gap-2">
+            <Link
+              to="/manager"
               className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-green-700 transition-colors"
             >
               <BarChart3 className="h-4 w-4" />
               <span>Dashboard</span>
-            </a>
-            <a
-              href="/manager/bookings"
+            </Link>
+            <Link
+              to="/manager/calendar"
               className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-green-700 transition-colors"
             >
               <Calendar className="h-4 w-4" />
-              <span>Bookings</span>
-            </a>
-            <a
-              href="/manager/guests"
+              <span>Calendar</span>
+            </Link>
+            <Link
+              to="/manager/reservation"
+              className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-green-700 transition-colors"
+            >
+              <BookOpen className="h-4 w-4" />
+              <span>Reservations</span>
+            </Link>
+            <Link
+              to="/manager/bookings"
               className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-green-700 transition-colors"
             >
               <Users className="h-4 w-4" />
-              <span>Guest Management</span>
-            </a>
+              <span>Bookings</span>
+            </Link>
           </nav>
         </div>
       </div>

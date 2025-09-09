@@ -16,9 +16,17 @@ const UnauthorizedPage = lazy(() => import('../pages/auth/Unauthorized').then(mo
 
 // Admin pages
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard').then(module => ({ default: module.AdminDashboard })))
+const AdminCalendar = lazy(() => import('../pages/admin/AdminCalendar').then(module => ({ default: module.AdminCalendar })))
+const AdminReservation = lazy(() => import('../pages/admin/AdminReservation').then(module => ({ default: module.AdminReservation })))
+const AdminBookings = lazy(() => import('../pages/admin/AdminBookings').then(module => ({ default: module.AdminBookings })))
+const AdminRoomTypes = lazy(() => import('../pages/admin/AdminRoomTypes').then(module => ({ default: module.AdminRoomTypes })))
+const AdminRooms = lazy(() => import('../pages/admin/AdminRooms').then(module => ({ default: module.AdminRooms })))
 
 // Manager pages  
 const ManagerDashboard = lazy(() => import('../pages/manager/ManagerDashboard').then(module => ({ default: module.ManagerDashboard })))
+const ManagerCalendar = lazy(() => import('../pages/manager/ManagerCalendar').then(module => ({ default: module.ManagerCalendar })))
+const ManagerReservation = lazy(() => import('../pages/manager/ManagerReservation').then(module => ({ default: module.ManagerReservation })))
+const ManagerBookings = lazy(() => import('../pages/manager/ManagerBookings').then(module => ({ default: module.ManagerBookings })))
 
 function AppRoutes() {
   return (
@@ -39,13 +47,19 @@ function AppRoutes() {
           {/* Admin routes - protected with AdminLayout */}
           <Route path="admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
-            {/* Add more admin routes here later */}
+            <Route path="calendar" element={<AdminCalendar />} />
+            <Route path="reservation" element={<AdminReservation />} />
+            <Route path="bookings" element={<AdminBookings />} />
+            <Route path="room-types" element={<AdminRoomTypes />} />
+            <Route path="rooms" element={<AdminRooms />} />
           </Route>
           
           {/* Manager routes - protected with ManagerLayout */}
           <Route path="manager" element={<ManagerLayout />}>
             <Route index element={<ManagerDashboard />} />
-            {/* Add more manager routes here later */}
+            <Route path="calendar" element={<ManagerCalendar />} />
+            <Route path="reservation" element={<ManagerReservation />} />
+            <Route path="bookings" element={<ManagerBookings />} />
           </Route>
           
           {/* Error pages */}

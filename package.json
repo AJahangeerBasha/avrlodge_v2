@@ -19,7 +19,9 @@
     "build": "vite build",
     "build-with-types": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "import-room-types": "tsx scripts/importRoomTypes.ts",
+    "import-rooms": "tsx scripts/importRooms.ts"
   },
   "dependencies": {
     "@dataconnect/generated": "file:src/dataconnect-generated",
@@ -107,6 +109,7 @@
     "express": "^4.19.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.20.5",
     "typescript": "^5.6.3",
     "vite": "^5.0.0"
   }

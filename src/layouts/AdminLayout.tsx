@@ -1,8 +1,8 @@
-import { Outlet, Navigate } from 'react-router-dom'
+import { Outlet, Navigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { ROLES } from '../lib/types/auth'
 import { Button } from '../components/ui/button'
-import { LogOut, Users, Settings, BarChart3 } from 'lucide-react'
+import { LogOut, Users, Settings, BarChart3, Calendar, BookOpen, Home, Bed } from 'lucide-react'
 
 export function AdminLayout() {
   const { currentUser, userRole, logout, loading } = useAuth()
@@ -64,28 +64,56 @@ export function AdminLayout() {
       {/* Navigation */}
       <div className="bg-blue-600 text-white">
         <div className="px-4 py-3">
-          <nav className="flex space-x-6">
-            <a
-              href="/admin"
+          <nav className="flex flex-wrap gap-2">
+            <Link
+              to="/admin"
               className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
             >
               <BarChart3 className="h-4 w-4" />
               <span>Dashboard</span>
-            </a>
-            <a
-              href="/admin/users"
+            </Link>
+            <Link
+              to="/admin/calendar"
+              className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <Calendar className="h-4 w-4" />
+              <span>Calendar</span>
+            </Link>
+            <Link
+              to="/admin/reservation"
+              className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <BookOpen className="h-4 w-4" />
+              <span>Reservations</span>
+            </Link>
+            <Link
+              to="/admin/bookings"
               className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
             >
               <Users className="h-4 w-4" />
-              <span>User Management</span>
-            </a>
-            <a
-              href="/admin/settings"
+              <span>Bookings</span>
+            </Link>
+            <Link
+              to="/admin/room-types"
+              className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <Home className="h-4 w-4" />
+              <span>Room Types</span>
+            </Link>
+            <Link
+              to="/admin/rooms"
+              className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <Bed className="h-4 w-4" />
+              <span>Rooms</span>
+            </Link>
+            <Link
+              to="/admin/settings"
               className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
             >
               <Settings className="h-4 w-4" />
               <span>Settings</span>
-            </a>
+            </Link>
           </nav>
         </div>
       </div>
