@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useScrollToSection } from "@/hooks/use-scroll-to-section"
+import { useAuth } from "../../contexts/AuthContext"
+import { ROLES } from "../../lib/types/auth"
+import { Button } from "./button"
+import { LogIn, Settings, BarChart3 } from "lucide-react"
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const scrollToSection = useScrollToSection()
+  const { currentUser, userRole, logout } = useAuth()
   
   useEffect(() => {
     const handleScroll = () => {
@@ -49,6 +54,63 @@ export default function Navbar() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Auth Section */}
+          <div className="flex items-center space-x-4">
+            {currentUser ? (
+              <div className="flex items-center space-x-3">
+                {/* Role-based Dashboard Links */}
+                {userRole === ROLES.ADMIN && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.location.href = '/admin'}
+                    className="flex items-center space-x-2"
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span>Admin</span>
+                  </Button>
+                )}
+                
+                {(userRole === ROLES.MANAGER || userRole === ROLES.ADMIN) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.location.href = '/manager'}
+                    className="flex items-center space-x-2"
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    <span>Manager</span>
+                  </Button>
+                )}
+
+                {/* User Info */}
+                <span className="text-sm text-gray-600">
+                  {currentUser.displayName || currentUser.email}
+                </span>
+                
+                {/* Logout */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => logout()}
+                  className="text-gray-600 hover:text-black"
+                >
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.location.href = '/auth/login'}
+                className="flex items-center space-x-2"
+              >
+                <LogIn className="h-4 w-4" />
+                <span>Login</span>
+              </Button>
+            )}
           </div>
           
         </div>

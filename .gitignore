@@ -8,3 +8,4 @@ vite.config.ts.*
 .next
 .vercel
 /logs
+/.claude
