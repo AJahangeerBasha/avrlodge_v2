@@ -42,28 +42,64 @@ const convertFirestoreToRoom = (doc: any): Room => {
 export const getAllRooms = async (filters?: RoomFilters): Promise<Room[]> => {
   try {
     const roomsRef = collection(db, ROOMS_COLLECTION)
-    let q = query(roomsRef)
     
-    // Apply filters
-    if (filters?.isActive !== undefined) {
-      q = query(q, where('isActive', '==', filters.isActive))
+    // Try with optimized query first (may require index)
+    try {
+      let q = query(roomsRef)
+      
+      // Apply filters
+      if (filters?.isActive !== undefined) {
+        q = query(q, where('isActive', '==', filters.isActive))
+      }
+      if (filters?.status) {
+        q = query(q, where('status', '==', filters.status))
+      }
+      if (filters?.roomTypeId) {
+        q = query(q, where('roomTypeId', '==', filters.roomTypeId))
+      }
+      if (filters?.floorNumber) {
+        q = query(q, where('floorNumber', '==', filters.floorNumber))
+      }
+      
+      // Order by room number (may require composite index)
+      if (!filters || Object.keys(filters).length <= 1) {
+        q = query(q, orderBy('roomNumber'))
+      }
+      
+      const querySnapshot = await getDocs(q)
+      let rooms = querySnapshot.docs.map(convertFirestoreToRoom)
+      
+      // Client-side sorting if we couldn't use orderBy
+      if (filters && Object.keys(filters).length > 1) {
+        rooms.sort((a, b) => a.roomNumber.localeCompare(b.roomNumber))
+      }
+      
+      return rooms
+    } catch (indexError) {
+      // Fallback: Get all docs and filter/sort in client
+      console.warn('Index not ready, using client-side filtering:', indexError.message)
+      const querySnapshot = await getDocs(roomsRef)
+      let rooms = querySnapshot.docs.map(convertFirestoreToRoom)
+      
+      // Apply filters client-side
+      if (filters?.isActive !== undefined) {
+        rooms = rooms.filter(room => room.isActive === filters.isActive)
+      }
+      if (filters?.status) {
+        rooms = rooms.filter(room => room.status === filters.status)
+      }
+      if (filters?.roomTypeId) {
+        rooms = rooms.filter(room => room.roomTypeId === filters.roomTypeId)
+      }
+      if (filters?.floorNumber) {
+        rooms = rooms.filter(room => room.floorNumber === filters.floorNumber)
+      }
+      
+      // Sort by room number
+      rooms.sort((a, b) => a.roomNumber.localeCompare(b.roomNumber))
+      
+      return rooms
     }
-    if (filters?.status) {
-      q = query(q, where('status', '==', filters.status))
-    }
-    if (filters?.roomTypeId) {
-      q = query(q, where('roomTypeId', '==', filters.roomTypeId))
-    }
-    if (filters?.floorNumber) {
-      q = query(q, where('floorNumber', '==', filters.floorNumber))
-    }
-    
-    // Order by room number
-    q = query(q, orderBy('roomNumber'))
-    
-    const querySnapshot = await getDocs(q)
-    
-    return querySnapshot.docs.map(convertFirestoreToRoom)
   } catch (error) {
     console.error('Error getting rooms:', error)
     throw error

@@ -43,14 +43,27 @@ const convertFirestoreToRoomType = (doc: any): RoomType => {
 export const getAllRoomTypes = async (): Promise<RoomType[]> => {
   try {
     const roomTypesRef = collection(db, ROOM_TYPES_COLLECTION)
-    const q = query(
-      roomTypesRef, 
-      where('isActive', '==', true),
-      orderBy('name')
-    )
-    const querySnapshot = await getDocs(q)
     
-    return querySnapshot.docs.map(convertFirestoreToRoomType)
+    // Try with composite query first (requires index)
+    try {
+      const q = query(
+        roomTypesRef, 
+        where('isActive', '==', true),
+        orderBy('name')
+      )
+      const querySnapshot = await getDocs(q)
+      return querySnapshot.docs.map(convertFirestoreToRoomType)
+    } catch (indexError) {
+      // Fallback: Get all docs and filter/sort in client
+      console.warn('Index not ready, using client-side filtering:', indexError.message)
+      const querySnapshot = await getDocs(roomTypesRef)
+      const roomTypes = querySnapshot.docs
+        .map(convertFirestoreToRoomType)
+        .filter(roomType => roomType.isActive)
+        .sort((a, b) => a.name.localeCompare(b.name))
+      
+      return roomTypes
+    }
   } catch (error) {
     console.error('Error getting room types:', error)
     throw error

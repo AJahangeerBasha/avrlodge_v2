@@ -2,7 +2,7 @@ import { Outlet, Navigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { ROLES } from '../lib/types/auth'
 import { Button } from '../components/ui/button'
-import { LogOut, Users, Settings, BarChart3, Calendar, BookOpen, Home, Bed } from 'lucide-react'
+import { LogOut, Users, Settings, BarChart3, Calendar, BookOpen, Home, Bed, DollarSign } from 'lucide-react'
 
 export function AdminLayout() {
   const { currentUser, userRole, logout, loading } = useAuth()
@@ -106,6 +106,13 @@ export function AdminLayout() {
             >
               <Bed className="h-4 w-4" />
               <span>Rooms</span>
+            </Link>
+            <Link
+              to="/admin/special-charges"
+              className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <DollarSign className="h-4 w-4" />
+              <span>Special Charges</span>
             </Link>
             <Link
               to="/admin/settings"

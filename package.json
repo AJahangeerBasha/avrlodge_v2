@@ -21,7 +21,8 @@
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "import-room-types": "tsx scripts/importRoomTypes.ts",
-    "import-rooms": "tsx scripts/importRooms.ts"
+    "import-rooms": "tsx scripts/importRooms.ts",
+    "import-special-charges": "tsx scripts/importSpecialCharges.ts"
   },
   "dependencies": {
     "@dataconnect/generated": "file:src/dataconnect-generated",
