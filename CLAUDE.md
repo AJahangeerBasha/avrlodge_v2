@@ -108,9 +108,58 @@ This file contains project-specific information for Claude Code to better unders
      - `deletedAt?: timestamp` (soft delete)
      - `deletedBy?: string` (user uid)
 
+   - **Room Check-in Documents Collection** (`/roomCheckinDocuments/{id}`)
+     - `reservationId?: string` (reference to reservations)
+     - `roomId: string` (reference to rooms)
+     - `documentType: 'aadhar' | 'driving_license' | 'voter_id' | 'passport' | 'pan_card' | 'other'`
+     - `fileUrl: string` (Firebase Storage URL)
+     - `fileName: string`
+     - `uploadedAt: timestamp`
+     - `uploadedBy?: string` (user uid)
+     - `createdAt/updatedAt: timestamp`
+     - `createdBy/updatedBy: string` (user uid)
+     - `deletedAt?: timestamp` (soft delete)
+     - `deletedBy?: string` (user uid)
+
+   - **Payments Collection** (`/payments/{id}`)
+     - `reservationId?: string` (reference to reservations)
+     - `amount: number`
+     - `paymentType: 'booking_advance' | 'full_payment' | 'partial_payment' | 'security_deposit' | 'additional_charges' | 'refund' | 'cancellation_fee' | 'extra_services'`
+     - `paymentMethod: 'cash' | 'card' | 'upi' | 'net_banking' | 'wallet' | 'bank_transfer' | 'cheque' | 'other'`
+     - `receiptNumber: string` (auto-generated: PAY-MMYYYY-XXXXX)
+     - `paymentStatus: 'pending' | 'completed' | 'failed' | 'refunded' | 'cancelled'`
+     - `transactionId?: string`
+     - `gatewayResponse?: string`
+     - `notes?: string`
+     - `paymentDate: timestamp`
+     - `createdAt/updatedAt: timestamp`
+     - `createdBy/updatedBy: string` (user uid)
+     - `deletedAt?: timestamp` (soft delete)
+     - `deletedBy?: string` (user uid)
+
+   - **Guests Collection** (`/guests/{id}`)
+     - `reservationId?: string` (reference to reservations)
+     - `name: string`
+     - `phone: string`
+     - `whatsapp?: string`
+     - `telegram?: string`
+     - `pincode?: string` (6-digit Indian pincode)
+     - `state?: string` (Indian state)
+     - `district?: string`
+     - `isPrimaryGuest: boolean`
+     - `createdAt/updatedAt: timestamp`
+     - `createdBy/updatedBy: string` (user uid)
+     - `deletedAt?: timestamp` (soft delete)
+     - `deletedBy?: string` (user uid)
+
    - **Reference Number Counters Collection** (`/referenceNumberCounters/{id}`)
      - `id: string` (format: MMYYYY, e.g., "012025")
      - `counter: number` (incremental counter)
+     - `createdAt/updatedAt: timestamp`
+
+   - **Receipt Number Counters Collection** (`/receiptNumberCounters/{id}`)
+     - `id: string` (format: MMYYYY, e.g., "012025")
+     - `counter: number` (incremental counter for PAY-MMYYYY-XXXXX)
      - `createdAt/updatedAt: timestamp`
 
 3. **Role-Based Access Control**
@@ -378,3 +427,4 @@ Since we're using Firebase Spark plan (free), role management is handled via Fir
 - **Authentication Flow**: Redirect logic based on user roles
 - **Navigation System**: Complete admin and manager panel navigation
 - **Firestore Rules**: Extended development period until Dec 31, 2025
+- to memorize
