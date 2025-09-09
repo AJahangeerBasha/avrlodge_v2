@@ -1,0 +1,53 @@
+[
+  {
+    "id": 1,
+    "state": "Tamil Nadu",
+    "district": [
+      "ARIYALUR",
+      "CHENNAI",
+      "COIMBATORE",
+      "CUDDALORE",
+      "DHARMAPURI",
+      "DINDIGUL",
+      "ERODE",
+      "KANCHIPURAM",
+      "KANYAKUMARI",
+      "KARUR",
+      "KRISHNAGIRI",
+      "MADURAI",
+      "NAGAPATTINAM",
+      "NAMAKKAL",
+      "NILGIRIS",
+      "PERAMBALUR",
+      "PUDUKKOTTAI",
+      "RAMANATHAPURAM",
+      "SALEM",
+      "SIVAGANGA",
+      "THANJAVUR",
+      "THENI",
+      "TIRUCHIRAPPALLI",
+      "TIRUNELVELI",
+      "TIRUVALLUR",
+      "TIRUVANNAMALAI",
+      "TIRUVARUR",
+      "TUTICORIN",
+      "VELLORE",
+      "VILLUPURAM",
+      "VIRUDHUNAGAR"
+    ]
+  },
+  {
+    "id": 2,
+    "state": "Pondicherry",
+    "district": [
+      "Karaikal",
+      "Mahe", 
+      "Pondicherry"
+    ]
+  },
+  {
+    "id": 3,
+    "state": "Others",
+    "district": []
+  }
+]
