@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -38,46 +39,61 @@ export const AdminBookings: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'bg-green-100 text-green-800';
-      case 'checkedin': return 'bg-blue-100 text-blue-800';
-      case 'active': return 'bg-purple-100 text-purple-800';
-      case 'completed': return 'bg-gray-100 text-gray-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
+      case 'confirmed': return 'bg-gray-100 text-black';
+      case 'checkedin': return 'bg-black text-white';
+      case 'active': return 'bg-gray-700 text-white';
+      case 'completed': return 'bg-gray-200 text-gray-800';
+      case 'cancelled': return 'bg-gray-300 text-gray-700';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 bg-white min-h-screen">
+      <motion.div 
+        className="flex items-center justify-between"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Booking Management</h2>
+          <h2 className="text-3xl font-serif font-bold text-black">Booking Management</h2>
           <p className="text-gray-600 mt-2">
             Comprehensive view and management of all guest bookings.
           </p>
         </div>
-        <Button className="flex items-center space-x-2">
-          <Plus className="h-4 w-4" />
-          <span>New Booking</span>
-        </Button>
-      </div>
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <Button className="flex items-center space-x-2 bg-black hover:bg-gray-800 text-white transition-all duration-300">
+            <Plus className="h-4 w-4" />
+            <span>New Booking</span>
+          </Button>
+        </motion.div>
+      </motion.div>
 
       {/* Search and Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search by guest name, booking ID, or room number..."
-                  className="pl-10"
-                />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <Card className="bg-white/95 backdrop-blur-sm border-gray-200 shadow-lg">
+          <CardContent className="p-4">
+            <div className="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    placeholder="Search by guest name, booking ID, or room number..."
+                    className="pl-10 border-gray-300 focus:border-black focus:ring-black bg-white"
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
-                <Calendar className="h-4 w-4 mr-2" />
+              <div className="flex space-x-2">
+                <Button variant="outline" size="sm" className="border-gray-300 hover:bg-gray-50">
+                  <Calendar className="h-4 w-4 mr-2" />
                 Date Range
               </Button>
               <Button variant="outline" size="sm">
@@ -88,6 +104,7 @@ export const AdminBookings: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      </motion.div>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">

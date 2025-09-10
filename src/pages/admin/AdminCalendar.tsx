@@ -1,54 +1,93 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
 export const AdminCalendar: React.FC = () => {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 bg-white min-h-screen">
+      <motion.div 
+        className="flex items-center justify-between"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Calendar Management</h2>
+          <h2 className="text-3xl font-serif font-bold text-black">Calendar Management</h2>
           <p className="text-gray-600 mt-2">
             Manage bookings, availability, and scheduling across all properties.
           </p>
         </div>
-        <Button className="flex items-center space-x-2">
-          <Plus className="h-4 w-4" />
-          <span>Add Event</span>
-        </Button>
-      </div>
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <Button className="flex items-center space-x-2 bg-black hover:bg-gray-800 text-white transition-all duration-300">
+            <Plus className="h-4 w-4" />
+            <span>Add Event</span>
+          </Button>
+        </motion.div>
+      </motion.div>
 
       {/* Calendar Header */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-lg font-medium">December 2025</span>
-              <Button variant="outline" size="sm">
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm">Today</Button>
-              <Button variant="outline" size="sm">Month</Button>
-              <Button variant="outline" size="sm">Week</Button>
-              <Button variant="outline" size="sm">Day</Button>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {/* Calendar Grid Placeholder */}
-          <div className="grid grid-cols-7 gap-4 mb-4">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="text-center font-medium p-2 text-gray-600">
-                {day}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <Card className="bg-white/95 backdrop-blur-sm border-gray-200 shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between text-black font-serif">
+              <div className="flex items-center space-x-4">
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button variant="outline" size="sm" className="border-gray-300 hover:bg-gray-50">
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                </motion.div>
+                <span className="text-lg font-medium">December 2025</span>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button variant="outline" size="sm" className="border-gray-300 hover:bg-gray-50">
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </motion.div>
               </div>
-            ))}
-          </div>
+              <div className="flex space-x-2">
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button variant="outline" size="sm" className="border-gray-300 hover:bg-gray-50">Today</Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button variant="outline" size="sm" className="border-gray-300 hover:bg-gray-50">Month</Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button variant="outline" size="sm" className="border-gray-300 hover:bg-gray-50">Week</Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button variant="outline" size="sm" className="border-gray-300 hover:bg-gray-50">Day</Button>
+                </motion.div>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Calendar Grid Placeholder */}
+            <motion.div 
+              className="grid grid-cols-7 gap-4 mb-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+                <motion.div 
+                  key={day} 
+                  className="text-center font-medium p-2 text-black"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
+                >
+                  {day}
+                </motion.div>
+              ))}
+            </motion.div>
           
           {/* Calendar Days */}
           <div className="grid grid-cols-7 gap-2">
@@ -83,8 +122,9 @@ export const AdminCalendar: React.FC = () => {
               );
             })}
           </div>
-        </CardContent>
+          </CardContent>
       </Card>
+      </motion.div>
 
       {/* Today's Schedule */}
       <Card>

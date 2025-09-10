@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -16,18 +17,23 @@ export const AdminReservation: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'bg-green-100 text-green-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
+      case 'confirmed': return 'bg-black text-white';
+      case 'pending': return 'bg-gray-200 text-black';
+      case 'cancelled': return 'bg-gray-400 text-white';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 bg-white min-h-screen">
+      <motion.div 
+        className="flex items-center justify-between"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Reservation Management</h2>
+          <h2 className="text-3xl font-serif font-bold text-black">Reservation Management</h2>
           <p className="text-gray-600 mt-2">
             Manage all guest reservations and booking details.
           </p>
@@ -42,7 +48,7 @@ export const AdminReservation: React.FC = () => {
             <span>New Reservation</span>
           </Button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Filters */}
       <Card>

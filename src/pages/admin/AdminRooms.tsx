@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
@@ -111,9 +112,9 @@ export const AdminRooms: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 bg-white min-h-screen">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
         </div>
       </div>
     )
@@ -121,12 +122,12 @@ export const AdminRooms: React.FC = () => {
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <Card>
+      <div className="space-y-6 bg-white min-h-screen">
+        <Card className="bg-white/95 backdrop-blur-sm border-gray-200 shadow-lg">
           <CardContent className="p-6">
             <div className="text-center text-red-600">
               <p>{error}</p>
-              <Button onClick={loadRooms} className="mt-4">
+              <Button onClick={loadRooms} className="mt-4 bg-black hover:bg-gray-800 text-white">
                 Try Again
               </Button>
             </div>
@@ -137,64 +138,100 @@ export const AdminRooms: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 bg-white min-h-screen">
+      <motion.div 
+        className="flex items-center justify-between"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Rooms Management</h2>
+          <h2 className="text-3xl font-serif font-bold text-black">Rooms Management</h2>
           <p className="text-gray-600 mt-2">
             Manage individual rooms, status, and assignments.
           </p>
         </div>
-        <Button className="flex items-center space-x-2">
-          <Plus className="h-4 w-4" />
-          <span>Add Room</span>
-        </Button>
-      </div>
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <Button className="flex items-center space-x-2 bg-black hover:bg-gray-800 text-white transition-all duration-300">
+            <Plus className="h-4 w-4" />
+            <span>Add Room</span>
+          </Button>
+        </motion.div>
+      </motion.div>
 
       {/* Statistics Cards */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-3">
-                <div className="bg-blue-100 p-2 rounded-full">
-                  <Bed className="h-5 w-5 text-blue-600" />
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-5 gap-6"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <Card className="bg-white/95 backdrop-blur-sm border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-gray-100 p-2 rounded-full">
+                    <Bed className="h-5 w-5 text-black" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Total Rooms</p>
+                    <p className="text-xl font-bold text-black">{stats.totalRooms}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">Total Rooms</p>
-                  <p className="text-xl font-bold text-gray-900">{stats.totalRooms}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-3">
-                <div className="bg-green-100 p-2 rounded-full">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <Card className="bg-white/95 backdrop-blur-sm border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-gray-100 p-2 rounded-full">
+                    <CheckCircle className="h-5 w-5 text-gray-700" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Available</p>
+                    <p className="text-xl font-bold text-black">{stats.availableRooms}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">Available</p>
-                  <p className="text-xl font-bold text-gray-900">{stats.availableRooms}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-3">
-                <div className="bg-red-100 p-2 rounded-full">
-                  <Users className="h-5 w-5 text-red-600" />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <Card className="bg-white/95 backdrop-blur-sm border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-gray-100 p-2 rounded-full">
+                    <Users className="h-5 w-5 text-gray-800" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Occupied</p>
+                    <p className="text-xl font-bold text-black">{stats.occupiedRooms}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">Occupied</p>
-                  <p className="text-xl font-bold text-gray-900">{stats.occupiedRooms}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
 
           <Card>
             <CardContent className="p-4">
@@ -223,7 +260,7 @@ export const AdminRooms: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       )}
 
       {/* Search and Filters */}

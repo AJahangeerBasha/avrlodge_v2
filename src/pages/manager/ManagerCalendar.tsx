@@ -1,37 +1,60 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Calendar, ChevronLeft, ChevronRight, Plus, Clock } from 'lucide-react';
 
 export const ManagerCalendar: React.FC = () => {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 bg-white min-h-screen">
+      <motion.div 
+        className="flex items-center justify-between"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Calendar Overview</h2>
+          <h2 className="text-3xl font-serif font-bold text-black">Calendar Overview</h2>
           <p className="text-gray-600 mt-2">
             View and manage daily operations and guest schedules.
           </p>
         </div>
-        <Button className="flex items-center space-x-2">
-          <Plus className="h-4 w-4" />
-          <span>Quick Booking</span>
-        </Button>
-      </div>
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <Button className="flex items-center space-x-2 bg-black hover:bg-gray-800 text-white transition-all duration-300">
+            <Plus className="h-4 w-4" />
+            <span>Quick Booking</span>
+          </Button>
+        </motion.div>
+      </motion.div>
 
       {/* Today's Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100">Check-ins Today</p>
-                <p className="text-2xl font-bold">8</p>
-              </div>
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-4 gap-6"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          whileHover={{ scale: 1.02 }}
+        >
+          <Card className="bg-black text-white shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-300">Check-ins Today</p>
+                  <p className="text-2xl font-bold">8</p>
+                </div>
               <Calendar className="h-8 w-8 text-blue-200" />
             </div>
           </CardContent>
         </Card>
+        </motion.div>
 
         <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
           <CardContent className="p-6">
@@ -68,7 +91,7 @@ export const ManagerCalendar: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
       {/* Calendar View */}
       <Card>
