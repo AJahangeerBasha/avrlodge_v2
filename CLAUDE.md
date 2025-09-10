@@ -214,6 +214,9 @@ src/
 │   ├── reservations.ts # Reservations CRUD operations
 │   ├── reservationRooms.ts # Reservation rooms CRUD operations
 │   ├── reservationSpecialCharges.ts # Reservation special charges CRUD operations
+│   ├── roomCheckinDocuments.ts # Room check-in documents CRUD operations
+│   ├── payments.ts     # Payments CRUD operations
+│   ├── guests.ts       # Guests CRUD operations
 │   ├── types/
 │   │   ├── auth.ts     # Authentication types
 │   │   ├── roomTypes.ts # Room types interfaces
@@ -221,13 +224,23 @@ src/
 │   │   ├── specialCharges.ts # Special charges interfaces
 │   │   ├── reservations.ts # Reservations interfaces
 │   │   ├── reservationRooms.ts # Reservation rooms interfaces
-│   │   └── reservationSpecialCharges.ts # Reservation special charges interfaces
+│   │   ├── reservationSpecialCharges.ts # Reservation special charges interfaces
+│   │   ├── roomCheckinDocuments.ts # Room check-in documents interfaces
+│   │   ├── payments.ts # Payments interfaces
+│   │   └── guests.ts   # Guests interfaces
 │   └── utils/
 │       ├── roomStatus.ts # Room status utilities
 │       ├── referenceNumber.ts # Reference number generation
+│       ├── receiptNumber.ts # Receipt number generation
 │       ├── reservationRoomValidation.ts # Reservation room validation
 │       ├── reservationSpecialChargeValidation.ts # Special charges validation
-│       └── reservationSpecialChargeManagement.ts # Special charges management
+│       ├── reservationSpecialChargeManagement.ts # Special charges management
+│       ├── roomCheckinDocumentValidation.ts # Document validation
+│       ├── roomCheckinDocumentManagement.ts # Document management
+│       ├── paymentValidation.ts # Payment validation
+│       ├── paymentManagement.ts # Payment management
+│       ├── guestValidation.ts # Guest validation
+│       └── guestManagement.ts # Guest management
 ├── pages/
 │   ├── admin/          # Admin dashboard pages
 │   ├── auth/           # Authentication pages
@@ -346,6 +359,27 @@ Since we're using Firebase Spark plan (free), role management is handled via Fir
   - Quantity-based calculations
   - Soft delete functionality for charge removal
 
+- **Room Check-in Documents**: Digital document management system
+  - Document types: Aadhar, Driving License, Voter ID, Passport, PAN Card, Other
+  - Firebase Storage integration for file uploads
+  - Document validation with file type and size restrictions
+  - Room and reservation-specific document organization
+  - Audit trails for document uploads and deletions
+
+- **Payments System**: Complete financial management system
+  - Auto-generated receipt numbers (format: PAY-MMYYYY-XXXXX)
+  - 8 payment types: booking advance, full payment, partial payment, security deposit, additional charges, refund, cancellation fee, extra services
+  - 8 payment methods: cash, card, UPI, net banking, wallet, bank transfer, cheque, other
+  - Payment status tracking (pending → completed → failed/refunded/cancelled)
+  - Refund processing with original payment linking
+
+- **Guests System**: Comprehensive guest management
+  - Primary guest designation with smart selection algorithms
+  - Multiple contact methods: phone (required), WhatsApp, Telegram
+  - Indian location tracking: 6-digit pincode, state, district
+  - Duplicate detection and guest merging capabilities
+  - Guest analytics and return visitor identification
+
 ### Admin Management Features
 - **Room Types Management** (`/admin/room-types`)
   - Full CRUD operations with real-time updates
@@ -398,6 +432,30 @@ Since we're using Firebase Spark plan (free), role management is handled via Fir
 - **Usage Analytics**: Track popular charges and revenue insights
 - **Soft Delete**: Preserve audit trail while removing charges
 
+### Document Management System
+- **Digital Document Storage**: Firebase Storage integration for secure file management
+- **Document Type Validation**: Support for 6 Indian identity document types
+- **File Validation**: Size limits (5MB), format restrictions (JPG, PNG, PDF)
+- **Upload Management**: Bulk document uploads with progress tracking
+- **Completion Tracking**: Document requirements and missing document identification
+- **Audit Trails**: Complete document operation history with user attribution
+
+### Payment Processing System
+- **Receipt Generation**: Auto-generated unique receipt numbers (PAY-MMYYYY-XXXXX format)
+- **Multi-Payment Support**: 8 payment types with business rule enforcement
+- **Payment Method Handling**: Support for 8 payment methods with processing fees and limits
+- **Refund Management**: Safe refund processing with validation against business rules
+- **Revenue Analytics**: Comprehensive payment analytics and dashboard metrics
+- **Transaction Safety**: All critical operations use Firestore transactions
+
+### Guest Management System
+- **Contact Management**: Multi-channel communication support (phone, WhatsApp, Telegram)
+- **Location Intelligence**: Indian geography validation with pincode-to-state detection
+- **Duplicate Prevention**: Smart algorithms to detect and prevent duplicate guests
+- **Primary Guest Logic**: Intelligent primary guest selection with scoring algorithms
+- **Guest Analytics**: Geographic distribution, contact method usage, and return visitor tracking
+- **Data Quality**: Comprehensive validation with smart suggestions and auto-corrections
+
 ### Validation & Business Rules
 - **Comprehensive Validation**: Multi-layer validation for all entities
 - **Business Rule Enforcement**: Prevent invalid state transitions and data inconsistencies
@@ -413,18 +471,36 @@ Since we're using Firebase Spark plan (free), role management is handled via Fir
 - **Error Handling**: Comprehensive error handling with fallback strategies
 
 ## Recent Updates
-- **Complete Backend Infrastructure**: Built full reservation management system with PostgreSQL to Firestore migration
-- **Database Migration**: Successfully migrated 5 PostgreSQL tables (room_types, rooms, special_charges_master, reservations, reservation_rooms, reservation_special_charges) to Firestore
-- **Admin Panel Enhancement**: Added room types, rooms, and special charges management with full CRUD operations
-- **Real-time Updates**: Implemented live status tracking and occupancy analytics
-- **Reference Number System**: Created transaction-safe auto-increment reference number generation (MMYYYY-XXX format)
-- **Validation Framework**: Comprehensive validation system for all entities with business rule enforcement
-- **Relationship Management**: Complete one-to-many relationship handling (reservations → rooms, reservations → charges)
-- **Status Workflows**: Advanced status management for reservations and rooms with enforced transitions
-- **Special Charges Engine**: Flexible charging system with custom rates, bulk operations, and usage analytics
-- **Firestore Optimization**: Updated indexes for efficient querying and deployed via Firebase CLI
-- **Role-based Routing**: Comprehensive admin/manager/guest access control system
-- **Authentication Flow**: Redirect logic based on user roles
-- **Navigation System**: Complete admin and manager panel navigation
+- **Complete Backend Infrastructure**: Built full resort management system with PostgreSQL to Firestore migration
+- **Database Migration**: Successfully migrated 8 PostgreSQL tables to Firestore with full relationship preservation
+  - Core tables: room_types, rooms, special_charges_master, reservations, reservation_rooms, reservation_special_charges
+  - Extended tables: room_checkin_documents, payments, guests
+- **Document Management System**: Complete digital document management with Firebase Storage integration
+  - Support for 6 Indian identity document types (Aadhar, Driving License, Voter ID, Passport, PAN Card, Other)
+  - File validation, bulk uploads, and completion tracking
+  - Document audit trails and requirement management
+- **Payment Processing System**: Comprehensive financial management with auto-generated receipts
+  - 8 payment types and 8 payment methods with business rule enforcement
+  - Receipt number generation (PAY-MMYYYY-XXXXX format) with monthly counter reset
+  - Refund processing, payment reconciliation, and revenue analytics
+  - Payment method constraints (UPI ₹1L limit, Cash ₹2L limit, processing fees)
+- **Guest Management System**: Advanced guest management with Indian market optimization
+  - Multi-contact support (phone, WhatsApp, Telegram) with smart formatting
+  - Indian geography validation (36 states/territories, 6-digit pincode, district tracking)
+  - Duplicate detection algorithms and intelligent guest merging
+  - Primary guest designation with smart selection and guest analytics
+- **Reference & Receipt Systems**: Transaction-safe auto-increment number generation
+  - Reservation reference numbers (MMYYYY-XXX format)
+  - Payment receipt numbers (PAY-MMYYYY-XXXXX format)
+  - Monthly counter reset with collision prevention
+- **Validation Framework**: Comprehensive multi-layer validation for all entities
+  - Business rule enforcement and data consistency checks
+  - Indian-specific validation (mobile numbers, pincode, state names)
+  - Smart suggestions and auto-corrections for data entry
+- **Real-time Operations**: Live updates with Firestore subscriptions and fallback client-side filtering
+- **Audit & Compliance**: Complete audit trails for all operations with user attribution
+- **Analytics & Insights**: Pre-built analytics for reservations, payments, guests, and documents
+- **Firestore Optimization**: 50+ composite indexes for efficient querying across all collections
+- **Role-based Access**: Comprehensive admin/manager/guest access control system
 - **Firestore Rules**: Extended development period until Dec 31, 2025
 - to memorize
