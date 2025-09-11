@@ -1,282 +1,255 @@
-import { useState, useRef, useEffect } from 'react'
-import { Calendar, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CalendarDays, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Button } from './button';
+import { Card, CardContent } from './card';
 
 interface DateRangePickerProps {
-  checkInDate: Date | null
-  checkOutDate: Date | null
-  onCheckInChange: (date: Date | null) => void
-  onCheckOutChange: (date: Date | null) => void
-  className?: string
-  allowPastDates?: boolean
+  startDate?: string;
+  endDate?: string;
+  onStartDateChange: (date: string) => void;
+  onEndDateChange: (date: string) => void;
+  minDate?: string;
+  className?: string;
 }
 
-export function DateRangePicker({ 
-  checkInDate, 
-  checkOutDate, 
-  onCheckInChange, 
-  onCheckOutChange, 
-  className = '',
-  allowPastDates = false
-}: DateRangePickerProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [currentMonth, setCurrentMonth] = useState(new Date())
-  const [activePicker, setActivePicker] = useState<'checkin' | 'checkout'>('checkin')
-  const pickerRef = useRef<HTMLDivElement>(null)
+export const DateRangePicker: React.FC<DateRangePickerProps> = ({
+  startDate,
+  endDate,
+  onStartDateChange,
+  onEndDateChange,
+  minDate,
+  className = ''
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectingStart, setSelectingStart] = useState(true);
 
-  // Close picker when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-      }
-    }
+  const today = new Date();
+  const minSelectableDate = minDate ? new Date(minDate) : today;
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
-  // Set current month to selected date when it changes
-  useEffect(() => {
-    if (activePicker === 'checkin' && checkInDate) {
-      setCurrentMonth(checkInDate)
-    } else if (activePicker === 'checkout' && checkOutDate) {
-      setCurrentMonth(checkOutDate)
-    }
-  }, [checkInDate, checkOutDate, activePicker])
+  const formatDisplayDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
 
   const getDaysInMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
-  }
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
 
-  const getFirstDayOfMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay()
-  }
+    const days = [];
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+    return days;
+  };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    })
-  }
-
-  const isDateSelected = (date: Date) => {
-    return (checkInDate && date.toDateString() === checkInDate.toDateString()) ||
-           (checkOutDate && date.toDateString() === checkOutDate.toDateString())
-  }
+  const handleDateSelect = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    
+    if (selectingStart || !startDate) {
+      onStartDateChange(dateStr);
+      setSelectingStart(false);
+    } else {
+      const startDateObj = new Date(startDate);
+      if (date >= startDateObj) {
+        onEndDateChange(dateStr);
+        setIsOpen(false);
+        setSelectingStart(true);
+      } else {
+        onStartDateChange(dateStr);
+        onEndDateChange('');
+      }
+    }
+  };
 
   const isDateInRange = (date: Date) => {
-    if (!checkInDate || !checkOutDate) return false
-    return date >= checkInDate && date <= checkOutDate
-  }
+    if (!startDate || !endDate) return false;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return date >= start && date <= end;
+  };
+
+  const isDateSelected = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return dateStr === startDate || dateStr === endDate;
+  };
 
   const isDateDisabled = (date: Date) => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    
-    // For checkout, disable dates before checkin
-    if (activePicker === 'checkout' && checkInDate && date <= checkInDate) {
-      return true
-    }
-    
-    // Only disable past dates if allowPastDates is false
-    if (!allowPastDates && date < today) {
-      return true
-    }
-    
-    return false
-  }
+    return date < minSelectableDate;
+  };
 
-  const handleDateClick = (day: number) => {
-    const selectedDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
-    
-    if (isDateDisabled(selectedDate)) return
-    
-    if (activePicker === 'checkin') {
-      onCheckInChange(selectedDate)
-      // Clear checkout when checkin changes and switch to checkout picker
-      onCheckOutChange(null)
-      setActivePicker('checkout')
-    } else {
-      onCheckOutChange(selectedDate)
-      setIsOpen(false)
-    }
-  }
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    setCurrentMonth(prev => {
+      const newMonth = new Date(prev);
+      newMonth.setMonth(prev.getMonth() + (direction === 'next' ? 1 : -1));
+      return newMonth;
+    });
+  };
 
-  const nextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))
-  }
+  const days = getDaysInMonth(currentMonth);
+  const monthYear = currentMonth.toLocaleDateString('en-US', { 
+    month: 'long', 
+    year: 'numeric' 
+  });
 
-  const prevMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))
-  }
-
-  const generateCalendarDays = () => {
-    const daysInMonth = getDaysInMonth(currentMonth)
-    const firstDay = getFirstDayOfMonth(currentMonth)
-    const days = []
-
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-8 w-8" />)
-    }
-
-    // Add days of the month
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
-      const isDisabled = isDateDisabled(date)
-      const isSelected = isDateSelected(date)
-      const isInRange = isDateInRange(date)
-      const isToday = date.toDateString() === new Date().toDateString()
-
-      days.push(
-        <button
-          key={day}
-          onClick={() => handleDateClick(day)}
-          disabled={isDisabled}
-          className={`
-            h-10 w-10 rounded-full text-sm font-medium transition-all duration-200 touch-manipulation
-            flex items-center justify-center
-            ${isDisabled 
-              ? 'text-gray-300 cursor-not-allowed' 
-              : 'hover:bg-blue-50 hover:text-blue-600 cursor-pointer active:scale-95'
-            }
-            ${isToday && !isSelected
-              ? 'bg-gray-100 text-gray-900 ring-1 ring-gray-300' 
-              : ''
-            }
-            ${isSelected 
-              ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-md' 
-              : ''
-            }
-            ${isInRange && !isSelected
-              ? 'bg-blue-100 text-blue-700' 
-              : ''
-            }
-          `}
-        >
-          {day}
-        </button>
-      )
-    }
-
-    return days
-  }
-
-  const clearDates = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    onCheckInChange(null)
-    onCheckOutChange(null)
-  }
-
-  const getDisplayText = () => {
-    if (checkInDate && checkOutDate) {
-      return `${formatDate(checkInDate)} - ${formatDate(checkOutDate)}`
-    } else if (checkInDate) {
-      return `Start Date: ${formatDate(checkInDate)}`
-    } else {
-      return 'Select start date and end date'
-    }
-  }
+  const handleClearDates = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onStartDateChange('');
+    onEndDateChange('');
+    setSelectingStart(true);
+  };
 
   return (
-    <div className={`relative ${className}`} ref={pickerRef}>
-      <button
-        onClick={() => {
-          setIsOpen(!isOpen)
-          // Reset to checkin picker if no dates are selected
-          if (!checkInDate && !checkOutDate) {
-            setActivePicker('checkin')
-          } else if (checkInDate && !checkOutDate) {
-            setActivePicker('checkout')
-          } else {
-            setActivePicker('checkin')
-          }
-        }}
-        className="flex items-center justify-between w-full px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+    <div className={`relative ${className}`}>
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full justify-start text-left font-normal bg-white hover:bg-gray-50"
+        onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="flex items-center space-x-2">
-          <Calendar className="w-4 h-4 text-gray-500" />
-          <span className={`text-sm ${checkInDate || checkOutDate ? 'text-gray-900' : 'text-gray-500'}`}>
-            {getDisplayText()}
-          </span>
-        </div>
-        {(checkInDate || checkOutDate) && (
-          <button
-            onClick={clearDates}
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X className="w-3 h-3 text-gray-400 hover:text-gray-600" />
-          </button>
+        <CalendarDays className="mr-2 h-4 w-4" />
+        <span className="flex-1">
+          {startDate && endDate 
+            ? `${formatDisplayDate(startDate)} - ${formatDisplayDate(endDate)}`
+            : startDate 
+              ? `${formatDisplayDate(startDate)} - Select check-out`
+              : 'Select check-in and check-out dates'
+          }
+        </span>
+        {(startDate || endDate) && (
+          <X 
+            className="ml-2 h-4 w-4 text-gray-400 hover:text-gray-600" 
+            onClick={handleClearDates}
+          />
         )}
-      </button>
+      </Button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-full mt-2 z-50"
+          >
+            <Card className="w-80 bg-white shadow-lg border border-gray-200">
+              <CardContent className="p-4 bg-white">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => navigateMonth('prev')}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <h3 className="text-sm font-semibold">{monthYear}</h3>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => navigateMonth('next')}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <div className="text-xs text-center text-gray-600">
+                    {selectingStart ? 'Select check-in date' : 'Select check-out date'}
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-1">
+                    {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                      <div key={day} className="p-2 text-xs font-medium text-center text-gray-500">
+                        {day}
+                      </div>
+                    ))}
+
+                    {days.map((date, index) => {
+                      if (!date) {
+                        return <div key={index} className="p-2" />;
+                      }
+
+                      const disabled = isDateDisabled(date);
+                      const selected = isDateSelected(date);
+                      const inRange = isDateInRange(date);
+
+                      return (
+                        <button
+                          key={index}
+                          type="button"
+                          disabled={disabled}
+                          onClick={() => !disabled && handleDateSelect(date)}
+                          className={`p-2 text-xs rounded-md transition-colors duration-150 ${
+                            disabled 
+                              ? 'text-gray-300 cursor-not-allowed' 
+                              : 'hover:bg-gray-100 cursor-pointer'
+                          } ${
+                            selected 
+                              ? 'bg-black text-white hover:bg-gray-800' 
+                              : ''
+                          } ${
+                            inRange && !selected 
+                              ? 'bg-gray-100 text-gray-900' 
+                              : ''
+                          }`}
+                        >
+                          {date.getDate()}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex justify-between pt-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        onStartDateChange('');
+                        onEndDateChange('');
+                        setSelectingStart(true);
+                      }}
+                    >
+                      Clear
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Close
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 w-full min-w-[280px] max-w-sm bg-white rounded-lg shadow-lg border border-gray-200 z-[9999] p-3 mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-900">
-              {activePicker === 'checkin' ? 'Select Start Date' : 'Select End Date'}
-            </h3>
-            <div className="flex space-x-1">
-              <button
-                onClick={prevMonth}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors touch-manipulation"
-                aria-label="Previous month"
-              >
-                <ChevronLeft className="w-4 h-4 text-gray-600" />
-              </button>
-              <button
-                onClick={nextMonth}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors touch-manipulation"
-                aria-label="Next month"
-              >
-                <ChevronRight className="w-4 h-4 text-gray-600" />
-              </button>
-            </div>
-          </div>
-
-          {/* Month Display */}
-          <div className="text-center mb-3">
-            <p className="text-sm text-gray-600">
-              {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-            </p>
-          </div>
-
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-              <div key={day} className="h-10 flex items-center justify-center text-xs font-medium text-gray-500">
-                {day}
-              </div>
-            ))}
-            {generateCalendarDays()}
-          </div>
-
-          {/* Quick Actions */}
-          <div className="flex justify-between items-center pt-3 border-t border-gray-100 gap-2">
-            <button
-              onClick={() => {
-                const today = new Date()
-                onCheckInChange(today)
-                const tomorrow = new Date(today)
-                tomorrow.setDate(tomorrow.getDate() + 1)
-                onCheckOutChange(tomorrow)
-                setIsOpen(false)
-              }}
-              className="px-3 py-2 text-xs text-blue-600 hover:text-blue-700 font-medium bg-blue-50 hover:bg-blue-100 rounded-md transition-colors touch-manipulation"
-            >
-              Select Today
-            </button>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="px-3 py-2 text-xs text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors touch-manipulation"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setIsOpen(false)}
+        />
       )}
     </div>
-  )
-} 
+  );
+};
