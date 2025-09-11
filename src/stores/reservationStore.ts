@@ -82,6 +82,7 @@ export interface ReservationState {
   // Room Allocation Actions
   addRoomAllocation: (room: RoomAllocation) => void;
   removeRoomAllocation: (id: string) => void;
+  updateRoomAllocation: (id: string, updates: Partial<RoomAllocation>) => void;
   setRoomAllocations: (rooms: RoomAllocation[]) => void;
   
   // Special Charges Actions
@@ -98,6 +99,7 @@ export interface ReservationState {
   // Utility Actions
   resetForm: () => void;
   calculateTotalAmount: () => number;
+  calculateNumberOfNights: () => number;
 }
 
 // Initial state
@@ -210,6 +212,12 @@ export const useReservationStore = create<ReservationState>()(
         roomAllocations: state.roomAllocations.filter(room => room.id !== id)
       })),
       
+      updateRoomAllocation: (id, updates) => set((state) => ({
+        roomAllocations: state.roomAllocations.map(room =>
+          room.id === id ? { ...room, ...updates } : room
+        )
+      })),
+      
       setRoomAllocations: (rooms) => set({ roomAllocations: rooms }),
       
       // Special Charges Actions
@@ -258,6 +266,18 @@ export const useReservationStore = create<ReservationState>()(
         }
         
         return subtotal - discount;
+      },
+      
+      calculateNumberOfNights: () => {
+        const state = get();
+        
+        if (!state.checkInDate || !state.checkOutDate) return 0;
+        
+        const checkIn = new Date(state.checkInDate);
+        const checkOut = new Date(state.checkOutDate);
+        const numberOfNights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+        
+        return Math.max(0, numberOfNights);
       },
     }),
     {

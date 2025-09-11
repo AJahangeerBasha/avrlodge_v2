@@ -4,8 +4,11 @@ export const validatePhoneNumber = (phone: string): boolean => {
   // Remove all non-digit characters
   const cleanPhone = phone.replace(/\D/g, '');
   
-  // Check if it's exactly 10 digits
-  return cleanPhone.length === 10;
+  // Check if it's exactly 10 digits and starts with 6-9
+  if (cleanPhone.length !== 10) return false;
+  
+  const firstDigit = parseInt(cleanPhone[0]);
+  return firstDigit >= 6 && firstDigit <= 9;
 };
 
 export const formatPhoneNumber = (phone: string): string => {
@@ -17,8 +20,7 @@ export const formatPhoneNumber = (phone: string): string => {
 };
 
 export const isValidPhoneNumber = (phone: string): boolean => {
-  const cleanPhone = formatPhoneNumber(phone);
-  return cleanPhone.length === 10;
+  return validatePhoneNumber(phone);
 };
 
 export const getPhoneValidationError = (phone: string): string | null => {
@@ -27,8 +29,14 @@ export const getPhoneValidationError = (phone: string): string | null => {
   const cleanPhone = formatPhoneNumber(phone);
   
   if (cleanPhone.length === 0) return 'Phone number is required';
-  if (cleanPhone.length < 10) return 'Phone number must be 10 digits';
-  if (cleanPhone.length > 10) return 'Phone number must be exactly 10 digits';
+  if (cleanPhone.length < 10) return 'Phone number must be 10 digits starting with 6-9';
+  if (cleanPhone.length > 10) return 'Phone number must be exactly 10 digits starting with 6-9';
+  
+  // Check if it starts with 6-9
+  const firstDigit = parseInt(cleanPhone[0]);
+  if (firstDigit < 6 || firstDigit > 9) {
+    return 'Phone number must start with 6, 7, 8, or 9';
+  }
   
   return null;
 };

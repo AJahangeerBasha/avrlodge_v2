@@ -80,6 +80,7 @@ export const AdminReservation: React.FC = () => {
     setGuestType,
     addRoomAllocation,
     removeRoomAllocation,
+    updateRoomAllocation,
     setRoomAllocations,
     addSpecialCharge,
     removeSpecialCharge,
@@ -90,6 +91,7 @@ export const AdminReservation: React.FC = () => {
     setError,
     resetForm,
     calculateTotalAmount,
+    calculateNumberOfNights,
   } = useReservationStore();
   
   // Parse search params for edit mode
@@ -369,7 +371,7 @@ export const AdminReservation: React.FC = () => {
                     const formatted = formatPhoneNumber(e.target.value);
                     updatePrimaryGuestField('phone', formatted);
                   }}
-                  placeholder="Enter 10-digit phone number"
+                  placeholder="Enter 10-digit phone number starting with 6-9"
                   maxLength={10}
                   pattern="[0-9]{10}"
                   className={primaryPhoneError ? 'border-red-500' : ''}
@@ -410,7 +412,7 @@ export const AdminReservation: React.FC = () => {
                           const formatted = formatPhoneNumber(e.target.value);
                           updatePrimaryGuestField('whatsapp', formatted);
                         }}
-                        placeholder="Enter 10-digit WhatsApp number"
+                        placeholder="Enter 10-digit WhatsApp number starting with 6-9"
                         maxLength={10}
                         pattern="[0-9]{10}"
                         className={primaryWhatsappError ? 'border-red-500' : ''}
@@ -436,7 +438,7 @@ export const AdminReservation: React.FC = () => {
                     const formatted = formatPhoneNumber(e.target.value);
                     updatePrimaryGuestField('telegram', formatted);
                   }}
-                  placeholder="Enter 10-digit Telegram number"
+                  placeholder="Enter 10-digit Telegram number starting with 6-9"
                   maxLength={10}
                   pattern="[0-9]{10}"
                   className={primaryTelegramError ? 'border-red-500' : ''}
@@ -516,7 +518,7 @@ export const AdminReservation: React.FC = () => {
                             const formatted = formatPhoneNumber(e.target.value);
                             updateSecondaryGuest(guest.id, { phone: formatted });
                           }}
-                          placeholder="Enter 10-digit phone number"
+                          placeholder="Enter 10-digit phone number starting with 6-9"
                           maxLength={10}
                           pattern="[0-9]{10}"
                           className={phoneError ? 'border-red-500' : ''}
@@ -557,7 +559,7 @@ export const AdminReservation: React.FC = () => {
                                   const formatted = formatPhoneNumber(e.target.value);
                                   updateSecondaryGuest(guest.id, { whatsapp: formatted });
                                 }}
-                                placeholder="Enter 10-digit WhatsApp number"
+                                placeholder="Enter 10-digit WhatsApp number starting with 6-9"
                                 maxLength={10}
                                 pattern="[0-9]{10}"
                                 className={whatsappError ? 'border-red-500' : ''}
@@ -582,7 +584,7 @@ export const AdminReservation: React.FC = () => {
                             const formatted = formatPhoneNumber(e.target.value);
                             updateSecondaryGuest(guest.id, { telegram: formatted });
                           }}
-                          placeholder="Enter 10-digit Telegram number"
+                          placeholder="Enter 10-digit Telegram number starting with 6-9"
                           maxLength={10}
                           pattern="[0-9]{10}"
                           className={telegramError ? 'border-red-500' : ''}
@@ -623,7 +625,7 @@ export const AdminReservation: React.FC = () => {
               )
             }
           >
-            Next Step
+            Next: Location & Dates
           </Button>
         </div>
       </div>
@@ -634,31 +636,38 @@ export const AdminReservation: React.FC = () => {
     // Get districts for selected state
     const selectedStateData = statesDistrictsData.find(s => s.state === selectedState);
     const districts = selectedStateData ? selectedStateData.district : [];
+    const numberOfNights = calculateNumberOfNights();
 
     return (
       <div className="space-y-6">
-        <div className="text-center">
-          <h3 className="text-2xl font-bold text-black">Location & Dates</h3>
-          <p className="text-gray-600">Select guest location, check-in/check-out dates, and guest information</p>
+        {/* Header with Step Indicator */}
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="text-2xl font-bold text-black">Tell us where you're traveling from</h3>
+            <p className="text-gray-600 mt-1">Provide guest location and stay details</p>
+          </div>
+          <div className="text-right">
+            <div className="text-sm font-medium text-gray-900">Step 2 of 4</div>
+            <div className="text-xs text-gray-500">Location & Dates</div>
+          </div>
         </div>
 
-        {/* Location Section */}
+        {/* Location Details Section */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <MapPin className="h-5 w-5" />
-              <span>Guest Location</span>
-            </CardTitle>
+            <CardTitle className="text-lg font-semibold text-gray-900">Location Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="state">State *</Label>
+                <Label htmlFor="state" className="text-sm font-medium text-gray-700">
+                  Select State *
+                </Label>
                 <select
                   id="state"
                   value={selectedState}
                   onChange={(e) => setSelectedState(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md"
+                  className="w-full p-3 border border-gray-300 rounded-lg bg-white hover:border-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-colors"
                   required
                 >
                   {statesDistrictsData.map((stateData) => (
@@ -670,12 +679,14 @@ export const AdminReservation: React.FC = () => {
               </div>
               
               <div>
-                <Label htmlFor="district">District *</Label>
+                <Label htmlFor="district" className="text-sm font-medium text-gray-700">
+                  Search District *
+                </Label>
                 <SearchableDropdown
                   options={districts}
                   value={selectedDistrict}
                   onChange={setSelectedDistrict}
-                  placeholder="Select district"
+                  placeholder="Search and select district"
                   disabled={!selectedState}
                   required
                   className="w-full"
@@ -685,38 +696,53 @@ export const AdminReservation: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Dates Section */}
+        {/* Stay Details Section */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Calendar className="h-5 w-5" />
-              <span>Check-in & Check-out Dates</span>
-            </CardTitle>
+            <CardTitle className="text-lg font-semibold text-gray-900">Stay Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <DateRangePicker
-              startDate={checkInDate}
-              endDate={checkOutDate}
-              onStartDateChange={setCheckInDate}
-              onEndDateChange={setCheckOutDate}
-              minDate={new Date().toISOString().split('T')[0]}
-              className="w-full"
-            />
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Stay Dates *</Label>
+              <p className="text-xs text-gray-500 mb-2">Select Check In & Check Out</p>
+              <DateRangePicker
+                startDate={checkInDate}
+                endDate={checkOutDate}
+                onStartDateChange={setCheckInDate}
+                onEndDateChange={setCheckOutDate}
+                minDate={new Date().toISOString().split('T')[0]}
+                className="w-full"
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 p-4 bg-gray-50 rounded-lg">
+              <div className="text-center">
+                <div className="text-xs text-gray-500">Check-in time</div>
+                <div className="font-semibold text-gray-900">12:00 PM</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xs text-gray-500">Check-out time</div>
+                <div className="font-semibold text-gray-900">11:00 AM</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xs text-gray-500">Number of nights</div>
+                <div className="font-semibold text-blue-600 text-lg">{numberOfNights}</div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Guest Information */}
+        {/* Guest Information Section */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Users className="h-5 w-5" />
-              <span>Guest Information</span>
-            </CardTitle>
+            <CardTitle className="text-lg font-semibold text-gray-900">Guest Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="guestCount">Number of Guests *</Label>
+                <Label htmlFor="guestCount" className="text-sm font-medium text-gray-700">
+                  Number of Pax (Adults + Kids) *
+                </Label>
                 <Input
                   id="guestCount"
                   type="number"
@@ -724,17 +750,20 @@ export const AdminReservation: React.FC = () => {
                   max="20"
                   value={guestCount}
                   onChange={(e) => setGuestCount(parseInt(e.target.value) || 1)}
+                  className="p-3 text-lg font-semibold"
                   required
                 />
               </div>
               
               <div>
-                <Label htmlFor="guestType">Guest Type *</Label>
+                <Label htmlFor="guestType" className="text-sm font-medium text-gray-700">
+                  Guest Type *
+                </Label>
                 <select 
                   id="guestType"
                   value={guestType}
                   onChange={(e) => setGuestType(e.target.value as any)}
-                  className="w-full p-2 border border-gray-300 rounded-md"
+                  className="w-full p-3 border border-gray-300 rounded-lg bg-white hover:border-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-colors"
                   required
                 >
                   <option value="">Select guest type</option>
@@ -748,161 +777,473 @@ export const AdminReservation: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Navigation Buttons */}
         <div className="flex justify-between">
-          <Button variant="outline" onClick={handleBack}>
-            Previous
+          <Button variant="outline" onClick={handleBack} className="px-6">
+            Back: Guest Details
           </Button>
           <Button 
             onClick={handleNext} 
             disabled={!selectedState || !selectedDistrict || !checkInDate || !checkOutDate || !guestType}
+            className="px-6"
           >
-            Next Step
+            Next: Room Allocation
           </Button>
         </div>
       </div>
     );
   };
 
-  const renderRoomAllocationForm = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h3 className="text-2xl font-bold text-black">Room Allocation</h3>
-        <p className="text-gray-600">Select and allocate rooms for the guests</p>
-      </div>
+  const renderRoomAllocationForm = () => {
+    const totalCost = calculateTotalAmount();
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <BedDouble className="h-5 w-5" />
-            <span>Available Rooms</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {roomTypes.map((roomType) => (
-              <div key={roomType.id} className="p-4 border border-gray-200 rounded-lg">
-                <h4 className="font-semibold text-black">{roomType.name}</h4>
-                <p className="text-sm text-gray-600">{roomType.description}</p>
-                <p className="text-lg font-bold text-black mt-2">₹{roomType.pricePerNight}/night</p>
-                <p className="text-sm text-gray-500">Max {roomType.maxGuests} guests</p>
-                <Button
-                  size="sm"
-                  className="mt-2 w-full"
-                  onClick={() => {
-                    // Add room allocation logic here
-                    const newAllocation: RoomAllocation = {
-                      id: crypto.randomUUID(),
-                      roomId: roomType.id,
-                      roomNumber: `${roomType.name}-${Date.now()}`,
-                      roomType: roomType.name,
-                      capacity: roomType.maxGuests,
-                      tariff: roomType.pricePerNight,
-                      guestCount: Math.min(roomType.maxGuests, guestCount)
-                    };
-                    setRoomAllocations([...roomAllocations, newAllocation]);
-                  }}
-                >
-                  Add Room
-                </Button>
+    const addNewRoom = () => {
+      // Get already selected room IDs to exclude them
+      const selectedRoomIds = roomAllocations.map(allocation => allocation.roomId);
+      
+      // Get first available room that hasn't been selected yet
+      const availableRoom = rooms.find(room => 
+        room.status === 'available' && 
+        room.isActive && 
+        !selectedRoomIds.includes(room.id)
+      );
+      
+      if (!availableRoom) {
+        setError('No more available rooms found');
+        return;
+      }
+
+      // Get room type info to get pricing
+      const roomType = roomTypes.find(rt => rt.id === availableRoom.roomTypeId);
+      if (!roomType) {
+        setError('Room type information not found');
+        return;
+      }
+
+      const newAllocation: RoomAllocation = {
+        id: crypto.randomUUID(),
+        roomId: availableRoom.id,
+        roomNumber: availableRoom.roomNumber,
+        roomType: roomType.name,
+        capacity: roomType.maxGuests,
+        tariff: roomType.pricePerNight,
+        guestCount: 1
+      };
+      addRoomAllocation(newAllocation);
+    };
+
+    return (
+      <div className="space-y-6">
+        {/* Header with Total Cost */}
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="text-2xl font-bold text-black">Room Allocation</h3>
+            <p className="text-gray-600 mt-1">Select rooms and allocate guests</p>
+          </div>
+          <div className="text-right">
+            <div className="text-sm text-gray-500">Guests: {guestCount}</div>
+            <div className="text-lg font-bold text-black">Total Cost: ₹{totalCost.toLocaleString()}</div>
+          </div>
+        </div>
+
+        {/* Room Allocation Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span className="text-lg font-semibold text-gray-900">Room Allocation</span>
+              <Button 
+                onClick={addNewRoom}
+                className="flex items-center space-x-2"
+                disabled={rooms.filter(r => 
+                  r.status === 'available' && 
+                  r.isActive && 
+                  !roomAllocations.map(allocation => allocation.roomId).includes(r.id)
+                ).length === 0}
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add Room</span>
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {roomAllocations.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <p>No rooms allocated yet.</p>
+                <p className="text-sm mt-1">Click "Add Room" to allocate rooms for guests.</p>
+              </div>
+            ) : (
+              roomAllocations.map((allocation, index) => {
+                // Get available rooms for this room type, excluding already selected rooms (except current one)
+                const roomType = roomTypes.find(rt => rt.name === allocation.roomType);
+                const otherSelectedRoomIds = roomAllocations
+                  .filter(otherAllocation => otherAllocation.id !== allocation.id)
+                  .map(otherAllocation => otherAllocation.roomId);
+                
+                const availableRooms = rooms.filter(room => 
+                  room.roomTypeId === roomType?.id && 
+                  room.status === 'available' && 
+                  room.isActive &&
+                  (!otherSelectedRoomIds.includes(room.id) || room.id === allocation.roomId)
+                );
+
+                return (
+                  <div key={allocation.id} className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="font-semibold text-gray-900">Room {index + 1}</h4>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeRoomAllocation(allocation.id)}
+                        className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                      >
+                        Remove
+                      </Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Room Number Dropdown */}
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Room Number</Label>
+                        <select
+                          value={allocation.roomNumber}
+                          onChange={(e) => {
+                            const selectedRoom = availableRooms.find(r => r.roomNumber === e.target.value);
+                            if (selectedRoom) {
+                              updateRoomAllocation(allocation.id, {
+                                roomId: selectedRoom.id,
+                                roomNumber: selectedRoom.roomNumber
+                              });
+                            }
+                          }}
+                          className="w-full p-3 border border-gray-300 rounded-lg bg-white hover:border-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-colors"
+                        >
+                          {availableRooms.map((room) => (
+                            <option key={room.id} value={room.roomNumber}>
+                              {room.roomNumber} - ₹{allocation.tariff}/night
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Guest Count */}
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Guest Count</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          max="20"
+                          value={allocation.guestCount}
+                          onChange={(e) => updateRoomAllocation(allocation.id, {
+                            guestCount: parseInt(e.target.value) || 1
+                          })}
+                          className="p-3 text-lg font-semibold"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Capacity Warning */}
+                    <div className="mt-3 text-sm text-gray-600">
+                      {allocation.guestCount > allocation.capacity && (
+                        <p className="text-amber-600 font-medium">
+                          ⚠️ Can exceed room capacity. Extra guests will incur additional charges.
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Room Info */}
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 p-3 bg-white rounded-lg">
+                      <div className="text-center">
+                        <div className="text-xs text-gray-500">Capacity</div>
+                        <div className="font-semibold text-gray-900">{allocation.capacity} guests</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xs text-gray-500">Tariff</div>
+                        <div className="font-semibold text-gray-900">₹{allocation.tariff}/night</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between">
+          <Button variant="outline" onClick={handleBack} className="px-6">
+            Back: Location & Dates
+          </Button>
+          <Button 
+            onClick={handleNext} 
+            disabled={roomAllocations.length === 0}
+            className="px-6"
+          >
+            Next: Payment & Confirm
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderPaymentConfirmationForm = () => {
+    const numberOfNights = calculateNumberOfNights();
+    
+    // Calculate room tariff total
+    const roomTariffTotal = roomAllocations.reduce((total, room) => {
+      return total + (room.tariff * numberOfNights);
+    }, 0);
+
+    // Calculate special charges total
+    const specialChargesTotal = specialCharges.reduce((total, charge) => {
+      return total + (charge.amount * (charge.quantity || 1));
+    }, 0);
+
+    const subtotal = roomTariffTotal + specialChargesTotal;
+    
+    let discount = 0;
+    if (discountType === 'percentage') {
+      discount = (subtotal * discountValue) / 100;
+    } else if (discountType === 'amount') {
+      discount = discountValue;
+    }
+    
+    const finalTotal = subtotal - discount;
+
+    const addCustomCharge = () => {
+      const newCharge: SpecialCharge = {
+        id: crypto.randomUUID(),
+        masterId: crypto.randomUUID(),
+        name: 'Custom Charge',
+        amount: 0,
+        quantity: 1,
+        description: 'Custom charge'
+      };
+      addSpecialCharge(newCharge);
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h3 className="text-2xl font-bold text-black">Payment & Confirmation</h3>
+          <p className="text-gray-600">Review details and confirm the reservation</p>
+        </div>
+
+        {/* Room Tariff Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-gray-900">Room Tariff Summary</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {roomAllocations.map((room, index) => (
+              <div key={room.id} className="p-4 bg-gray-50 rounded-lg">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <div className="font-semibold text-gray-900">{room.roomNumber} - {room.roomType}</div>
+                    <div className="text-sm text-gray-600">{room.guestCount} guests</div>
+                    <div className="text-sm text-gray-600">₹{room.tariff}/night</div>
+                    <div className="text-sm text-gray-600">Capacity: {room.capacity}</div>
+                  </div>
+                </div>
               </div>
             ))}
-          </div>
+            <div className="border-t pt-4">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold text-gray-900">Total Room Tariff</span>
+                <div className="text-right">
+                  <div className="font-bold text-lg text-black">₹{roomTariffTotal.toLocaleString()}</div>
+                  <div className="text-sm text-gray-600">{numberOfNights} night{numberOfNights !== 1 ? 's' : ''}</div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          {roomAllocations.length > 0 && (
-            <div className="mt-6">
-              <h4 className="font-semibold text-black mb-4">Selected Rooms</h4>
-              <div className="space-y-2">
-                {roomAllocations.map((room, index) => (
-                  <div key={room.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <span className="font-medium">{room.roomType}</span>
-                      <span className="text-sm text-gray-600 ml-2">₹{room.tariff}/night</span>
+        {/* Special Charges Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span className="text-lg font-semibold text-gray-900">Special Charges</span>
+              <Button 
+                onClick={addCustomCharge}
+                variant="outline"
+                className="flex items-center space-x-2"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add Custom Charge</span>
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Master Special Charges */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {specialChargesMaster.map((masterCharge) => {
+                const isSelected = specialCharges.some(sc => sc.masterId === masterCharge.id);
+                
+                return (
+                  <div 
+                    key={masterCharge.id} 
+                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                      isSelected 
+                        ? 'border-black bg-black text-white' 
+                        : 'border-gray-200 bg-white hover:border-gray-400'
+                    }`}
+                    onClick={() => {
+                      if (isSelected) {
+                        // Remove charge
+                        const chargeToRemove = specialCharges.find(sc => sc.masterId === masterCharge.id);
+                        if (chargeToRemove) {
+                          removeSpecialCharge(chargeToRemove.id);
+                        }
+                      } else {
+                        // Add charge
+                        const newCharge: SpecialCharge = {
+                          id: crypto.randomUUID(),
+                          masterId: masterCharge.id,
+                          name: masterCharge.chargeName,
+                          amount: masterCharge.defaultRate,
+                          quantity: 1,
+                          description: masterCharge.description
+                        };
+                        addSpecialCharge(newCharge);
+                      }
+                    }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">{masterCharge.chargeName}</span>
+                      <span className="font-bold">₹{masterCharge.defaultRate}</span>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setRoomAllocations(roomAllocations.filter((_, i) => i !== index))}
-                    >
-                      Remove
-                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Selected Charges */}
+            {specialCharges.length > 0 && (
+              <div className="space-y-2 mt-6">
+                <h4 className="font-medium text-gray-900 mb-3">Selected Charges:</h4>
+                {specialCharges.map((charge) => (
+                  <div key={charge.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex-1">
+                      <div className="font-medium">{charge.name}</div>
+                      {charge.quantity && charge.quantity > 1 && (
+                        <div className="text-sm text-gray-600">Qty: {charge.quantity}</div>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <span className="font-semibold">₹{charge.amount * (charge.quantity || 1)}</span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeSpecialCharge(charge.id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            )}
 
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={handleBack}>
-          Previous
-        </Button>
-        <Button onClick={handleNext} disabled={roomAllocations.length === 0}>
-          Next Step
-        </Button>
-      </div>
-    </div>
-  );
-
-  const renderPaymentConfirmationForm = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h3 className="text-2xl font-bold text-black">Payment & Confirmation</h3>
-        <p className="text-gray-600">Review details and confirm the reservation</p>
-      </div>
-
-      {/* Booking Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <CreditCard className="h-5 w-5" />
-            <span>Booking Summary</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex justify-between">
-              <span>Guest:</span>
-              <span className="font-medium">{primaryGuest.name}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Check-in:</span>
-              <span className="font-medium">{checkInDate}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Check-out:</span>
-              <span className="font-medium">{checkOutDate}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Number of Guests:</span>
-              <span className="font-medium">{guestCount}</span>
-            </div>
             <div className="border-t pt-4">
-              <div className="flex justify-between text-lg font-bold">
-                <span>Total Amount:</span>
-                <span>₹{calculateTotalAmount().toLocaleString()}</span>
+              <div className="flex justify-between">
+                <span className="font-semibold text-gray-900">Total Special Charges</span>
+                <span className="font-bold text-lg text-black">₹{specialChargesTotal.toLocaleString()}</span>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+        {/* Discount Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-gray-900">Discount</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label className="text-sm font-medium text-gray-700">Discount Type</Label>
+                <select
+                  value={discountType}
+                  onChange={(e) => setDiscountType(e.target.value as any)}
+                  className="w-full p-3 border border-gray-300 rounded-lg bg-white hover:border-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-colors"
+                >
+                  <option value="none">No Discount</option>
+                  <option value="percentage">Percentage (%)</option>
+                  <option value="amount">Fixed Amount</option>
+                </select>
+              </div>
+              
+              {discountType !== 'none' && (
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    {discountType === 'percentage' ? 'Percentage (%)' : 'Amount (₹)'}
+                  </Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    max={discountType === 'percentage' ? 100 : subtotal}
+                    value={discountValue}
+                    onChange={(e) => setDiscountValue(parseFloat(e.target.value) || 0)}
+                    className="p-3"
+                    placeholder={discountType === 'percentage' ? 'Enter percentage' : 'Enter amount'}
+                  />
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={handleBack}>
-          Previous
-        </Button>
-        <Button onClick={handleConfirm} disabled={isSubmitting}>
-          {isSubmitting ? 'Creating...' : isEditMode ? 'Update Reservation' : 'Create Reservation'}
-        </Button>
+        {/* Final Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-gray-900">Final Summary</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span>Room Tariff</span>
+                <span className="font-medium">₹{roomTariffTotal.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Special Charges</span>
+                <span className="font-medium">₹{specialChargesTotal.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between border-t pt-3">
+                <span className="font-medium">Subtotal</span>
+                <span className="font-semibold">₹{subtotal.toLocaleString()}</span>
+              </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-green-600">
+                  <span>Discount</span>
+                  <span className="font-medium">-₹{discount.toLocaleString()}</span>
+                </div>
+              )}
+              <div className="flex justify-between border-t pt-3 text-xl font-bold text-black">
+                <span>Total Amount</span>
+                <span>₹{finalTotal.toLocaleString()}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="flex justify-between">
+          <Button variant="outline" onClick={handleBack} className="px-6">
+            Back: Room Allocation
+          </Button>
+          <Button onClick={handleConfirm} disabled={isSubmitting} className="px-6">
+            {isSubmitting ? 'Creating...' : isEditMode ? 'Update Reservation' : 'Create Reservation'}
+          </Button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="space-y-6 bg-white min-h-screen">
