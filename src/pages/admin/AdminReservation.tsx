@@ -1100,42 +1100,39 @@ export const AdminReservation: React.FC = () => {
     );
   };
 
-  const renderPaymentConfirmationForm = () => {
-    const numberOfNights = calculateNumberOfNights();
-    
-    // Auto-select Extra Person charge if guest count exceeds room capacity
-    const totalRoomCapacity = roomAllocations.reduce((total, room) => total + room.capacity, 0);
-    const extraPersonsNeeded = Math.max(0, guestCount - totalRoomCapacity);
-    
-    // Find Extra Person charge in master charges
-    const extraPersonCharge = specialChargesMaster.find(charge => 
-      charge.chargeName.toLowerCase().includes('extra person') || 
-      charge.chargeName.toLowerCase().includes('extra') && charge.chargeName.toLowerCase().includes('person')
-    );
-    
-    // Auto-add Extra Person charge if needed and not already added
-    if (extraPersonsNeeded > 0 && extraPersonCharge && !specialCharges.some(sc => sc.masterId === extraPersonCharge.id)) {
-      const newCharge: SpecialCharge = {
-        id: crypto.randomUUID(),
-        masterId: extraPersonCharge.id,
-        name: extraPersonCharge.chargeName,
-        amount: extraPersonCharge.defaultRate,
-        quantity: extraPersonsNeeded,
-        description: `${extraPersonsNeeded} extra person(s) required`
-      };
-      addSpecialCharge(newCharge);
-    }
-    
-    // Update quantity if already exists but quantity is different, or remove if no longer needed
-    if (extraPersonCharge) {
+  // Auto-manage Extra Person charges when guest count vs room capacity changes
+  useEffect(() => {
+    if (currentStep === 4 && specialChargesMaster.length > 0 && roomAllocations.length > 0) {
+      const totalRoomCapacity = roomAllocations.reduce((total, room) => total + room.capacity, 0);
+      const extraPersonsNeeded = Math.max(0, guestCount - totalRoomCapacity);
+      
+      // Find Extra Person charge in master charges
+      const extraPersonCharge = specialChargesMaster.find(charge => 
+        charge.chargeName.toLowerCase().includes('extra person') || 
+        charge.chargeName.toLowerCase().includes('extra') && charge.chargeName.toLowerCase().includes('person')
+      );
+      
+      if (!extraPersonCharge) return;
+      
       const existingAutoCharge = specialCharges.find(sc => 
         sc.masterId === extraPersonCharge.id && 
         sc.description && sc.description.includes('extra person(s) required')
       );
       
       if (extraPersonsNeeded > 0) {
-        // Update quantity if different
-        if (existingAutoCharge && existingAutoCharge.quantity !== extraPersonsNeeded) {
+        if (!existingAutoCharge) {
+          // Auto-add Extra Person charge
+          const newCharge: SpecialCharge = {
+            id: crypto.randomUUID(),
+            masterId: extraPersonCharge.id,
+            name: extraPersonCharge.chargeName,
+            amount: extraPersonCharge.defaultRate,
+            quantity: extraPersonsNeeded,
+            description: `${extraPersonsNeeded} extra person(s) required`
+          };
+          addSpecialCharge(newCharge);
+        } else if (existingAutoCharge.quantity !== extraPersonsNeeded) {
+          // Update quantity if different
           const updatedCharges = specialCharges.map(c =>
             c.id === existingAutoCharge.id
               ? { ...c, quantity: extraPersonsNeeded, description: `${extraPersonsNeeded} extra person(s) required` }
@@ -1151,6 +1148,14 @@ export const AdminReservation: React.FC = () => {
         }
       }
     }
+  }, [currentStep, guestCount, roomAllocations, specialChargesMaster, specialCharges, addSpecialCharge, setSpecialCharges]);
+
+  const renderPaymentConfirmationForm = () => {
+    const numberOfNights = calculateNumberOfNights();
+    
+    // Calculate extra persons needed (for UI display logic)
+    const totalRoomCapacity = roomAllocations.reduce((total, room) => total + room.capacity, 0);
+    const extraPersonsNeeded = Math.max(0, guestCount - totalRoomCapacity);
     
     // Calculate room tariff total
     const roomTariffTotal = roomAllocations.reduce((total, room) => {
