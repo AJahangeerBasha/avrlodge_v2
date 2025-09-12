@@ -413,21 +413,23 @@ export const AdminReservation: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="primaryName">Full Name *</Label>
-                <Input
+                <Label htmlFor="primaryName" className="text-sm font-medium text-gray-700 mb-2 block">Full Name *</Label>
+                <input
                   id="primaryName"
+                  type="text"
                   value={primaryGuest.name}
                   onChange={(e) => updatePrimaryGuestField('name', e.target.value)}
                   placeholder="Enter full name"
-                  className="px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
                   required
                 />
               </div>
               
               <div>
-                <Label htmlFor="primaryPhone">Phone Number *</Label>
-                <Input
+                <Label htmlFor="primaryPhone" className="text-sm font-medium text-gray-700 mb-2 block">Phone Number *</Label>
+                <input
                   id="primaryPhone"
+                  type="tel"
                   value={primaryGuest.phone}
                   onChange={(e) => {
                     const formatted = formatPhoneNumber(e.target.value);
@@ -436,8 +438,8 @@ export const AdminReservation: React.FC = () => {
                   placeholder="Enter 10-digit phone number starting with 6-9"
                   maxLength={10}
                   pattern="[0-9]{10}"
-                  className={`px-4 py-3 rounded-xl border bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors ${
-                    primaryPhoneError ? 'border-red-500' : 'border-gray-300'
+                  className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 focus:outline-none transition-colors ${
+                    primaryPhoneError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-gray-400'
                   }`}
                   required
                 />
@@ -447,7 +449,7 @@ export const AdminReservation: React.FC = () => {
               </div>
               
               <div>
-                <Label htmlFor="primaryWhatsapp">WhatsApp (Optional)</Label>
+                <Label htmlFor="primaryWhatsapp" className="text-sm font-medium text-gray-700 mb-2 block">WhatsApp (Optional)</Label>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <input
@@ -469,8 +471,9 @@ export const AdminReservation: React.FC = () => {
                   
                   {!primaryGuest.usePhoneForWhatsapp && (
                     <div>
-                      <Input
+                      <input
                         id="primaryWhatsapp"
+                        type="tel"
                         value={primaryGuest.whatsapp}
                         onChange={(e) => {
                           const formatted = formatPhoneNumber(e.target.value);
@@ -479,8 +482,8 @@ export const AdminReservation: React.FC = () => {
                         placeholder="Enter 10-digit WhatsApp number starting with 6-9"
                         maxLength={10}
                         pattern="[0-9]{10}"
-                        className={`px-4 py-3 rounded-xl border bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors ${
-                          primaryWhatsappError ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 focus:outline-none transition-colors ${
+                          primaryWhatsappError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-gray-400'
                         }`}
                       />
                       {primaryWhatsappError && (
@@ -496,9 +499,10 @@ export const AdminReservation: React.FC = () => {
               </div>
               
               <div>
-                <Label htmlFor="primaryTelegram">Telegram (Optional)</Label>
-                <Input
+                <Label htmlFor="primaryTelegram" className="text-sm font-medium text-gray-700 mb-2 block">Telegram (Optional)</Label>
+                <input
                   id="primaryTelegram"
+                  type="tel"
                   value={primaryGuest.telegram}
                   onChange={(e) => {
                     const formatted = formatPhoneNumber(e.target.value);
@@ -507,8 +511,8 @@ export const AdminReservation: React.FC = () => {
                   placeholder="Enter 10-digit Telegram number starting with 6-9"
                   maxLength={10}
                   pattern="[0-9]{10}"
-                  className={`px-4 py-3 rounded-xl border bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors ${
-                    primaryTelegramError ? 'border-red-500' : 'border-gray-300'
+                  className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 focus:outline-none transition-colors ${
+                    primaryTelegramError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-gray-400'
                   }`}
                 />
                 {primaryTelegramError && (
@@ -574,7 +578,7 @@ export const AdminReservation: React.FC = () => {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label>Full Name *</Label>
+                        <Label className="text-sm font-medium text-gray-700 mb-2 block">Full Name *</Label>
                         <input
                           type="text"
                           value={guest.name}
@@ -586,7 +590,7 @@ export const AdminReservation: React.FC = () => {
                       </div>
                       
                       <div>
-                        <Label>Phone Number *</Label>
+                        <Label className="text-sm font-medium text-gray-700 mb-2 block">Phone Number *</Label>
                         <input
                           type="tel"
                           value={guest.phone}
@@ -608,7 +612,7 @@ export const AdminReservation: React.FC = () => {
                       </div>
                       
                       <div>
-                        <Label>WhatsApp (Optional)</Label>
+                        <Label className="text-sm font-medium text-gray-700 mb-2 block">WhatsApp (Optional)</Label>
                         <div className="space-y-2">
                           <div className="flex items-center space-x-2">
                             <input
@@ -658,7 +662,7 @@ export const AdminReservation: React.FC = () => {
                       </div>
                       
                       <div>
-                        <Label>Telegram (Optional)</Label>
+                        <Label className="text-sm font-medium text-gray-700 mb-2 block">Telegram (Optional)</Label>
                         <input
                           type="tel"
                           value={guest.telegram}
@@ -1055,6 +1059,23 @@ export const AdminReservation: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Guest Count Validation */}
+        {(() => {
+          const totalRoomGuests = roomAllocations.reduce((sum, allocation) => sum + allocation.guestCount, 0);
+          const isValid = totalRoomGuests === guestCount;
+          
+          if (roomAllocations.length > 0 && !isValid) {
+            return (
+              <Alert className="border-red-200 bg-red-50">
+                <AlertDescription className="text-red-700">
+                  <strong>Guest count mismatch:</strong> Room allocations total <strong>{totalRoomGuests} guests</strong>, but overall guest count is <strong>{guestCount}</strong>. Please adjust the guest counts in room allocations to match.
+                </AlertDescription>
+              </Alert>
+            );
+          }
+          return null;
+        })()}
+
         {/* Navigation Buttons */}
         <div className="flex justify-between items-center pt-6">
           <Button 
@@ -1066,7 +1087,10 @@ export const AdminReservation: React.FC = () => {
           </Button>
           <Button 
             onClick={handleNext} 
-            disabled={roomAllocations.length === 0}
+            disabled={(() => {
+              const totalRoomGuests = roomAllocations.reduce((sum, allocation) => sum + allocation.guestCount, 0);
+              return roomAllocations.length === 0 || totalRoomGuests !== guestCount;
+            })()}
             className="px-8 py-3 bg-black hover:bg-gray-800 text-white font-medium rounded-lg"
           >
             Next: Payment & Confirm
@@ -1102,16 +1126,29 @@ export const AdminReservation: React.FC = () => {
       addSpecialCharge(newCharge);
     }
     
-    // Update quantity if already exists but quantity is different
-    if (extraPersonsNeeded > 0 && extraPersonCharge) {
-      const existingCharge = specialCharges.find(sc => sc.masterId === extraPersonCharge.id);
-      if (existingCharge && existingCharge.quantity !== extraPersonsNeeded) {
-        const updatedCharges = specialCharges.map(c =>
-          c.masterId === extraPersonCharge.id
-            ? { ...c, quantity: extraPersonsNeeded, description: `${extraPersonsNeeded} extra person(s) required` }
-            : c
-        );
-        setSpecialCharges(updatedCharges);
+    // Update quantity if already exists but quantity is different, or remove if no longer needed
+    if (extraPersonCharge) {
+      const existingAutoCharge = specialCharges.find(sc => 
+        sc.masterId === extraPersonCharge.id && 
+        sc.description && sc.description.includes('extra person(s) required')
+      );
+      
+      if (extraPersonsNeeded > 0) {
+        // Update quantity if different
+        if (existingAutoCharge && existingAutoCharge.quantity !== extraPersonsNeeded) {
+          const updatedCharges = specialCharges.map(c =>
+            c.id === existingAutoCharge.id
+              ? { ...c, quantity: extraPersonsNeeded, description: `${extraPersonsNeeded} extra person(s) required` }
+              : c
+          );
+          setSpecialCharges(updatedCharges);
+        }
+      } else {
+        // Remove auto-selected Extra Person charge when capacity exceeds guest count
+        if (existingAutoCharge) {
+          const updatedCharges = specialCharges.filter(c => c.id !== existingAutoCharge.id);
+          setSpecialCharges(updatedCharges);
+        }
       }
     }
     
@@ -1209,8 +1246,8 @@ export const AdminReservation: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Master Special Charges - Horizontal Layout */}
-            <div className="flex flex-wrap gap-4 mb-6">
+            {/* Master Special Charges - Single Line Layout */}
+            <div className="flex gap-4 mb-6 overflow-x-auto pb-2" style={{scrollbarWidth: 'thin'}}>
               {specialChargesMaster.map((masterCharge) => {
                 const isSelected = specialCharges.some(sc => sc.masterId === masterCharge.id);
                 const isExtraPersonCharge = masterCharge.chargeName.toLowerCase().includes('extra person') || 
@@ -1220,21 +1257,29 @@ export const AdminReservation: React.FC = () => {
                 return (
                   <div 
                     key={masterCharge.id} 
-                    className={`flex flex-col items-center p-4 rounded-lg transition-colors ${
+                    className={`flex flex-col items-center p-4 rounded-lg transition-colors cursor-pointer min-w-[140px] ${
                       isSelected 
                         ? isAutoSelected 
                           ? 'bg-blue-100 border border-blue-300' 
                           : 'bg-gray-100 border border-gray-300' 
                         : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
-                    } ${isAutoSelected ? 'opacity-75 cursor-not-allowed' : 'cursor-pointer'}`}
+                    } ${isAutoSelected ? 'opacity-90' : ''}`}
                     onClick={() => {
-                      // Check if this is an auto-selected Extra Person charge
+                      // Check if this is an Extra Person charge
                       const isExtraPersonCharge = masterCharge.chargeName.toLowerCase().includes('extra person') || 
                         (masterCharge.chargeName.toLowerCase().includes('extra') && masterCharge.chargeName.toLowerCase().includes('person'));
-                      const isAutoSelected = isExtraPersonCharge && extraPersonsNeeded > 0;
                       
-                      if (isAutoSelected) {
-                        // Do nothing - auto-selected charges cannot be manually toggled
+                      if (isExtraPersonCharge) {
+                        // For Extra Person charges, always allow adding new manual records
+                        const newCharge: SpecialCharge = {
+                          id: crypto.randomUUID(),
+                          masterId: masterCharge.id,
+                          name: masterCharge.chargeName,
+                          amount: masterCharge.defaultRate,
+                          quantity: 1,
+                          description: 'Manual selection'
+                        };
+                        addSpecialCharge(newCharge);
                         return;
                       }
                       
@@ -1277,7 +1322,7 @@ export const AdminReservation: React.FC = () => {
               })}
             </div>
 
-            {/* Selected Charges with Enhanced Layout */}
+            {/* Selected Charges - Vertical Layout (one below another) */}
             {specialCharges.length > 0 && (
               <div className="space-y-3">
                 {specialCharges.map((charge) => (
@@ -1325,7 +1370,8 @@ export const AdminReservation: React.FC = () => {
                         const masterCharge = specialChargesMaster.find(mc => mc.id === charge.masterId);
                         const isExtraPersonCharge = masterCharge && (masterCharge.chargeName.toLowerCase().includes('extra person') || 
                           (masterCharge.chargeName.toLowerCase().includes('extra') && masterCharge.chargeName.toLowerCase().includes('person')));
-                        const isAutoSelected = isExtraPersonCharge && extraPersonsNeeded > 0;
+                        // Auto-selected charges have specific description indicating they are required
+                        const isAutoSelected = isExtraPersonCharge && charge.description && charge.description.includes('extra person(s) required');
                         
                         return (
                           <Button
