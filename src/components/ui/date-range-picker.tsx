@@ -117,7 +117,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
       <Button
         type="button"
         variant="outline"
-        className="w-full justify-start text-left font-normal bg-white hover:bg-gray-50"
+        className="w-full justify-start text-left font-normal bg-white hover:bg-gray-50 rounded-xl border border-gray-300 focus:border-gray-400 transition-colors"
         onClick={() => setIsOpen(!isOpen)}
       >
         <CalendarDays className="mr-2 h-4 w-4" />

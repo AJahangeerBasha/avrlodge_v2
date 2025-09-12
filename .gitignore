@@ -9,3 +9,4 @@ vite.config.ts.*
 .vercel
 /logs
 /.claude
+/ui-design

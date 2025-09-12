@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Outlet, Navigate, Link } from 'react-router-dom'
+import { Outlet, Navigate, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { ROLES } from '../lib/types/auth'
 import { Button } from '../components/ui/button'
@@ -8,6 +8,7 @@ import { LogOut, Users, Settings, BarChart3, Calendar, BookOpen, Home, Bed, Doll
 export function AdminLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { currentUser, userRole, logout, loading } = useAuth()
+  const location = useLocation()
 
   // Show loading state while checking authentication
   if (loading) {
@@ -53,26 +54,87 @@ export function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <div className="bg-white shadow">
+      {/* Header with Navigation */}
+      <div className="bg-white shadow-sm border-b">
         <div className="px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-lg md:text-xl font-semibold text-gray-900">AVR Lodge Admin</h1>
+          {/* Left Side - Logo and Navigation */}
+          <div className="flex items-center space-x-6">
+            {/* Logo */}
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                <div className="w-4 h-4 border-2 border-white rounded-sm"></div>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold text-gray-900">Admin</span>
+                <span className="text-xs text-gray-500">AVR Lodge</span>
+              </div>
+            </div>
+            
+            {/* Desktop Navigation Buttons */}
+            <nav className="hidden md:flex items-center space-x-1">
+              <Link
+                to="/admin/calendar"
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                  location.pathname === '/admin/calendar'
+                    ? 'bg-black text-white'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                <Calendar className="h-4 w-4" />
+                <span>Calendar</span>
+              </Link>
+              <Link
+                to="/admin/reservation"
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                  location.pathname === '/admin/reservation'
+                    ? 'bg-black text-white'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                <BookOpen className="h-4 w-4" />
+                <span>Reservation</span>
+              </Link>
+              <Link
+                to="/admin/bookings"
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                  location.pathname === '/admin/bookings'
+                    ? 'bg-black text-white'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                <Users className="h-4 w-4" />
+                <span>Bookings</span>
+              </Link>
+              <Link
+                to="/admin"
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                  location.pathname === '/admin'
+                    ? 'bg-black text-white'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span>Analytics</span>
+              </Link>
+            </nav>
           </div>
           
-          {/* Desktop User Info and Logout */}
+          {/* Right Side - User Info and Sign Out */}
           <div className="hidden md:flex items-center space-x-4">
-            <span className="text-sm text-gray-600">
-              Welcome, {currentUser.displayName || currentUser.email}
-            </span>
+            <div className="text-right">
+              <div className="text-sm font-medium text-gray-900">
+                {currentUser.displayName || currentUser.email?.split('@')[0] || 'Admin User'}
+              </div>
+              <div className="text-xs text-gray-500">Admin</div>
+            </div>
             <Button
               variant="outline"
               size="sm"
               onClick={handleLogout}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 hover:bg-gray-50"
             >
               <LogOut className="h-4 w-4" />
-              <span>Logout</span>
+              <span>Sign Out</span>
             </Button>
           </div>
 
@@ -90,24 +152,6 @@ export function AdminLayout() {
               )}
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* Desktop Navigation */}
-      <div className="hidden md:block bg-black text-white">
-        <div className="px-4 py-3">
-          <nav className="flex flex-wrap gap-2">
-            {navigationItems.map(({ to, icon: Icon, label }) => (
-              <Link
-                key={to}
-                to={to}
-                className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-800 transition-colors"
-              >
-                <Icon className="h-4 w-4" />
-                <span>{label}</span>
-              </Link>
-            ))}
-          </nav>
         </div>
       </div>
 
