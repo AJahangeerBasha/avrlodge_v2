@@ -126,7 +126,7 @@ export const DOCUMENT_TYPE_INFO: Record<DocumentType, DocumentTypeInfo> = {
     description: 'Government issued identity proof',
     acceptedFormats: ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'],
     maxFileSize: 5 * 1024 * 1024, // 5MB
-    isRequired: true
+    isRequired: false
   },
   driving_license: {
     type: 'driving_license',

@@ -548,3 +548,223 @@ Since we're using Firebase Spark plan (free), role management is handled via Fir
 - **Firestore Optimization**: 50+ composite indexes for efficient querying across all collections
 - **Role-based Access**: Comprehensive admin/manager/guest access control system
 - **Firestore Rules**: Extended development period until Dec 31, 2025
+
+## Booking Management System Implementation (Recent)
+
+### Complete Firebase Booking System
+- **Branch**: `bookings` - Complete booking management system with Firebase integration
+- **Migration**: Moved from PostgreSQL/Supabase to pure Firebase ecosystem
+- **Components**: 6 new React components with TypeScript integration
+- **Context**: Centralized booking state management with `BookingsContext`
+
+### Core Components Architecture
+
+#### **FirebaseBookingCard Component** (`/src/components/bookings/FirebaseBookingCard.tsx`)
+- **Purpose**: Main booking display card with comprehensive booking information
+- **Features**:
+  - Real-time payment history with accordion UI (saves space)
+  - Dynamic status calculation: `reservation` → `booking` (when payment made) → `checked_in` → `checked_out`
+  - Document viewing integration with upload count display
+  - Payment totals calculated from actual Firebase payments (not cached booking values)
+  - Guest contact information with phone, WhatsApp, Telegram links
+  - Room assignment display with room numbers and types
+
+- **Business Logic**:
+  ```typescript
+  const calculatePaymentTotals = () => {
+    const totalPaid = payments
+      .filter(payment => payment.paymentStatus === 'completed')
+      .reduce((sum, payment) => sum + (payment.amount || 0), 0)
+    const remainingBalance = Math.max(0, (booking.total_quote || 0) - totalPaid)
+    return { totalPaid, remainingBalance }
+  }
+
+  const getCalculatedStatus = () => {
+    if (booking.status === 'checked_out') return 'Checked Out'
+    if (booking.status === 'checked_in') return 'Checked In'
+    if (calculatePaymentTotals().totalPaid > 0) return 'Booking'
+    return 'Reservation'
+  }
+  ```
+
+#### **FirebasePaymentModal Component** (`/src/components/bookings/FirebasePaymentModal.tsx`)
+- **Purpose**: Payment processing and recording interface
+- **Payment Methods**:
+  - Jubair QR (UPI via QR Code)
+  - Basha QR (UPI via QR Code)
+  - Cash payments
+- **Features**:
+  - Real-time payment calculation and validation
+  - Transaction ID capture for QR payments
+  - Auto-amount setting to remaining balance
+  - Payment method validation and constraints
+  - Instant parent component refresh after payment
+
+- **Simplified Payment Data**:
+  ```typescript
+  const paymentData = {
+    reservationId: booking.id,
+    amount: paymentAmount,
+    paymentMethod: actualPaymentMethod, // "Jubair QR", "Basha QR", "Cash"
+    transactionId: transactionId.trim() || undefined,
+    paymentDate: new Date().toISOString()
+  }
+  ```
+
+#### **Room Check-in/Check-out Modals**
+- **RoomCheckInModal**: Document upload integration with Supabase Storage
+- **RoomCheckOutModal**: Checkout processing with final payment reconciliation
+- **Document Management**: Support for 6 Indian identity document types
+- **Validation**: File type, size validation, and completion tracking
+
+#### **BookingModalManager Component** (`/src/components/bookings/BookingModalManager.tsx`)
+- **Purpose**: Centralized modal state management
+- **Pattern**: Single component managing all booking-related modals
+- **Integration**: Seamless integration with BookingsContext
+- **Auto-refresh**: Automatic booking data refresh after operations
+
+### BookingsContext State Management (`/src/contexts/BookingsContext.tsx`)
+- **Purpose**: Global booking state management with React Context
+- **Features**:
+  - Centralized modal state (payment, check-in, check-out)
+  - Automatic data refresh after operations
+  - Real-time booking updates
+  - Modal action handlers with proper state cleanup
+
+- **Context API**:
+  ```typescript
+  interface BookingsContextType {
+    paymentModal: PaymentModalState
+    checkInModal: CheckInModalState
+    checkOutModal: CheckOutModalState
+    actions: {
+      openPaymentModal: (booking: Booking) => void
+      closePaymentModal: () => void
+      openCheckInModal: (booking: Booking, room: Room) => void
+      closeCheckInModal: () => void
+      openCheckOutModal: (booking: Booking, room: Room) => void
+      closeCheckOutModal: () => void
+      refreshBookings: () => void
+    }
+  }
+  ```
+
+### Payment System Integration
+
+#### **Fixed Payment Data Structure**
+- **Removed Fields**: `notes`, `paymentType`, `paymentStatus` (auto-set to 'completed')
+- **Simplified Storage**: Clean payment method names stored ("Jubair QR", "Basha QR", "Cash")
+- **Business Rule**: Payment amount cannot exceed remaining balance
+- **Validation**: Real-time amount validation with max limit enforcement
+
+#### **Payment History Display**
+- **UI Pattern**: Accordion format to save space in booking cards
+- **Data Source**: Live Firebase payments collection (not cached booking values)
+- **Real-time Updates**: Automatic refresh when payments are made
+- **Filtering**: Client-side soft delete filtering (fixed Firestore query issues)
+
+### Document Management Integration
+
+#### **Fixed Document Loading Issue**
+- **Problem**: "View Uploaded Documents" showing empty after check-in
+- **Root Cause**: Server-side Firestore query `where('deletedAt', '==', null)` not matching documents without `deletedAt` field
+- **Solution**: Moved to client-side soft delete filtering
+- **Implementation**:
+  ```typescript
+  // Fixed in getRoomCheckinDocuments() and subscribeToRoomCheckinDocuments()
+  // Removed: q = query(q, where('deletedAt', '==', null))
+  // Added: documents = documents.filter(doc => !doc.deletedAt)
+  ```
+
+#### **Document Upload Flow**
+1. **Check-in Modal**: Upload documents during room check-in
+2. **Supabase Storage**: Secure file storage with validation
+3. **Firebase Metadata**: Document metadata stored in Firestore
+4. **Real-time Updates**: Immediate document count updates in booking cards
+5. **View Documents**: Modal-based document viewer with download support
+
+### Real-time Data Synchronization
+
+#### **Payment History Sync**
+- **Challenge**: Payment totals not updating after payment completion
+- **Solution**: Real-time payment loading with calculated totals
+- **Implementation**: `useEffect` triggers on booking changes and manual refresh calls
+- **Result**: Instant UI updates when payments are made
+
+#### **Status Calculation Logic**
+- **Dynamic Status**: Status calculated from actual payment data, not cached values
+- **Business Rules**:
+  - `Reservation`: No payments made (`totalPaid = 0`)
+  - `Booking`: Partial or full payment made (`totalPaid > 0`)
+  - `Checked In`: Room check-in completed
+  - `Checked Out`: Room check-out completed
+
+#### **Component Communication**
+- **Parent-Child Updates**: Payment modal triggers parent BookingCard refresh
+- **Context Integration**: All modals communicate via BookingsContext
+- **State Consistency**: Centralized state management prevents stale data
+
+### UI/UX Design Patterns
+
+#### **Black & White Aesthetic**
+- **Design Philosophy**: Professional monochromatic design with subtle animations
+- **Framer Motion**: Smooth modal transitions and hover effects
+- **Glass Morphism**: `bg-white/95 backdrop-blur-sm` for modal overlays
+- **Visual Hierarchy**: Clear information structure with appropriate spacing
+
+#### **Responsive Design**
+- **Mobile-First**: All booking components fully responsive
+- **Accordion UI**: Space-efficient payment history display
+- **Modal Optimization**: Proper modal sizing and scroll handling
+- **Touch-Friendly**: Mobile-optimized button sizes and interactions
+
+### Firebase Integration Optimizations
+
+#### **Firestore Query Optimization**
+- **Issue**: Complex queries with multiple filters causing index errors
+- **Solution**: Simplified server-side queries with client-side filtering fallbacks
+- **Performance**: Efficient data loading with minimal over-fetching
+- **Reliability**: Fallback mechanisms for query failures
+
+#### **Real-time Subscriptions**
+- **Payment Updates**: Live payment status changes
+- **Document Updates**: Real-time document upload/delete notifications
+- **Booking Status**: Instant status updates across all components
+- **Error Handling**: Comprehensive error handling with user feedback
+
+### Business Logic Implementation
+
+#### **Payment Processing Rules**
+- **Amount Validation**: Cannot exceed remaining balance
+- **Payment Methods**: Support for UPI QR codes and cash payments
+- **Transaction Tracking**: Optional transaction ID for QR payments
+- **Auto-calculation**: Remaining balance auto-calculated and displayed
+
+#### **Status Transition Logic**
+- **State Machine**: Proper status transitions with validation
+- **Business Rules**: Prevent invalid status changes
+- **User Feedback**: Clear status indicators and change notifications
+- **Audit Trail**: All status changes logged with timestamps and user attribution
+
+#### **Document Requirements**
+- **Check-in Requirement**: Documents must be uploaded during check-in
+- **File Validation**: Type, size, and format validation
+- **Completion Tracking**: Document upload progress and requirements
+- **Security**: Secure file storage with access controls
+
+### Component Integration Architecture
+
+#### **Layout Integration**
+- **AdminBookings Page**: Main booking management interface
+- **Modal Management**: Centralized modal state and lifecycle
+- **Context Providers**: BookingsContext wrapping booking components
+- **Layout Consistency**: Consistent design across all booking interfaces
+
+#### **Data Flow Pattern**
+1. **BookingsContext**: Global state management
+2. **BookingCard**: Display and user interaction
+3. **Modals**: Specialized operations (payment, check-in, check-out)
+4. **Firebase Services**: Backend data operations
+5. **UI Updates**: Real-time synchronization and refresh
+
+This comprehensive booking system provides a complete resort management solution with real-time updates, secure payment processing, document management, and professional UI/UX design.

@@ -454,7 +454,28 @@ export const getGuests = async (
 export const getGuestsByReservationId = async (
   reservationId: string
 ): Promise<Guest[]> => {
-  return getGuests({ reservationId, isActive: true })
+  try {
+    // Use direct query without isActive filter to avoid deletedAt issues
+    const q = query(
+      collection(db, COLLECTION_NAME),
+      where('reservationId', '==', reservationId),
+      orderBy('createdAt', 'desc')
+    )
+    
+    const querySnapshot = await getDocs(q)
+    let guests = querySnapshot.docs
+      .map(doc => convertGuestData(doc))
+      .filter((guest): guest is Guest => guest !== null)
+    
+    // Filter out actually deleted guests (if deletedAt field exists and is not null/undefined)
+    guests = guests.filter(guest => !guest.deletedAt)
+    
+    return guests
+  } catch (error) {
+    console.error('Error getting guests by reservation ID:', error)
+    // Fallback to the original method but without isActive
+    return getGuests({ reservationId })
+  }
 }
 
 // Get primary guest for a reservation

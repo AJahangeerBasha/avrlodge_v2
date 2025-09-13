@@ -152,12 +152,12 @@ export function DatePicker({
           </span>
         </div>
         {selectedDate && (
-          <button
+          <span
             onClick={clearDate}
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
           >
             <X className="w-3 h-3 text-gray-400 hover:text-gray-600" />
-          </button>
+          </span>
         )}
       </button>
 

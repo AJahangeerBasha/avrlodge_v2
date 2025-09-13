@@ -295,9 +295,11 @@ export const getPayments = async (
     }
 
     // Filter out soft deleted payments by default
-    if (filters?.isActive !== false) {
-      q = query(q, where('deletedAt', '==', null))
-    }
+    // Note: We'll handle deletedAt filtering client-side instead of server-side
+    // because Firestore treats missing fields and null fields differently
+    // if (filters?.isActive !== false) {
+    //   q = query(q, where('deletedAt', '==', null))
+    // }
 
     // Add ordering and limit
     q = query(q, orderBy('createdAt', 'desc'))
@@ -307,9 +309,44 @@ export const getPayments = async (
     }
 
     const querySnapshot = await getDocs(q)
+    console.log('Query snapshot size:', querySnapshot.size)
+    console.log('Raw docs found:', querySnapshot.docs.length)
+
+    // If no results and we're filtering by reservationId, check what's actually in the collection
+    if (querySnapshot.size === 0 && filters?.reservationId) {
+      console.log('🔍 No results found, checking entire payments collection for debugging...')
+      const allPaymentsQuery = collection(db, COLLECTION_NAME)
+      const allPaymentsSnapshot = await getDocs(allPaymentsQuery)
+      console.log(`Total payments in collection: ${allPaymentsSnapshot.size}`)
+
+      if (allPaymentsSnapshot.size > 0) {
+        console.log('Sample payment documents:')
+        allPaymentsSnapshot.docs.slice(0, 3).forEach((doc, index) => {
+          const data = doc.data()
+          console.log(`Payment ${index + 1}:`, {
+            id: doc.id,
+            reservationId: data.reservationId,
+            reservation_id: data.reservation_id,
+            amount: data.amount,
+            paymentStatus: data.paymentStatus,
+            deletedAt: data.deletedAt,
+            createdAt: data.createdAt
+          })
+        })
+      }
+    }
+
     let payments = querySnapshot.docs
       .map(doc => convertPaymentData(doc))
       .filter((payment): payment is Payment => payment !== null)
+
+    console.log('Filtered payments count:', payments.length)
+
+    // Apply client-side filtering for deletedAt (soft delete)
+    if (filters?.isActive !== false) {
+      payments = payments.filter(payment => !payment.deletedAt)
+      console.log('After deletedAt filter, payments count:', payments.length)
+    }
 
     // Apply client-side filters
     if (filters?.minAmount !== undefined) {

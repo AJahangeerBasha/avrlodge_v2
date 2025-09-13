@@ -268,10 +268,9 @@ export const getRoomCheckinDocuments = async (
       q = query(q, where('createdBy', '==', filters.createdBy))
     }
 
-    // Filter out soft deleted documents by default
-    if (filters?.isActive !== false) {
-      q = query(q, where('deletedAt', '==', null))
-    }
+    // Note: Removed server-side soft delete filtering due to Firestore limitations
+    // Documents without deletedAt field are not matched by where('deletedAt', '==', null)
+    // Client-side filtering applied below
 
     // Add ordering and limit
     q = query(q, orderBy('createdAt', 'desc'))
@@ -285,11 +284,16 @@ export const getRoomCheckinDocuments = async (
       .map(doc => convertDocumentData(doc))
       .filter((doc): doc is RoomCheckinDocument => doc !== null)
 
+    // Apply soft delete filter client-side (more reliable than server-side)
+    if (filters?.isActive !== false) {
+      documents = documents.filter(doc => !doc.deletedAt)
+    }
+
     // Apply date range filter (client-side due to Firestore limitations)
     if (filters?.dateRange) {
       const startDate = new Date(filters.dateRange.start)
       const endDate = new Date(filters.dateRange.end)
-      
+
       documents = documents.filter(doc => {
         const docDate = new Date(doc.createdAt)
         return docDate >= startDate && docDate <= endDate
@@ -396,10 +400,9 @@ export const subscribeToRoomCheckinDocuments = (
       q = query(q, where('roomId', '==', filters.roomId))
     }
     
-    // Filter out deleted documents
-    if (filters.isActive !== false) {
-      q = query(q, where('deletedAt', '==', null))
-    }
+    // Note: Removed server-side soft delete filtering due to Firestore limitations
+    // Documents without deletedAt field are not matched by where('deletedAt', '==', null)
+    // Client-side filtering applied below
     
     q = query(q, orderBy('createdAt', 'desc'))
 
@@ -411,6 +414,11 @@ export const subscribeToRoomCheckinDocuments = (
           .filter((doc): doc is RoomCheckinDocument => doc !== null)
 
         // Apply additional filters client-side
+        // Apply soft delete filter first
+        if (filters.isActive !== false) {
+          documents = documents.filter(doc => !doc.deletedAt)
+        }
+
         if (filters.documentType) {
           documents = documents.filter(doc => doc.documentType === filters.documentType)
         }

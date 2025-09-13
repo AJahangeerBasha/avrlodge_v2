@@ -1,75 +1,67 @@
-#!/usr/bin/env tsx
-
 /**
- * Debug script to check what data exists for a reservation ID
+ * Debug script to check reservation and guest data
  */
 
-import { 
-  collection, 
-  getDocs, 
-  query, 
-  where
-} from 'firebase/firestore'
-import { db } from './firebaseConfig'
+import './firebaseConfig'
+import { getAllReservations } from '../src/lib/reservations'
+import { getGuestsByReservationId } from '../src/lib/guests'
 
-async function debugReservationData(reservationId: string) {
-  console.log(`🔍 Debugging data for reservation ID: ${reservationId}`)
-  console.log('='.repeat(60))
-
-  const collections = [
-    'guests',
-    'guestAudits', 
-    'reservationRooms',
-    'reservationSpecialCharges',
-    'roomCheckinDocuments',
-    'payments'
-  ]
-
-  for (const collectionName of collections) {
-    console.log(`\n📂 Checking ${collectionName} collection...`)
+async function debugReservationData() {
+  try {
+    console.log('🔍 Loading all reservations...')
+    const reservations = await getAllReservations()
+    console.log(`📊 Found ${reservations.length} reservations`)
     
-    try {
-      // Get all documents to see the structure first
-      const allDocsQuery = await getDocs(collection(db, collectionName))
-      console.log(`   Total documents in ${collectionName}: ${allDocsQuery.size}`)
-      
-      if (allDocsQuery.size > 0) {
-        // Show structure of first document
-        const firstDoc = allDocsQuery.docs[0]
-        const data = firstDoc.data()
-        console.log(`   Sample document structure:`, Object.keys(data))
-        console.log(`   Sample document:`, data)
-      }
-
-      // Try to find documents with reservationId
-      const reservationQuery = query(collection(db, collectionName), where('reservationId', '==', reservationId))
-      const reservationDocs = await getDocs(reservationQuery)
-      console.log(`   Documents with reservationId '${reservationId}': ${reservationDocs.size}`)
-      
-      reservationDocs.forEach(doc => {
-        console.log(`   - Document ID: ${doc.id}`)
-        console.log(`   - Data:`, doc.data())
-      })
-
-    } catch (error) {
-      console.log(`   ❌ Error querying ${collectionName}:`, error.message)
+    if (reservations.length === 0) {
+      console.log('❌ No reservations found in database')
+      return
     }
+    
+    console.log('\n📋 First few reservations:')
+    for (let i = 0; i < Math.min(3, reservations.length); i++) {
+      const reservation = reservations[i]
+      console.log(`\n🎫 Reservation ${i + 1}:`)
+      console.log(`   ID: ${reservation.id}`)
+      console.log(`   Reference: ${reservation.referenceNumber}`)
+      console.log(`   Guest Count: ${reservation.guestCount}`)
+      console.log(`   Status: ${reservation.status}`)
+      console.log(`   Check-in: ${reservation.checkInDate}`)
+      console.log(`   Check-out: ${reservation.checkOutDate}`)
+      
+      // Check guests for this reservation
+      console.log(`\n👥 Loading guests for reservation ${reservation.referenceNumber}...`)
+      try {
+        const guests = await getGuestsByReservationId(reservation.id)
+        console.log(`   Found ${guests.length} guests`)
+        
+        if (guests.length > 0) {
+          guests.forEach((guest, guestIndex) => {
+            console.log(`   Guest ${guestIndex + 1}: ${guest.name} (${guest.phone}) - Primary: ${guest.isPrimaryGuest}`)
+          })
+          
+          const primaryGuest = guests.find(g => g.isPrimaryGuest)
+          if (primaryGuest) {
+            console.log(`   ✅ Primary Guest: ${primaryGuest.name} (${primaryGuest.phone})`)
+          } else {
+            console.log(`   ❌ No primary guest found`)
+          }
+        } else {
+          console.log(`   ❌ No guests found for this reservation`)
+        }
+      } catch (guestError) {
+        console.error(`   ❌ Error loading guests:`, guestError)
+      }
+    }
+    
+  } catch (error) {
+    console.error('❌ Error in debug script:', error)
   }
 }
 
-async function main() {
-  const args = process.argv.slice(2)
-  
-  if (args.length === 0) {
-    console.error('❌ Usage: tsx scripts/debugReservationData.ts <reservationId>')
-    process.exit(1)
-  }
-
-  const reservationId = args[0]
-  await debugReservationData(reservationId)
-  console.log('\n🏁 Debug completed')
-}
-
-if (require.main === module) {
-  main().catch(console.error)
-}
+debugReservationData().then(() => {
+  console.log('\n✅ Debug script completed')
+  process.exit(0)
+}).catch(error => {
+  console.error('❌ Script failed:', error)
+  process.exit(1)
+})

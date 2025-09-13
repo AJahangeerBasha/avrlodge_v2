@@ -55,11 +55,14 @@ export const validateFileUrl = (fileUrl: string): ValidationError | null => {
     }
   }
   
-  // Check if URL is from Firebase Storage (basic check)
-  if (!fileUrl.includes('firebase') && !fileUrl.includes('googleapis.com')) {
+  // Check if URL is from supported storage providers (Firebase Storage or Supabase Storage)
+  const isFirebaseStorage = fileUrl.includes('firebase') || fileUrl.includes('googleapis.com')
+  const isSupabaseStorage = fileUrl.includes('supabase.co') || fileUrl.includes('supabase.com')
+
+  if (!isFirebaseStorage && !isSupabaseStorage) {
     return {
       field: 'fileUrl',
-      message: 'File URL should be from Firebase Storage',
+      message: 'File URL should be from Firebase Storage or Supabase Storage',
       code: 'INVALID_STORAGE_URL'
     }
   }

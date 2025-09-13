@@ -57,6 +57,22 @@ if (import.meta.env.DEV) {
   console.log('📊 Project ID:', import.meta.env.VITE_FIREBASE_PROJECT_ID);
   console.log('🔐 Auth Domain:', import.meta.env.VITE_FIREBASE_AUTH_DOMAIN);
   console.log('🗄️ Storage Bucket:', import.meta.env.VITE_FIREBASE_STORAGE_BUCKET);
+
+  // Connect to Firebase Storage emulator in development
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    try {
+      // Only connect to emulator if not already connected
+      const storageEmulatorHost = 'localhost:9199';
+      console.log('🔧 Connecting to Storage emulator at:', storageEmulatorHost);
+
+      // This will only work if the emulator is running
+      const { connectStorageEmulator } = await import('firebase/storage');
+      connectStorageEmulator(storage, 'localhost', 9199);
+      console.log('✅ Connected to Firebase Storage emulator');
+    } catch (error) {
+      console.warn('⚠️ Storage emulator not running, using production storage:', error);
+    }
+  }
 }
 
 let analytics: ReturnType<typeof getAnalytics> | null = null;

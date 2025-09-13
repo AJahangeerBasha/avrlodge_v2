@@ -1,5 +1,8 @@
 {
   "emulators": {
+    "storage": {
+      "port": 9199
+    },
     "dataconnect": {
       "dataDir": "dataconnect/.dataconnect/pgliteData"
     }
@@ -12,5 +15,8 @@
     "location": "asia-east1",
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }
