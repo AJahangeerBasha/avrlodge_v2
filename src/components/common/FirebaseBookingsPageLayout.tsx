@@ -13,6 +13,7 @@ import { getAllReservations } from '../../lib/reservations'
 import { getAllReservationRooms } from '../../lib/reservationRooms'
 import { getGuestsByReservationId } from '../../lib/guests'
 import { getAllReservationSpecialCharges } from '../../lib/reservationSpecialCharges'
+import { getPaymentsByReservationId } from '../../lib/payments'
 import { useAuth } from '../../contexts/AuthContext'
 import { useBookings } from '../../contexts/BookingsContext'
 
@@ -69,6 +70,12 @@ interface Booking {
   }>
   created_at: string
   updated_at?: string
+  // Virtual fields for status filtering
+  virtualStatus?: string
+  virtualPaymentTotals?: {
+    totalPaid: number
+    remainingBalance: number
+  }
 }
 
 type DateFilterType = 'today' | 'yesterday' | 'tomorrow' | 'this_weekend' | 'current_week' | 'last_week' | 'next_week' | 'current_month' | 'previous_month' | 'next_month' | 'all' | string
@@ -286,19 +293,103 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
     }
   }
 
-  // Helper function to filter bookings by status
-  const filterBookingsByStatus = useCallback((bookings: Booking[], statusFilter: StatusFilterType) => {
+  // Virtual status calculation logic (same as FirebaseBookingCard)
+  const calculatePaymentTotalsForBooking = (booking: Booking, payments: any[]) => {
+    if (payments.length === 0) {
+      return {
+        totalPaid: booking.total_paid || 0,
+        remainingBalance: booking.remaining_balance || 0
+      }
+    }
+
+    const totalPaid = payments
+      .filter(payment => payment.paymentStatus === 'completed')
+      .reduce((sum, payment) => sum + (payment.amount || 0), 0)
+
+    const remainingBalance = Math.max(0, (booking.total_quote || 0) - totalPaid)
+
+    return { totalPaid, remainingBalance }
+  }
+
+  const getCalculatedStatusForBooking = (booking: Booking, payments: any[]): string => {
+    // If already cancelled, keep cancelled
+    if (booking.status === 'cancelled') {
+      return 'cancelled'
+    }
+
+    // Check room states if we have reservation_rooms
+    if (booking.reservation_rooms && booking.reservation_rooms.length > 0) {
+      const roomStates = booking.reservation_rooms.map(room => room.room_status || 'pending')
+
+      // If all rooms are checked out
+      if (roomStates.every(status => status === 'checked_out')) {
+        return 'checked_out'
+      }
+
+      // If all rooms are checked in
+      if (roomStates.every(status => status === 'checked_in')) {
+        return 'checked_in'
+      }
+
+      // If some rooms are checked in (partial check-in)
+      if (roomStates.some(status => status === 'checked_in')) {
+        return 'checked_in' // Still show as checked_in for partial
+      }
+    }
+
+    // Check payment status for booking vs reservation - use calculated total paid
+    const { totalPaid } = calculatePaymentTotalsForBooking(booking, payments)
+    if (totalPaid > 0) {
+      return 'booking' // Payment made = booking status
+    }
+
+    // Default to reservation for new bookings with no payment
+    return 'reservation'
+  }
+
+  // Helper function to filter bookings by virtual status
+  const filterBookingsByStatus = useCallback(async (bookings: Booking[], statusFilter: StatusFilterType) => {
     if (statusFilter === 'all_status') {
       return bookings
     }
-    
+
+    // For each booking, we need to calculate the virtual status
+    const bookingsWithVirtualStatus = await Promise.all(
+      bookings.map(async (booking) => {
+        try {
+          // Load payment data for virtual status calculation
+          const payments = await getPaymentsByReservationId(booking.id)
+          const virtualStatus = getCalculatedStatusForBooking(booking, payments)
+          const paymentTotals = calculatePaymentTotalsForBooking(booking, payments)
+
+          return {
+            ...booking,
+            virtualStatus,
+            virtualPaymentTotals: paymentTotals
+          }
+        } catch (error) {
+          console.error(`Error loading payments for booking ${booking.id}:`, error)
+          // Fallback to original booking data
+          return {
+            ...booking,
+            virtualStatus: booking.status,
+            virtualPaymentTotals: {
+              totalPaid: booking.total_paid || 0,
+              remainingBalance: booking.remaining_balance || 0
+            }
+          }
+        }
+      })
+    )
+
+    // Filter based on virtual status
     if (statusFilter === 'pending_payments') {
-      return bookings.filter(booking => 
-        (booking.remaining_balance || 0) > 0 && booking.status !== 'cancelled'
+      return bookingsWithVirtualStatus.filter(booking =>
+        (booking.virtualPaymentTotals?.remainingBalance || 0) > 0 && booking.virtualStatus !== 'cancelled'
       )
     }
-    
-    return bookings.filter(booking => booking.status === statusFilter)
+
+    return bookingsWithVirtualStatus.filter(booking => booking.virtualStatus === statusFilter)
   }, [])
 
   // Helper function to get status filter display text
@@ -382,13 +473,13 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
           return (checkInDate <= end && checkOutDate >= start)
         })
         
-        // Apply status filtering
-        const statusFilteredResults = filterBookingsByStatus(dateFilteredResults, selectedStatusFilter)
-        
+        // Apply status filtering (async)
+        const statusFilteredResults = await filterBookingsByStatus(dateFilteredResults, selectedStatusFilter)
+
         setBookings(statusFilteredResults)
       } else {
-        // Apply status filtering to all bookings
-        const statusFilteredResults = filterBookingsByStatus(bookingsWithDetails, selectedStatusFilter)
+        // Apply status filtering to all bookings (async)
+        const statusFilteredResults = await filterBookingsByStatus(bookingsWithDetails, selectedStatusFilter)
         setBookings(statusFilteredResults)
       }
       
@@ -457,8 +548,37 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
         })
       )
       
-      // Filter bookings based on search term (client-side search)
-      const searchResults = allBookingsWithDetails.filter((booking: Booking) => {
+      // Calculate virtual status for each booking and then filter based on search term
+      const bookingsWithVirtualStatus = await Promise.all(
+        allBookingsWithDetails.map(async (booking) => {
+          try {
+            // Load payment data for virtual status calculation
+            const payments = await getPaymentsByReservationId(booking.id)
+            const virtualStatus = getCalculatedStatusForBooking(booking, payments)
+            const paymentTotals = calculatePaymentTotalsForBooking(booking, payments)
+
+            return {
+              ...booking,
+              virtualStatus,
+              virtualPaymentTotals: paymentTotals
+            }
+          } catch (error) {
+            console.error(`Error loading payments for search booking ${booking.id}:`, error)
+            // Fallback to original booking data
+            return {
+              ...booking,
+              virtualStatus: booking.status,
+              virtualPaymentTotals: {
+                totalPaid: booking.total_paid || 0,
+                remainingBalance: booking.remaining_balance || 0
+              }
+            }
+          }
+        })
+      )
+
+      // Filter bookings based on search term (including virtual status)
+      const searchResults = bookingsWithVirtualStatus.filter((booking: Booking) => {
         const searchLower = term.toLowerCase()
         return (
           booking.reference_number?.toLowerCase().includes(searchLower) ||
@@ -466,10 +586,11 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
           booking.guest_phone?.toLowerCase().includes(searchLower) ||
           booking.guest_email?.toLowerCase().includes(searchLower) ||
           booking.room_numbers?.toLowerCase().includes(searchLower) ||
-          booking.status?.toLowerCase().includes(searchLower)
+          booking.status?.toLowerCase().includes(searchLower) ||
+          booking.virtualStatus?.toLowerCase().includes(searchLower)
         )
       })
-      
+
       setBookings(searchResults)
       
       if (searchResults?.length === 0) {
