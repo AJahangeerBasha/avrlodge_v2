@@ -187,7 +187,7 @@ export const validatePaymentStatus = (paymentStatus: string): ValidationError | 
 export const validateGuestType = (guestType: string | undefined): ValidationError | null => {
   if (!guestType) return null
   
-  const validGuestTypes: GuestType[] = ['individual', 'family', 'group', 'corporate', 'wedding', 'event']
+  const validGuestTypes: GuestType[] = ['individual', 'family', 'friends', 'couple']
   
   if (!validGuestTypes.includes(guestType as GuestType)) {
     return {
@@ -207,30 +207,30 @@ export const validatePaymentConsistency = (data: CreateReservationData): Validat
   const { totalPrice, advancePayment = 0, balancePayment = 0, paymentStatus = 'pending' } = data
   
   // Check if advance + balance equals total
-  if (Math.abs((advancePayment + balancePayment) - totalPrice) > 0.01) {
-    errors.push({
-      field: 'payments',
-      message: 'Advance payment + Balance payment must equal Total price',
-      code: 'PAYMENT_MISMATCH'
-    })
-  }
+  // if (Math.abs((advancePayment + balancePayment) - totalPrice) > 0.01) {
+  //   errors.push({
+  //     field: 'payments',
+  //     message: 'Advance payment + Balance payment must equal Total price',
+  //     code: 'PAYMENT_MISMATCH'
+  //   })
+  // }
   
   // Validate payment status consistency
-  if (paymentStatus === 'paid' && (advancePayment + balancePayment) < totalPrice) {
-    errors.push({
-      field: 'paymentStatus',
-      message: 'Payment status cannot be "paid" when total payments are less than total price',
-      code: 'INCONSISTENT_PAYMENT_STATUS'
-    })
-  }
+  // if (paymentStatus === 'paid' && (advancePayment + balancePayment) < totalPrice) {
+  //   errors.push({
+  //     field: 'paymentStatus',
+  //     message: 'Payment status cannot be "paid" when total payments are less than total price',
+  //     code: 'INCONSISTENT_PAYMENT_STATUS'
+  //   })
+  // }
   
-  if (paymentStatus === 'pending' && (advancePayment > 0 || balancePayment > 0)) {
-    errors.push({
-      field: 'paymentStatus',
-      message: 'Payment status should not be "pending" when payments have been made',
-      code: 'INCONSISTENT_PAYMENT_STATUS'
-    })
-  }
+  // if (paymentStatus === 'pending' && (advancePayment > 0 || balancePayment > 0)) {
+  //   errors.push({
+  //     field: 'paymentStatus',
+  //     message: 'Payment status should not be "pending" when payments have been made',
+  //     code: 'INCONSISTENT_PAYMENT_STATUS'
+  //   })
+  // }
   
   return errors
 }
@@ -270,11 +270,11 @@ export const validateReservation = (data: CreateReservationData): ValidationResu
   const totalPriceError = validateAmount(data.totalPrice, 'totalPrice', false)
   if (totalPriceError) errors.push(totalPriceError)
   
-  const advancePaymentError = validateAmount(data.advancePayment || 0, 'advancePayment')
-  if (advancePaymentError) errors.push(advancePaymentError)
+  // const advancePaymentError = validateAmount(data.advancePayment || 0, 'advancePayment')
+  // if (advancePaymentError) errors.push(advancePaymentError)
   
-  const balancePaymentError = validateAmount(data.balancePayment || 0, 'balancePayment')
-  if (balancePaymentError) errors.push(balancePaymentError)
+  // const balancePaymentError = validateAmount(data.balancePayment || 0, 'balancePayment')
+  // if (balancePaymentError) errors.push(balancePaymentError)
   
   // Validate status values
   const statusError = validateStatus(data.status || 'reservation')
@@ -287,7 +287,7 @@ export const validateReservation = (data: CreateReservationData): ValidationResu
   if (guestTypeError) errors.push(guestTypeError)
   
   // Validate payment consistency
-  errors.push(...validatePaymentConsistency(data))
+  // errors.push(...validatePaymentConsistency(data))
   
   return {
     isValid: errors.length === 0,

@@ -1,24 +1,24 @@
-import { 
-  collection, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  getDocs, 
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
   getDoc,
-  query, 
-  where, 
+  query,
+  where,
   orderBy,
   limit,
   serverTimestamp,
-  Timestamp 
+  Timestamp
 } from 'firebase/firestore'
 import { db } from './firebase'
-import { 
-  Reservation, 
-  CreateReservationData, 
-  UpdateReservationData, 
-  ReservationFilters, 
+import {
+  Reservation,
+  CreateReservationData,
+  UpdateReservationData,
+  ReservationFilters,
   ReservationStats,
   ReservationStatus,
   PaymentStatus
@@ -54,7 +54,7 @@ const convertFirestoreToReservation = (doc: any): Reservation => {
     paymentStatus: data.paymentStatus || 'pending',
     createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : data.createdAt,
     updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : data.updatedAt,
-    deletedAt: data.deletedAt ? 
+    deletedAt: data.deletedAt ?
       (data.deletedAt instanceof Timestamp ? data.deletedAt.toDate().toISOString() : data.deletedAt) : null,
     createdBy: data.createdBy,
     updatedBy: data.updatedBy,
@@ -66,11 +66,11 @@ const convertFirestoreToReservation = (doc: any): Reservation => {
 export const getAllReservations = async (filters?: ReservationFilters): Promise<Reservation[]> => {
   try {
     const reservationsRef = collection(db, RESERVATIONS_COLLECTION)
-    
+
     // Try with optimized query first
     try {
       let q = query(reservationsRef)
-      
+
       // Apply filters
       if (filters?.status) {
         q = query(q, where('status', '==', filters.status))
@@ -90,15 +90,15 @@ export const getAllReservations = async (filters?: ReservationFilters): Promise<
       if (filters?.referenceNumber) {
         q = query(q, where('referenceNumber', '==', filters.referenceNumber))
       }
-      
+
       // Order by creation date (most recent first)
       if (!filters || Object.keys(filters).length <= 1) {
         q = query(q, orderBy('createdAt', 'desc'))
       }
-      
+
       const querySnapshot = await getDocs(q)
       let reservations = querySnapshot.docs.map(convertFirestoreToReservation)
-      
+
       // Client-side filtering for date ranges
       if (filters?.checkInDateFrom || filters?.checkInDateTo) {
         reservations = reservations.filter(reservation => {
@@ -111,7 +111,7 @@ export const getAllReservations = async (filters?: ReservationFilters): Promise<
           return true
         })
       }
-      
+
       if (filters?.checkOutDateFrom || filters?.checkOutDateTo) {
         reservations = reservations.filter(reservation => {
           if (filters.checkOutDateFrom && reservation.checkOutDate < filters.checkOutDateFrom) {
@@ -123,19 +123,19 @@ export const getAllReservations = async (filters?: ReservationFilters): Promise<
           return true
         })
       }
-      
+
       // Client-side sorting if we couldn't use orderBy
       if (filters && Object.keys(filters).length > 1) {
         reservations.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       }
-      
+
       return reservations
     } catch (indexError) {
       // Fallback: Get all docs and filter/sort in client
       console.warn('Index not ready, using client-side filtering:', indexError.message)
       const querySnapshot = await getDocs(reservationsRef)
       let reservations = querySnapshot.docs.map(convertFirestoreToReservation)
-      
+
       // Apply all filters client-side
       if (filters) {
         reservations = reservations.filter(reservation => {
@@ -152,10 +152,10 @@ export const getAllReservations = async (filters?: ReservationFilters): Promise<
           return true
         })
       }
-      
+
       // Sort by creation date
       reservations.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      
+
       return reservations
     }
   } catch (error) {
@@ -169,11 +169,11 @@ export const getReservationById = async (id: string): Promise<Reservation | null
   try {
     const docRef = doc(db, RESERVATIONS_COLLECTION, id)
     const docSnap = await getDoc(docRef)
-    
+
     if (docSnap.exists()) {
       return convertFirestoreToReservation(docSnap)
     }
-    
+
     return null
   } catch (error) {
     console.error('Error getting reservation:', error)
@@ -187,11 +187,11 @@ export const getReservationByReferenceNumber = async (referenceNumber: string): 
     const reservationsRef = collection(db, RESERVATIONS_COLLECTION)
     const q = query(reservationsRef, where('referenceNumber', '==', referenceNumber), limit(1))
     const querySnapshot = await getDocs(q)
-    
+
     if (!querySnapshot.empty) {
       return convertFirestoreToReservation(querySnapshot.docs[0])
     }
-    
+
     return null
   } catch (error) {
     console.error('Error getting reservation by reference number:', error)
@@ -203,7 +203,7 @@ export const getReservationByReferenceNumber = async (referenceNumber: string): 
 export const getReservationsWithRoomDetails = async (filters?: ReservationFilters): Promise<Reservation[]> => {
   try {
     const reservations = await getAllReservations(filters)
-    
+
     // Fetch room details for each reservation
     const reservationsWithRooms = await Promise.all(
       reservations.map(async (reservation) => {
@@ -225,7 +225,7 @@ export const getReservationsWithRoomDetails = async (filters?: ReservationFilter
         }
       })
     )
-    
+
     return reservationsWithRooms
   } catch (error) {
     console.error('Error getting reservations with room details:', error)
@@ -235,7 +235,7 @@ export const getReservationsWithRoomDetails = async (filters?: ReservationFilter
 
 // Create new reservation
 export const createReservation = async (
-  data: CreateReservationData, 
+  data: CreateReservationData,
   userId: string
 ): Promise<{ id: string; referenceNumber: string }> => {
   try {
@@ -244,10 +244,10 @@ export const createReservation = async (
     if (!validation.isValid) {
       throw new Error(`Validation failed: ${validation.errors.map(e => e.message).join(', ')}`)
     }
-    
+
     // Generate reference number
     const referenceNumber = await generateReferenceNumber()
-    
+
     const reservationsRef = collection(db, RESERVATIONS_COLLECTION)
     const reservationData = {
       ...data,
@@ -256,8 +256,8 @@ export const createReservation = async (
       paymentStatus: data.paymentStatus || 'pending',
       percentageDiscount: data.percentageDiscount || 0,
       fixedDiscount: data.fixedDiscount || 0,
-      advancePayment: data.advancePayment || 0,
-      balancePayment: data.balancePayment || 0,
+      // advancePayment: data.advancePayment || 0,
+      // balancePayment: data.balancePayment || 0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       createdBy: userId,
@@ -265,7 +265,7 @@ export const createReservation = async (
       deletedAt: null,
       deletedBy: null
     }
-    
+
     const docRef = await addDoc(reservationsRef, reservationData)
     return { id: docRef.id, referenceNumber }
   } catch (error) {
@@ -276,7 +276,7 @@ export const createReservation = async (
 
 // Update reservation
 export const updateReservation = async (
-  id: string, 
+  id: string,
   data: UpdateReservationData
 ): Promise<void> => {
   try {
@@ -285,7 +285,7 @@ export const updateReservation = async (
       ...data,
       updatedAt: serverTimestamp()
     }
-    
+
     await updateDoc(docRef, updateData)
   } catch (error) {
     console.error('Error updating reservation:', error)
@@ -295,7 +295,7 @@ export const updateReservation = async (
 
 // Update reservation status
 export const updateReservationStatus = async (
-  id: string, 
+  id: string,
   status: ReservationStatus,
   userId: string
 ): Promise<void> => {
@@ -314,7 +314,7 @@ export const updateReservationStatus = async (
 
 // Update payment status
 export const updatePaymentStatus = async (
-  id: string, 
+  id: string,
   paymentStatus: PaymentStatus,
   advancePayment?: number,
   balancePayment?: number,
@@ -326,11 +326,11 @@ export const updatePaymentStatus = async (
       paymentStatus,
       updatedAt: serverTimestamp()
     }
-    
+
     if (advancePayment !== undefined) updateData.advancePayment = advancePayment
     if (balancePayment !== undefined) updateData.balancePayment = balancePayment
     if (userId) updateData.updatedBy = userId
-    
+
     await updateDoc(docRef, updateData)
   } catch (error) {
     console.error('Error updating payment status:', error)
@@ -383,12 +383,12 @@ export const getReservationsForRoom = async (roomId: string): Promise<Reservatio
 
 // Get reservations for date range
 export const getReservationsForDateRange = async (
-  checkInFrom: string, 
+  checkInFrom: string,
   checkInTo: string
 ): Promise<Reservation[]> => {
-  return getAllReservations({ 
-    checkInDateFrom: checkInFrom, 
-    checkInDateTo: checkInTo 
+  return getAllReservations({
+    checkInDateFrom: checkInFrom,
+    checkInDateTo: checkInTo
   })
 }
 
@@ -396,10 +396,10 @@ export const getReservationsForDateRange = async (
 export const getReservationStats = async (): Promise<ReservationStats> => {
   try {
     const reservations = await getAllReservations()
-    
+
     const stats = reservations.reduce((acc, reservation) => {
       acc.totalReservations++
-      
+
       switch (reservation.status) {
         case 'reservation':
         case 'booking':
@@ -413,15 +413,15 @@ export const getReservationStats = async (): Promise<ReservationStats> => {
           acc.cancelledReservations++
           break
       }
-      
+
       if (reservation.paymentStatus === 'pending') {
         acc.pendingPayments++
       }
-      
+
       if (reservation.status === 'checked_out') {
         acc.totalRevenue += reservation.totalPrice
       }
-      
+
       return acc
     }, {
       totalReservations: 0,
@@ -433,7 +433,7 @@ export const getReservationStats = async (): Promise<ReservationStats> => {
       averageStayDuration: 0,
       occupancyRate: 0
     })
-    
+
     // Calculate average stay duration
     if (reservations.length > 0) {
       const totalDuration = reservations.reduce((sum, reservation) => {
@@ -444,11 +444,11 @@ export const getReservationStats = async (): Promise<ReservationStats> => {
       }, 0)
       stats.averageStayDuration = totalDuration / reservations.length
     }
-    
+
     // Note: Occupancy rate calculation would need total room count and date range
     // This is a simplified calculation
     stats.occupancyRate = stats.activeReservations / Math.max(stats.totalReservations, 1) * 100
-    
+
     return stats
   } catch (error) {
     console.error('Error getting reservation stats:', error)
@@ -458,8 +458,8 @@ export const getReservationStats = async (): Promise<ReservationStats> => {
 
 // Check room availability for date range
 export const isRoomAvailable = async (
-  roomId: string, 
-  checkInDate: string, 
+  roomId: string,
+  checkInDate: string,
   checkOutDate: string,
   excludeReservationId?: string
 ): Promise<boolean> => {
@@ -470,7 +470,7 @@ export const isRoomAvailable = async (
       where('roomId', '==', roomId),
       where('status', 'in', ['reservation', 'booking', 'checked_in'])
     )
-    
+
     const querySnapshot = await getDocs(q)
     const conflictingReservations = querySnapshot.docs
       .map(convertFirestoreToReservation)
@@ -479,17 +479,17 @@ export const isRoomAvailable = async (
         if (excludeReservationId && reservation.id === excludeReservationId) {
           return false
         }
-        
+
         // Check for date overlap
         const existingCheckIn = new Date(reservation.checkInDate)
         const existingCheckOut = new Date(reservation.checkOutDate)
         const newCheckIn = new Date(checkInDate)
         const newCheckOut = new Date(checkOutDate)
-        
+
         // Check if dates overlap
         return !(newCheckOut <= existingCheckIn || newCheckIn >= existingCheckOut)
       })
-    
+
     return conflictingReservations.length === 0
   } catch (error) {
     console.error('Error checking room availability:', error)

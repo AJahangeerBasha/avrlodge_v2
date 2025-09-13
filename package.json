@@ -23,7 +23,8 @@
     "import-room-types": "tsx scripts/importRoomTypes.ts",
     "import-rooms": "tsx scripts/importRooms.ts",
     "import-special-charges": "tsx scripts/importSpecialCharges.ts",
-    "add-rooms": "tsx scripts/addRooms.ts"
+    "add-rooms": "tsx scripts/addRooms.ts",
+    "delete-reservation": "tsx scripts/deleteReservationData.ts"
   },
   "dependencies": {
     "@dataconnect/generated": "file:src/dataconnect-generated",
@@ -66,6 +67,7 @@
     "clsx": "^2.1.0",
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
+    "dotenv": "^17.2.2",
     "embla-carousel-react": "^8.6.0",
     "firebase": "^12.2.1",
     "framer-motion": "^11.18.2",

@@ -171,11 +171,17 @@ export const AdminReservation: React.FC = () => {
 
   const loadInitialData = async () => {
     try {
+      console.log('Loading initial data...');
       const [roomTypesData, roomsData, specialChargesData] = await Promise.all([
         getAllRoomTypes(),
         getAllRooms(),
-        getAllSpecialCharges()
+        getAllSpecialCharges({ isActive: true }) // Only get active charges
       ]);
+      
+      console.log('Loaded room types:', roomTypesData.length);
+      console.log('Loaded rooms:', roomsData.length);
+      console.log('Loaded special charges data:', specialChargesData);
+      console.log('Active special charges count:', specialChargesData.length);
       
       setRoomTypes(roomTypesData);
       setRooms(roomsData);
@@ -255,9 +261,8 @@ export const AdminReservation: React.FC = () => {
       // Set location data
       const primaryGuestLocation = reservationGuests?.find(g => g.isPrimaryGuest);
       if (primaryGuestLocation) {
-        setPincode(primaryGuestLocation.pincode || '');
-        setState(primaryGuestLocation.state || '');
-        setDistrict(primaryGuestLocation.district || '');
+        setSelectedState(primaryGuestLocation.state || '');
+        setSelectedDistrict(primaryGuestLocation.district || '');
       }
 
       // Set guest type
@@ -309,37 +314,149 @@ export const AdminReservation: React.FC = () => {
       // Generate reference number for new reservations
       const referenceNumber = isEditMode ? '' : await generateReferenceNumber();
       
-      // Prepare reservation data
+      // Convert guest type to expected format
+      const normalizedGuestType = (() => {
+        switch (guestType.toLowerCase()) {
+          case 'individual':
+            return 'individual';
+          case 'couple':
+            return 'couple';
+          case 'family':
+            return 'family';
+          case 'friends':
+            return 'group';
+          default:
+            return 'individual';
+        }
+      })();
+
+      // Log discount values for debugging
+      console.log('Discount type:', discountType);
+      console.log('Discount value:', discountValue);
+      console.log('Calculated discounts - percentage:', discountType === 'percentage' ? discountValue : 0, 'fixed:', discountType === 'amount' ? discountValue : 0);
+
+      // Calculate room tariff total for the old interface compatibility
+      const roomTariffTotal = roomAllocations.reduce((total, room) => {
+        const numberOfNights = calculateNumberOfNights();
+        return total + (room.tariff * numberOfNights);
+      }, 0);
+
+      // For the new system, we need to create a reservation using the new format
       const reservationData = {
-        referenceNumber: isEditMode ? undefined : referenceNumber,
+        // Required fields for compatibility with old interface
+        roomId: roomAllocations.length > 0 ? roomAllocations[0].roomId : 'temp-room-id',
+        totalQuote: calculateTotalAmount(),
+        roomTariff: roomTariffTotal,
+        
+        // New system fields
         guestName: primaryGuest.name,
         guestEmail: '', // Not captured in this form
         guestPhone: primaryGuest.phone,
-        guestType: guestType,
+        guestType: normalizedGuestType,
         checkInDate: checkInDate,
         checkOutDate: checkOutDate,
         guestCount: guestCount,
         totalPrice: calculateTotalAmount(),
+        percentageDiscount: discountType === 'percentage' ? discountValue : 0,
+        fixedDiscount: discountType === 'amount' ? discountValue : 0,
         status: 'reservation' as const,
-        paymentStatus: 'pending' as const,
-        isActive: true,
-        createdBy: currentUser.uid,
-        updatedBy: currentUser.uid
+        paymentStatus: 'pending' as const
       };
+
+      console.log('Final reservation data:', reservationData);
 
       let savedReservation;
       
       if (isEditMode && editReservationId) {
         // Update existing reservation
-        savedReservation = await updateReservation(editReservationId, reservationData, currentUser.uid);
+        savedReservation = await updateReservation(editReservationId, reservationData);
         
         setError('');
         console.log('Reservation updated successfully');
         navigate('/admin/bookings');
         return;
       } else {
-        // Create new reservation
+        // Create new reservation with the simplified data
         savedReservation = await createReservation(reservationData, currentUser.uid);
+        const newReservationId = savedReservation.id;
+        
+        // Create primary guest with state/district
+        await createGuest({
+          reservationId: newReservationId,
+          name: primaryGuest.name,
+          phone: primaryGuest.phone,
+          whatsapp: primaryGuest.whatsapp || undefined,
+          telegram: primaryGuest.telegram || undefined,
+          state: selectedState,
+          district: selectedDistrict,
+          isPrimaryGuest: true
+        }, currentUser.uid);
+
+        // Create secondary guests with state/district
+        if (secondaryGuests.length > 0) {
+          for (const guest of secondaryGuests) {
+            await createGuest({
+              reservationId: newReservationId,
+              name: guest.name,
+              phone: guest.phone,
+              whatsapp: guest.whatsapp || undefined,
+              telegram: guest.telegram || undefined,
+              state: selectedState,
+              district: selectedDistrict,
+              isPrimaryGuest: false
+            }, currentUser.uid);
+          }
+        }
+
+        // Create reservation rooms for each room allocation
+        if (roomAllocations.length > 0) {
+          console.log('Creating reservation rooms:', roomAllocations);
+          const { createReservationRoom } = await import('../../lib/reservationRooms');
+          for (const roomAllocation of roomAllocations) {
+            console.log('Creating room allocation:', roomAllocation);
+            const roomData = {
+              reservationId: newReservationId,
+              roomId: roomAllocation.roomId,
+              roomNumber: roomAllocation.roomNumber,
+              roomType: roomAllocation.roomType,
+              guestCount: roomAllocation.guestCount,
+              tariffPerNight: roomAllocation.tariff,
+              roomStatus: 'pending' as const
+            };
+            console.log('Creating reservation room with data:', roomData);
+            const roomId = await createReservationRoom(roomData, currentUser.uid);
+            console.log('Successfully created reservation room:', roomId);
+          }
+        }
+
+        // Create special charges linked to this reservation
+        if (specialCharges.length > 0) {
+          console.log('Creating special charges:', specialCharges);
+          const { createReservationSpecialCharge } = await import('../../lib/reservationSpecialCharges');
+          for (const charge of specialCharges) {
+            console.log('Processing charge:', charge);
+            if (!charge.masterId) {
+              console.error('Missing masterId for charge:', charge);
+              continue;
+            }
+            try {
+              const chargeData = {
+                reservationId: newReservationId,
+                specialChargeId: charge.masterId,
+                quantity: charge.quantity || 1,
+                customRate: charge.amount,
+                customDescription: charge.description,
+                totalAmount: charge.amount * (charge.quantity || 1)
+              };
+              console.log('Creating charge with data:', chargeData);
+              const chargeId = await createReservationSpecialCharge(chargeData, currentUser.uid);
+              console.log('Successfully created charge:', chargeId);
+            } catch (chargeError) {
+              console.error('Error creating individual charge:', chargeError);
+              // Continue with other charges even if one fails
+            }
+          }
+        }
         
         // Show success modal
         setSuccessData({
@@ -789,6 +906,44 @@ export const AdminReservation: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Location Information Section */}
+        <Card className="border-0 shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center space-x-2 text-lg font-semibold text-gray-900">
+              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                <MapPin className="h-4 w-4 text-white" />
+              </div>
+              <span>Guest Location</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">State *</Label>
+                <SearchableDropdown
+                  options={statesDistrictsData.map(s => s.state)}
+                  value={selectedState}
+                  onChange={setSelectedState}
+                  placeholder="Select state"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">District *</Label>
+                <SearchableDropdown
+                  options={districts}
+                  value={selectedDistrict}
+                  onChange={setSelectedDistrict}
+                  placeholder={selectedState ? "Select district" : "Select state first"}
+                  disabled={!selectedState || districts.length === 0}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Guest Information Section */}
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-4">
@@ -850,7 +1005,7 @@ export const AdminReservation: React.FC = () => {
           </Button>
           <Button 
             onClick={handleNext} 
-            disabled={!checkInDate || !checkOutDate || !guestType}
+            disabled={!checkInDate || !checkOutDate || !selectedState || !selectedDistrict || !guestType}
             className="px-8 py-3 bg-black hover:bg-gray-800 text-white font-medium rounded-lg"
           >
             Next: Room Allocation →
@@ -1150,6 +1305,18 @@ export const AdminReservation: React.FC = () => {
     }
   }, [currentStep, guestCount, roomAllocations, specialChargesMaster, specialCharges, addSpecialCharge, setSpecialCharges]);
 
+  // Reset district when state changes
+  useEffect(() => {
+    if (selectedState) {
+      const stateData = statesDistrictsData.find(s => s.state === selectedState);
+      if (stateData && !stateData.district.includes(selectedDistrict)) {
+        setSelectedDistrict('');
+      }
+    } else {
+      setSelectedDistrict('');
+    }
+  }, [selectedState, selectedDistrict, setSelectedDistrict]);
+
   const renderPaymentConfirmationForm = () => {
     const numberOfNights = calculateNumberOfNights();
     
@@ -1251,6 +1418,15 @@ export const AdminReservation: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Debug info */}
+            {console.log('Rendering special charges, specialChargesMaster:', specialChargesMaster)}
+            {specialChargesMaster.length === 0 && (
+              <div className="text-center py-4 text-red-600 bg-red-50 rounded-lg">
+                <p>No special charges available. Please check if data is loaded properly.</p>
+                <p className="text-sm mt-1">specialChargesMaster length: {specialChargesMaster.length}</p>
+              </div>
+            )}
+            
             {/* Master Special Charges - Single Line Layout */}
             <div className="flex gap-4 mb-6 overflow-x-auto pb-2" style={{scrollbarWidth: 'thin'}}>
               {specialChargesMaster.map((masterCharge) => {
