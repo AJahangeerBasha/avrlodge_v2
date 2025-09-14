@@ -60,13 +60,16 @@ export const getAllSpecialCharges = async (filters?: SpecialChargeFilters): Prom
       }
       
       const querySnapshot = await getDocs(q)
-      const charges = querySnapshot.docs.map(convertFirestoreToSpecialCharge)
-      
+      let charges = querySnapshot.docs.map(convertFirestoreToSpecialCharge)
+
+      // Filter out soft-deleted records (client-side to handle null values)
+      charges = charges.filter(charge => !charge.deletedAt)
+
       // Client-side sorting if we couldn't use orderBy
       if (filters && Object.keys(filters).length > 1) {
         charges.sort((a, b) => a.chargeName.localeCompare(b.chargeName))
       }
-      
+
       return charges
     } catch (indexError) {
       // Fallback: Get all docs and filter/sort in client
@@ -74,6 +77,9 @@ export const getAllSpecialCharges = async (filters?: SpecialChargeFilters): Prom
       const querySnapshot = await getDocs(chargesRef)
       let charges = querySnapshot.docs.map(convertFirestoreToSpecialCharge)
       
+      // Filter out soft-deleted records first
+      charges = charges.filter(charge => !charge.deletedAt)
+
       // Apply filters client-side
       if (filters?.isActive !== undefined) {
         charges = charges.filter(charge => charge.isActive === filters.isActive)
@@ -81,10 +87,10 @@ export const getAllSpecialCharges = async (filters?: SpecialChargeFilters): Prom
       if (filters?.rateType) {
         charges = charges.filter(charge => charge.rateType === filters.rateType)
       }
-      
+
       // Sort by charge name
       charges.sort((a, b) => a.chargeName.localeCompare(b.chargeName))
-      
+
       return charges
     }
   } catch (error) {

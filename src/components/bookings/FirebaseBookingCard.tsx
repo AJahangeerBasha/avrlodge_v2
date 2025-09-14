@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useBookings } from '@/contexts/BookingsContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Phone, User, Hash, Calendar, Users, Home, DollarSign, X, AlertTriangle, History, FileText, Eye, ChevronDown, ChevronUp, RefreshCw, Receipt } from 'lucide-react'
@@ -223,7 +223,7 @@ export default function FirebaseBookingCard({
   };
 
   // Load payment history
-  const loadPaymentHistory = async () => {
+  const loadPaymentHistory = useCallback(async () => {
     try {
       setLoadingPayments(true)
       const paymentHistory = await getPaymentsByReservationId(booking.id)
@@ -238,7 +238,7 @@ export default function FirebaseBookingCard({
     } finally {
       setLoadingPayments(false)
     }
-  };
+  }, [booking.id, toast]);
 
   // Load documents
   const loadDocuments = async () => {
@@ -259,7 +259,7 @@ export default function FirebaseBookingCard({
   };
 
   // Load special charges
-  const loadSpecialCharges = async () => {
+  const loadSpecialCharges = useCallback(async () => {
     try {
       setLoadingSpecialCharges(true)
 
@@ -297,7 +297,7 @@ export default function FirebaseBookingCard({
     } finally {
       setLoadingSpecialCharges(false)
     }
-  };
+  }, [booking.id, booking.reservation_special_charges, booking.created_at]);
 
   // Calculate payment totals from actual payment history
   const calculatePaymentTotals = () => {
@@ -317,26 +317,19 @@ export default function FirebaseBookingCard({
     return { totalPaid, remainingBalance }
   }
 
-  // Load payment history on component mount and when booking data changes
+  // Load payment history on component mount and when booking ID changes
   useEffect(() => {
     loadPaymentHistory()
     loadSpecialCharges()
-  }, [booking.id, booking.total_paid, booking.remaining_balance])
+  }, [loadPaymentHistory, loadSpecialCharges])
 
-  // Refresh data when parent calls onPaymentUpdate
-  useEffect(() => {
-    // Re-load payments when payment updates occur
-    loadPaymentHistory()
-    loadSpecialCharges()
-  }, [booking])
-
-  // Also refresh when onPaymentUpdate function changes (indicates parent update)
+  // Refresh data when onPaymentUpdate function is called (indicates parent update)
   useEffect(() => {
     if (onPaymentUpdate) {
       loadPaymentHistory()
       loadSpecialCharges()
     }
-  }, [onPaymentUpdate])
+  }, [onPaymentUpdate, loadPaymentHistory, loadSpecialCharges])
 
   // Handle documents modal
   const handleShowDocuments = () => {

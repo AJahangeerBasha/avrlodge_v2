@@ -11,7 +11,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Guest } from '@/lib/types/guests';
 import { Room } from '@/lib/types/rooms';
 import { RoomType } from '@/lib/types/roomTypes';
-import { SpecialCharge } from '@/lib/types/specialCharges';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -162,23 +161,32 @@ export const AdminReservation: React.FC = () => {
   const loadInitialData = async () => {
     try {
       console.log('Loading initial data...');
-      const [roomTypesData, roomsData, specialChargesData] = await Promise.all([
+
+      // Load special charges first to debug the issue
+      console.log('Loading special charges...');
+      const specialChargesData = await getAllSpecialCharges({ isActive: true });
+      console.log('Special charges result:', specialChargesData);
+      console.log('Special charges count:', specialChargesData?.length || 0);
+
+      // Load other data
+      const [roomTypesData, roomsData] = await Promise.all([
         getAllRoomTypes(),
-        getAllRooms(),
-        getAllSpecialCharges({ isActive: true }) // Only get active charges
+        getAllRooms()
       ]);
-      
+
       console.log('Loaded room types:', roomTypesData.length);
       console.log('Loaded rooms:', roomsData.length);
-      console.log('Loaded special charges data:', specialChargesData);
-      console.log('Active special charges count:', specialChargesData.length);
-      
+      console.log('Final special charges to set:', specialChargesData);
+
       setRoomTypes(roomTypesData);
-      setRooms(roomsData);
-      setSpecialChargesMaster(specialChargesData);
+      // Note: roomsData is not stored in state, it's used when loading available rooms for dates
+      setSpecialChargesMaster(specialChargesData || []);
+
+      console.log('State updated with special charges');
     } catch (error) {
       console.error('Error loading initial data:', error);
-      setError('Failed to load initial data');
+      console.error('Error details:', error.message);
+      setError('Failed to load initial data: ' + error.message);
     }
   };
 
