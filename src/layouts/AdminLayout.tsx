@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
-import { ROLES } from '../lib/types/auth'
-import { Button } from '../components/ui/button'
+import { useAuth } from '@/contexts/AuthContext'
+import { ROLES } from '@/lib/types/auth'
+import { Button } from '@/components/ui/button'
 import { LogOut, Users, Settings, BarChart3, Calendar, BookOpen, Home, Bed, DollarSign, Menu, X } from 'lucide-react'
 
 export function AdminLayout() {

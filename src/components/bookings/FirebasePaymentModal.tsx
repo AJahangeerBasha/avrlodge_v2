@@ -3,15 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
   DollarSign,
-  CreditCard,
   Banknote,
   CheckCircle,
   AlertCircle,
-  Receipt,
-  Smartphone,
-  Building2,
-  Wallet,
-  FileText,
   QrCode
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -19,8 +13,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
+import { Payment } from '@/lib/types/payments'
 import { createPayment, getPaymentsByReservationId } from '@/lib/payments'
-import { PaymentType, PaymentMethod } from '@/lib/types/payments'
 
 interface Booking {
   id: string
@@ -51,7 +45,7 @@ export function FirebasePaymentModal({
   const [amount, setAmount] = useState('')
   const [transactionId, setTransactionId] = useState('')
   const [processing, setProcessing] = useState(false)
-  const [payments, setPayments] = useState<any[]>([])
+  const [payments, setPayments] = useState<Payment[]>([])
   const [loadingPayments, setLoadingPayments] = useState(true)
   const { toast } = useToast()
   const { currentUser } = useAuth()

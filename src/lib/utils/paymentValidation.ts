@@ -134,8 +134,9 @@ export const validateTransactionId = (transactionId: string | undefined): Valida
   }
   
   // Check for potentially dangerous characters
-  const dangerousChars = /[<>"/\\|?\x00-\x1f]/
-  if (dangerousChars.test(transactionId)) {
+  const hasInvalidChars = /[<>"'/\\|?]/.test(transactionId) ||
+    transactionId.split('').some(char => char.charCodeAt(0) < 32)
+  if (hasInvalidChars) {
     return {
       field: 'transactionId',
       message: 'Transaction ID contains invalid characters',

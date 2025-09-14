@@ -64,7 +64,7 @@ export default function CalendarPageLayout({ role }: CalendarPageLayoutProps) {
             startDate = format(selectedDate, 'yyyy-MM-dd')
             endDate = format(selectedDate, 'yyyy-MM-dd')
             break
-          case 'week':
+          case 'week': {
             const dayOfWeek = selectedDate.getDay()
             const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
             const weekStart = addDays(selectedDate, -daysFromMonday)
@@ -72,6 +72,7 @@ export default function CalendarPageLayout({ role }: CalendarPageLayoutProps) {
             startDate = format(weekStart, 'yyyy-MM-dd')
             endDate = format(weekEnd, 'yyyy-MM-dd')
             break
+          }
           case 'month':
           default:
             startDate = format(startOfMonth(selectedDate), 'yyyy-MM-dd')
@@ -122,13 +123,14 @@ export default function CalendarPageLayout({ role }: CalendarPageLayoutProps) {
         start = date
         end = date
         break
-      case 'week':
+      case 'week': {
         // Start from Monday of the week
         const dayOfWeek = date.getDay()
         const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
         start = addDays(date, -daysFromMonday)
         end = addDays(start, 6)
         break
+      }
       case 'month':
       default:
         start = startOfMonth(date)

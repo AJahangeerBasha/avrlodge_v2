@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Outlet, Navigate, Link } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
-import { ROLES } from '../lib/types/auth'
-import { Button } from '../components/ui/button'
+import { useAuth } from '@/contexts/AuthContext'
+import { ROLES } from '@/lib/types/auth'
+import { Button } from '@/components/ui/button'
 import { LogOut, Calendar, Users, BarChart3, BookOpen, Settings, Menu, X } from 'lucide-react'
 
 export function ManagerLayout() {

@@ -79,7 +79,8 @@ export const uploadFileWithProgress = (
   onSuccess?: (downloadURL: string) => void,
   metadata?: Record<string, any>
 ): Promise<void> => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
+    (async () => {
     try {
       // Supabase doesn't have built-in progress tracking for uploads
       // We'll simulate progress updates
@@ -108,6 +109,7 @@ export const uploadFileWithProgress = (
       onError?.(err)
       reject(err)
     }
+    })().catch(reject)
   })
 }
 

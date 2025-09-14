@@ -20,7 +20,7 @@
     "build-with-types": "tsc && vite build",
     "build-deploy": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 1000",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 500",
     "import-room-types": "tsx scripts/importRoomTypes.ts",
     "import-rooms": "tsx scripts/importRooms.ts",
     "import-special-charges": "tsx scripts/importSpecialCharges.ts",

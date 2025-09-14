@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Phone, User, Hash, CreditCard, CheckCircle, Calendar, DollarSign, LogIn, FileText, LogOut, Edit, X, Users, Home, Receipt } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import RoomCheckInModal from '@/components/admin/RoomCheckInModal'
 import RoomCheckOutModal from '@/components/admin/RoomCheckOutModal'
 import WhatsAppButton from '@/components/messaging/WhatsAppButton'
@@ -63,18 +62,15 @@ interface BookingCardProps {
   loadingDocuments?: boolean
   showActions?: boolean
   showRoomStatus?: boolean
-  whatsAppData?: any // For WhatsApp messaging data
+  whatsAppData?: unknown // For WhatsApp messaging data
 }
 
 export default function BookingCard({
   booking,
   onPaymentUpdate,
-  onCheckIn,
-  onCheckOut,
   onViewDocuments,
   onEdit,
   onCancel,
-  onStatusChange,
   onRoomCheckIn,
   onRoomCheckOut,
   updatingPayment,
@@ -83,10 +79,9 @@ export default function BookingCard({
   showRoomStatus = false,
   whatsAppData,
 }: BookingCardProps) {
-  const [selectedRoomForCheckIn, setSelectedRoomForCheckIn] = useState<any>(null)
-  const [selectedRoomForCheckOut, setSelectedRoomForCheckOut] = useState<any>(null)
+  const [selectedRoomForCheckIn, setSelectedRoomForCheckIn] = useState<unknown>(null)
+  const [selectedRoomForCheckOut, setSelectedRoomForCheckOut] = useState<unknown>(null)
   const [existingPayments, setExistingPayments] = useState<PaymentRecord[]>([])
-  const [loadingPayments, setLoadingPayments] = useState(false)
   const { profile } = useAuth()
 
   // Load payments automatically for admin users
@@ -423,7 +418,7 @@ export default function BookingCard({
               </div>
               
               <div className="space-y-1 max-h-32 overflow-y-auto">
-                {existingPayments.map((payment, index) => (
+                {existingPayments.map((payment) => (
                   <div
                     key={payment.id}
                     className="bg-white rounded p-2 border border-green-200/50"

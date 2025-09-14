@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { LogIn, X, User, Home, Calendar, Clock, Upload, FileText, CheckCircle, AlertTriangle, Trash2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { LogIn, X, User, Home, Calendar, Upload, FileText, CheckCircle, AlertTriangle, Trash2 } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { DatePicker } from '@/components/ui/date-picker'
 import { TimePicker } from '@/components/ui/time-picker'

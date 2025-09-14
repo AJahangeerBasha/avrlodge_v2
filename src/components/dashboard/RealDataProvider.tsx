@@ -30,17 +30,20 @@ export function RealDataProvider({ children, filter, dateRange }: RealDataProvid
     switch (filterType) {
       case 'today':
         return { from: startDate, to: endDate }
-      case 'yesterday':
+      case 'yesterday': {
         const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000)
         return { from: startOfDay(yesterday), to: endOfDay(yesterday) }
-      case 'current_week':
+      }
+      case 'current_week': {
         const startOfWeekDate = new Date(today.setDate(today.getDate() - today.getDay()))
         const endOfWeekDate = new Date(today.setDate(today.getDate() - today.getDay() + 6))
         return { from: startOfDay(startOfWeekDate), to: endOfDay(endOfWeekDate) }
-      case 'last_week':
+      }
+      case 'last_week': {
         const lastWeekStart = new Date(today.setDate(today.getDate() - today.getDay() - 7))
         const lastWeekEnd = new Date(today.setDate(today.getDate() - today.getDay() - 1))
         return { from: startOfDay(lastWeekStart), to: endOfDay(lastWeekEnd) }
+      }
       case 'current_month':
         return { from: new Date(today.getFullYear(), today.getMonth(), 1), to: new Date(today.getFullYear(), today.getMonth() + 1, 0) }
       case 'last_month':

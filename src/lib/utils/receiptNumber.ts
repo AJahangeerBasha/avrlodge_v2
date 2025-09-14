@@ -333,23 +333,26 @@ export const parseReceiptNumber = (receiptNumber: string): {
   
   try {
     switch (RECEIPT_NUMBER_CONFIG.resetPeriod) {
-      case 'daily':
+      case 'daily': {
         // Format: DDMMYYYY
         const day = parseInt(period.substring(0, 2))
         const month = parseInt(period.substring(2, 4))
         const year = parseInt(period.substring(4, 8))
         return { prefix, year, month, day, counter: parseInt(counter) }
+      }
       
-      case 'monthly':
+      case 'monthly': {
         // Format: MMYYYY
         const monthOnly = parseInt(period.substring(0, 2))
         const yearOnly = parseInt(period.substring(2, 6))
         return { prefix, year: yearOnly, month: monthOnly, counter: parseInt(counter) }
+      }
       
-      case 'yearly':
+      case 'yearly': {
         // Format: YYYY
         const yearFull = parseInt(period)
         return { prefix, year: yearFull, counter: parseInt(counter) }
+      }
       
       default:
         return null

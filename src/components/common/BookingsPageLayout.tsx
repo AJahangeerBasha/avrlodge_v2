@@ -186,23 +186,25 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
           start: startOfDay(now),
           end: endOfDay(now)
         }
-      case 'yesterday':
+      case 'yesterday': {
         const yesterday = subDays(now, 1)
         return {
           start: startOfDay(yesterday),
           end: endOfDay(yesterday)
         }
-      case 'tomorrow':
+      }
+      case 'tomorrow': {
         const tomorrow = addDays(now, 1)
         return {
           start: startOfDay(tomorrow),
           end: endOfDay(tomorrow)
         }
-      case 'this_weekend':
+      }
+      case 'this_weekend': {
         // Get the upcoming weekend (Saturday and Sunday)
         const currentDay = now.getDay()
         let weekendStart: Date
-        
+
         if (currentDay === 6) { // Saturday
           weekendStart = startOfDay(now)
         } else if (currentDay === 0) { // Sunday
@@ -211,13 +213,14 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
           // Find next Saturday
           weekendStart = startOfDay(nextSaturday(now))
         }
-        
+
         const weekendEnd = endOfDay(addDays(weekendStart, 1)) // Sunday
-        
+
         return {
           start: weekendStart,
           end: weekendEnd
         }
+      }
       case 'current_week':
         return {
           start: startOfWeek(now, { weekStartsOn: 1 }), // Monday

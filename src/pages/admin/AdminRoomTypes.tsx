@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card'
+import { Card, CardContent } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Badge } from '../../components/ui/badge'
@@ -13,12 +13,11 @@ import {
   Users, 
   Home, 
   DollarSign,
-  Settings,
   Bed
 } from 'lucide-react'
-import { getAllRoomTypes, deleteRoomType } from '../../lib/roomTypes'
-import { RoomType } from '../../lib/types/roomTypes'
-import { useAuth } from '../../contexts/AuthContext'
+import { getAllRoomTypes, deleteRoomType } from '@/lib/roomTypes'
+import { RoomType } from '@/lib/types/roomTypes'
+import { useAuth } from '@/contexts/AuthContext'
 
 export const AdminRoomTypes: React.FC = () => {
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([])

@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion'
-import { Filter } from 'lucide-react'
 
 interface CalendarFiltersProps {
   showFilters: boolean

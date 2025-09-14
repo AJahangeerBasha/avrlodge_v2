@@ -16,15 +16,14 @@
  * - payments
  */
 
-import { 
-  collection, 
-  getDocs, 
-  deleteDoc, 
-  doc, 
-  query, 
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  query,
   where,
-  writeBatch,
-  limit as firestoreLimit
+  writeBatch
 } from 'firebase/firestore'
 import { db } from './firebaseConfig'
 
@@ -53,7 +52,7 @@ interface DeletionStats {
 /**
  * Delete documents in batches to avoid Firestore limits
  */
-async function deleteInBatches(collectionName: string, docs: any[]): Promise<number> {
+async function deleteInBatches(collectionName: string, docs: FirebaseFirestore.QueryDocumentSnapshot[]): Promise<number> {
   const batchSize = 500 // Firestore batch limit
   let totalDeleted = 0
 

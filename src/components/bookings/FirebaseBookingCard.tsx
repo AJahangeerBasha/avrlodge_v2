@@ -7,11 +7,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
-import { updateReservationRoom } from '@/lib/reservationRooms'
+import { Payment } from '@/lib/types/payments'
+import { RoomCheckinDocument } from '@/lib/types/roomCheckinDocuments'
 import { updateReservationStatus } from '@/lib/reservations'
 import { getPaymentsByReservationId } from '@/lib/payments'
 import { getRoomCheckinDocumentsByReservationId } from '@/lib/roomCheckinDocuments'
-import { getReservationSpecialChargesByReservationId } from '@/lib/reservationSpecialCharges'
+import { getReservationSpecialChargesByReservationId, ReservationSpecialCharge } from '@/lib/reservationSpecialCharges'
 import { supabase } from '@/lib/supabase'
 
 interface Booking {
@@ -69,16 +70,14 @@ export default function FirebaseBookingCard({
   const [cancellationConfirmation, setCancellationConfirmation] = useState('')
   const [showDocuments, setShowDocuments] = useState(false)
   const [showPaymentHistory, setShowPaymentHistory] = useState(false)
-  const [selectedDocument, setSelectedDocument] = useState<any>(null)
-  const [payments, setPayments] = useState<any[]>([])
-  const [documents, setDocuments] = useState<any[]>([])
-  const [specialCharges, setSpecialCharges] = useState<any[]>([])
+  const [selectedDocument, setSelectedDocument] = useState<RoomCheckinDocument | null>(null)
+  const [payments, setPayments] = useState<Payment[]>([])
+  const [documents, setDocuments] = useState<RoomCheckinDocument[]>([])
+  const [specialCharges, setSpecialCharges] = useState<ReservationSpecialCharge[]>([])
   const [loadingPayments, setLoadingPayments] = useState(true)
   const [loadingDocuments, setLoadingDocuments] = useState(false)
   const [loadingSpecialCharges, setLoadingSpecialCharges] = useState(true)
-  const [loadingRoomHistory, setLoadingRoomHistory] = useState(true)
   const [showSpecialCharges, setShowSpecialCharges] = useState(false)
-  const [showRoomHistory, setShowRoomHistory] = useState(false)
   const [processing, setProcessing] = useState(false)
   const { actions } = useBookings()
   const { toast } = useToast()
@@ -373,7 +372,7 @@ export default function FirebaseBookingCard({
   }
 
   // Handle document preview
-  const handleDocumentPreview = (doc: any) => {
+  const handleDocumentPreview = (doc: RoomCheckinDocument) => {
     setSelectedDocument(doc)
   }
 
@@ -383,7 +382,7 @@ export default function FirebaseBookingCard({
   }
 
   // Get proper Supabase public URL for a document
-  const getSupabasePublicURL = (doc: any): string => {
+  const getSupabasePublicURL = (doc: RoomCheckinDocument): string => {
     if (!doc.fileUrl) return ''
 
     // If it's already a full Supabase URL, return as is
@@ -400,7 +399,7 @@ export default function FirebaseBookingCard({
   }
 
   // Create a signed URL for private files (fallback)
-  const getSignedURL = async (doc: any): Promise<string> => {
+  const getSignedURL = async (doc: RoomCheckinDocument): Promise<string> => {
     try {
       if (!doc.fileUrl) return ''
 

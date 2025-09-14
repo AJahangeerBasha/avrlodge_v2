@@ -63,8 +63,8 @@ export const SignupPage: React.FC = () => {
       setLoading(true);
       await signup(email, password, displayName);
       navigate('/dashboard');
-    } catch (error: any) {
-      setError(error.message || 'Failed to create account');
+    } catch (error: unknown) {
+      setError((error as Error).message || 'Failed to create account');
     } finally {
       setLoading(false);
     }
@@ -76,8 +76,8 @@ export const SignupPage: React.FC = () => {
       setLoading(true);
       await loginWithGoogle();
       navigate('/dashboard');
-    } catch (error: any) {
-      setError(error.message || 'Failed to sign up with Google');
+    } catch (error: unknown) {
+      setError((error as Error).message || 'Failed to sign up with Google');
     } finally {
       setLoading(false);
     }

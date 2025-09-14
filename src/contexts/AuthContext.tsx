@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User } from 'firebase/auth';
-import { onAuthStateChange, signOutUser, signInUser, createUser, signInWithGoogle, resetPassword, createUserDocument, updateUserProfile } from '../lib/auth';
-import { UserRole, UserClaims, ROLES } from '../lib/types/auth';
-import { getUserRoleAndClaims, initializeUserRole, subscribeToUserRole } from '../lib/roles';
+import { onAuthStateChange, signOutUser, signInUser, createUser, signInWithGoogle, resetPassword, createUserDocument, updateUserProfile } from '@/lib/auth';
+import { UserRole, UserClaims, ROLES } from '@/lib/types/auth';
+import { getUserRoleAndClaims, initializeUserRole, subscribeToUserRole } from '@/lib/roles';
 
 interface AuthContextType {
   currentUser: User | null;

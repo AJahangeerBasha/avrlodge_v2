@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react'
+import { Room } from '@/lib/types/rooms'
 
 // Booking interface
 interface Booking {
@@ -40,12 +41,12 @@ interface BookingsState {
   checkInModal: {
     isOpen: boolean
     booking: Booking | null
-    room: any | null
+    room: Room | null
   }
   checkOutModal: {
     isOpen: boolean
     booking: Booking | null
-    room: any | null
+    room: Room | null
   }
   paymentModal: {
     isOpen: boolean
@@ -54,7 +55,7 @@ interface BookingsState {
   roomChangeModal: {
     isOpen: boolean
     booking: Booking | null
-    room: any | null
+    room: Room | null
   }
   refreshCallback?: () => void
 }
@@ -70,13 +71,13 @@ type BookingsAction =
   | { type: 'SET_FILTERS'; payload: Partial<BookingsState['filters']> }
   | { type: 'CLEAR_FILTERS' }
   | { type: 'SET_SELECTED_BOOKING'; payload: Booking | null }
-  | { type: 'OPEN_CHECK_IN_MODAL'; payload: { booking: Booking; room: any } }
+  | { type: 'OPEN_CHECK_IN_MODAL'; payload: { booking: Booking; room: Room } }
   | { type: 'CLOSE_CHECK_IN_MODAL' }
-  | { type: 'OPEN_CHECK_OUT_MODAL'; payload: { booking: Booking; room: any } }
+  | { type: 'OPEN_CHECK_OUT_MODAL'; payload: { booking: Booking; room: Room } }
   | { type: 'CLOSE_CHECK_OUT_MODAL' }
   | { type: 'OPEN_PAYMENT_MODAL'; payload: Booking }
   | { type: 'CLOSE_PAYMENT_MODAL' }
-  | { type: 'OPEN_ROOM_CHANGE_MODAL'; payload: { booking: Booking; room: any } }
+  | { type: 'OPEN_ROOM_CHANGE_MODAL'; payload: { booking: Booking; room: Room } }
   | { type: 'CLOSE_ROOM_CHANGE_MODAL' }
   | { type: 'REFRESH_BOOKINGS' }
   | { type: 'SET_REFRESH_CALLBACK'; payload: () => void }
@@ -330,12 +331,12 @@ export function useBookings() {
     setSelectedBooking: (booking: Booking | null) =>
       dispatch({ type: 'SET_SELECTED_BOOKING', payload: booking }),
 
-    openCheckInModal: (booking: Booking, room: any) =>
+    openCheckInModal: (booking: Booking, room: Room) =>
       dispatch({ type: 'OPEN_CHECK_IN_MODAL', payload: { booking, room } }),
 
     closeCheckInModal: () => dispatch({ type: 'CLOSE_CHECK_IN_MODAL' }),
 
-    openCheckOutModal: (booking: Booking, room: any) =>
+    openCheckOutModal: (booking: Booking, room: Room) =>
       dispatch({ type: 'OPEN_CHECK_OUT_MODAL', payload: { booking, room } }),
 
     closeCheckOutModal: () => dispatch({ type: 'CLOSE_CHECK_OUT_MODAL' }),
@@ -345,7 +346,7 @@ export function useBookings() {
 
     closePaymentModal: () => dispatch({ type: 'CLOSE_PAYMENT_MODAL' }),
 
-    openRoomChangeModal: (booking: Booking, room: any) =>
+    openRoomChangeModal: (booking: Booking, room: Room) =>
       dispatch({ type: 'OPEN_ROOM_CHANGE_MODAL', payload: { booking, room } }),
 
     closeRoomChangeModal: () => dispatch({ type: 'CLOSE_ROOM_CHANGE_MODAL' }),

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card'
+import { Card, CardContent } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Badge } from '../../components/ui/badge'
@@ -19,10 +19,10 @@ import {
   MapPin,
   Filter
 } from 'lucide-react'
-import { getRoomsWithType, deleteRoom, updateRoomStatus, getRoomStats } from '../../lib/rooms'
-import { Room, RoomStats } from '../../lib/types/rooms'
-import { getStatusConfig, getStatusOptions } from '../../lib/utils/roomStatus'
-import { useAuth } from '../../contexts/AuthContext'
+import { getRoomsWithType, deleteRoom, updateRoomStatus, getRoomStats } from '@/lib/rooms'
+import { Room, RoomStats } from '@/lib/types/rooms'
+import { getStatusConfig, getStatusOptions } from '@/lib/utils/roomStatus'
+import { useAuth } from '@/contexts/AuthContext'
 
 export const AdminRooms: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([])
@@ -80,7 +80,7 @@ export const AdminRooms: React.FC = () => {
     if (!currentUser) return
     
     try {
-      await updateRoomStatus(roomId, newStatus as any, currentUser.uid)
+      await updateRoomStatus(roomId, newStatus as string, currentUser.uid)
       await loadRooms()
       await loadStats()
     } catch (err) {

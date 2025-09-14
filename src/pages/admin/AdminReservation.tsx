@@ -1,51 +1,46 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { format } from 'date-fns';
-import { CheckCircle, UserPlus, Calendar, Users, BedDouble, CreditCard, Plus, Trash2, X, MapPin, DollarSign } from 'lucide-react';
-import { useReservationStore, type RoomAllocation, type SpecialCharge } from '../../stores/reservationStore';
-import { validatePhoneNumber, formatPhoneNumber, getPhoneValidationError } from '../../utils/phoneValidation';
-import { DateRangePicker } from '../../components/ui/date-range-picker';
-import { SearchableDropdown } from '../../components/ui/searchable-dropdown';
-import statesDistrictsData from '../../data/states-districts.json';
-import { useAuth } from '../../contexts/AuthContext';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Badge } from '../../components/ui/badge';
-import { Alert, AlertDescription } from '../../components/ui/alert';
+import { CheckCircle, Calendar, Users, CreditCard, Plus, Trash2, X, MapPin, DollarSign } from 'lucide-react';
+import { useReservationStore, type RoomAllocation, type SpecialCharge } from '@/stores/reservationStore';
+import { validatePhoneNumber, formatPhoneNumber, getPhoneValidationError } from '@/utils/phoneValidation';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
+import { SearchableDropdown } from '@/components/ui/searchable-dropdown';
+import statesDistrictsData from '@/data/states-districts.json';
+import { useAuth } from '@/contexts/AuthContext';
+import { Guest } from '@/lib/types/guests';
+import { Room } from '@/lib/types/rooms';
+import { RoomType } from '@/lib/types/roomTypes';
+import { SpecialCharge } from '@/lib/types/specialCharges';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  getAllReservations,
   createReservation, 
   updateReservation, 
   getReservationById,
-  deleteReservation
-} from '../../lib/reservations';
+} from '@/lib/reservations';
 import {
-  getGuests,
   createGuest,
-  updateGuest,
-  deleteGuest,
   getGuestsByReservationId
-} from '../../lib/guests';
+} from '@/lib/guests';
 import {
   getAllRooms,
-  updateRoomStatus
-} from '../../lib/rooms';
+} from '@/lib/rooms';
 import {
   getAllRoomTypes
-} from '../../lib/roomTypes';
+} from '@/lib/roomTypes';
 import {
   getAllSpecialCharges
-} from '../../lib/specialCharges';
+} from '@/lib/specialCharges';
 import {
   getAvailableRoomsForDateRange,
-  getAvailableRoomsExcludingSelected
-} from '../../lib/utils/roomAvailability';
+} from '@/lib/utils/roomAvailability';
 import { 
   generateReferenceNumber 
-} from '../../lib/utils/referenceNumber';
+} from '@/lib/utils/referenceNumber';
 
 export const AdminReservation: React.FC = () => {
   const { currentUser } = useAuth();
@@ -85,7 +80,6 @@ export const AdminReservation: React.FC = () => {
     addRoomAllocation,
     removeRoomAllocation,
     updateRoomAllocation,
-    setRoomAllocations,
     addSpecialCharge,
     removeSpecialCharge,
     setSpecialCharges,
@@ -108,24 +102,20 @@ export const AdminReservation: React.FC = () => {
   const [successData, setSuccessData] = useState<{
     referenceNumber: string;
     totalAmount: number;
-    primaryGuest: any;
-    secondaryGuests: any[];
+    primaryGuest: Guest;
+    secondaryGuests: Guest[];
     checkInDate: string;
     checkOutDate: string;
-    roomAllocations: any[];
+    roomAllocations: RoomAllocation[];
     guestCount: number;
   } | null>(null);
 
   // Available data
-  const [roomTypes, setRoomTypes] = useState<any[]>([]);
-  const [rooms, setRooms] = useState<any[]>([]);
-  const [specialChargesMaster, setSpecialChargesMaster] = useState<any[]>([]);
-  const [availableRooms, setAvailableRooms] = useState<any[]>([]);
+  const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
+  const [specialChargesMaster, setSpecialChargesMaster] = useState<SpecialCharge[]>([]);
+  const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
   
   // Track original data for edit mode to detect deletions
-  const [originalSecondaryGuests, setOriginalSecondaryGuests] = useState<any[]>([]);
-  const [originalRoomAllocations, setOriginalRoomAllocations] = useState<any[]>([]);
-  const [originalSpecialCharges, setOriginalSpecialCharges] = useState<any[]>([]);
   
   // Payment method selection
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');

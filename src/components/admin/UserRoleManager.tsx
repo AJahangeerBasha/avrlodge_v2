@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '../ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Badge } from '../ui/badge';
-import { Alert, AlertDescription } from '../ui/alert';
+import React, { useState } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Users, Shield, Crown } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useCollection } from '../../hooks/useFirestore';
-import { setUserRole } from '../../lib/roles';
-import { ROLES, UserRole } from '../../lib/types/auth';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCollection } from '@/hooks/useFirestore';
+import { setUserRole } from '@/lib/roles';
+import { ROLES, UserRole } from '@/lib/types/auth';
 
 interface UserWithRole {
   id: string;
@@ -36,8 +35,8 @@ export const UserRoleManager: React.FC = () => {
     try {
       await setUserRole(userId, newRole, userRole);
       setMessage({ type: 'success', text: `Role updated successfully to ${newRole}` });
-    } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || 'Failed to update role' });
+    } catch (error: unknown) {
+      setMessage({ type: 'error', text: (error as Error).message || 'Failed to update role' });
     } finally {
       setUpdating(null);
     }

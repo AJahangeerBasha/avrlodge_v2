@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card'
+import { Card, CardContent } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Badge } from '../../components/ui/badge'
@@ -17,10 +16,10 @@ import {
   Filter,
   TrendingUp
 } from 'lucide-react'
-import { getAllSpecialCharges, deleteSpecialCharge, getSpecialChargesStats } from '../../lib/specialCharges'
-import { SpecialCharge, SpecialChargeStats } from '../../lib/types/specialCharges'
-import { getRateTypeConfig, getRateTypeOptions, formatRateDisplay } from '../../lib/utils/rateType'
-import { useAuth } from '../../contexts/AuthContext'
+import { getAllSpecialCharges, deleteSpecialCharge, getSpecialChargesStats } from '@/lib/specialCharges'
+import { SpecialCharge, SpecialChargeStats } from '@/lib/types/specialCharges'
+import { getRateTypeConfig, getRateTypeOptions, formatRateDisplay } from '@/lib/utils/rateType'
+import { useAuth } from '@/contexts/AuthContext'
 
 export const AdminSpecialCharges: React.FC = () => {
   const [charges, setCharges] = useState<SpecialCharge[]>([])

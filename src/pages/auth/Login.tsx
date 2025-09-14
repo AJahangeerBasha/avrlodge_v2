@@ -52,8 +52,8 @@ export const LoginPage: React.FC = () => {
       await login(email, password);
       // Let the layouts handle redirects based on role
       navigate('/');
-    } catch (error: any) {
-      setError(error.message || 'Failed to login');
+    } catch (error: unknown) {
+      setError((error as Error).message || 'Failed to login');
     } finally {
       setLoading(false);
     }
@@ -66,8 +66,8 @@ export const LoginPage: React.FC = () => {
       await loginWithGoogle();
       // Let the layouts handle redirects based on role
       navigate('/');
-    } catch (error: any) {
-      setError(error.message || 'Failed to login with Google');
+    } catch (error: unknown) {
+      setError((error as Error).message || 'Failed to login with Google');
     } finally {
       setLoading(false);
     }
