@@ -24,6 +24,7 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     chunkSizeWarningLimit: 1000,
+    target: 'es2022',
     rollupOptions: {
       output: {
         manualChunks: (id) => {
@@ -98,6 +99,9 @@ export default defineConfig({
   },
   define: {
     'process.env': process.env,
+  },
+  esbuild: {
+    target: 'es2022',
   },
   optimizeDeps: {
     include: [

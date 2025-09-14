@@ -110,7 +110,7 @@ export const useCalendarStore = create<CalendarState>()(
         setSelectedStatus: (status) => set((state) => ({
           filters: { ...state.filters, selectedStatus: status }
         })),
-        resetFilters: () => set((state) => ({
+        resetFilters: () => set(() => ({
           filters: {
             selectedRoomType: 'all',
             selectedStatus: 'all',

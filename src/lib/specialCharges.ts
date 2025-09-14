@@ -60,7 +60,7 @@ export const getAllSpecialCharges = async (filters?: SpecialChargeFilters): Prom
       }
       
       const querySnapshot = await getDocs(q)
-      let charges = querySnapshot.docs.map(convertFirestoreToSpecialCharge)
+      const charges = querySnapshot.docs.map(convertFirestoreToSpecialCharge)
       
       // Client-side sorting if we couldn't use orderBy
       if (filters && Object.keys(filters).length > 1) {

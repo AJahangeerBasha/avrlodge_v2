@@ -67,7 +67,7 @@ export const getAllRooms = async (filters?: RoomFilters): Promise<Room[]> => {
       }
       
       const querySnapshot = await getDocs(q)
-      let rooms = querySnapshot.docs.map(convertFirestoreToRoom)
+      const rooms = querySnapshot.docs.map(convertFirestoreToRoom)
       
       // Client-side sorting if we couldn't use orderBy
       if (filters && Object.keys(filters).length > 1) {

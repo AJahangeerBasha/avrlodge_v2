@@ -737,7 +737,7 @@ export const mergeDuplicateGuests = async (
     }
     
     // Merge contact information (keep the most complete)
-    let mergedData = { ...primaryGuest }
+    const mergedData = { ...primaryGuest }
     
     for (const duplicate of duplicateGuests) {
       if (!mergedData.whatsapp && duplicate.whatsapp) {
