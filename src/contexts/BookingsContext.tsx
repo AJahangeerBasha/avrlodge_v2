@@ -51,6 +51,11 @@ interface BookingsState {
     isOpen: boolean
     booking: Booking | null
   }
+  roomChangeModal: {
+    isOpen: boolean
+    booking: Booking | null
+    room: any | null
+  }
   refreshCallback?: () => void
 }
 
@@ -71,6 +76,8 @@ type BookingsAction =
   | { type: 'CLOSE_CHECK_OUT_MODAL' }
   | { type: 'OPEN_PAYMENT_MODAL'; payload: Booking }
   | { type: 'CLOSE_PAYMENT_MODAL' }
+  | { type: 'OPEN_ROOM_CHANGE_MODAL'; payload: { booking: Booking; room: any } }
+  | { type: 'CLOSE_ROOM_CHANGE_MODAL' }
   | { type: 'REFRESH_BOOKINGS' }
   | { type: 'SET_REFRESH_CALLBACK'; payload: () => void }
 
@@ -94,6 +101,11 @@ const initialState: BookingsState = {
   paymentModal: {
     isOpen: false,
     booking: null
+  },
+  roomChangeModal: {
+    isOpen: false,
+    booking: null,
+    room: null
   }
 }
 
@@ -222,6 +234,26 @@ function bookingsReducer(state: BookingsState, action: BookingsAction): Bookings
         }
       }
 
+    case 'OPEN_ROOM_CHANGE_MODAL':
+      return {
+        ...state,
+        roomChangeModal: {
+          isOpen: true,
+          booking: action.payload.booking,
+          room: action.payload.room
+        }
+      }
+
+    case 'CLOSE_ROOM_CHANGE_MODAL':
+      return {
+        ...state,
+        roomChangeModal: {
+          isOpen: false,
+          booking: null,
+          room: null
+        }
+      }
+
     case 'REFRESH_BOOKINGS':
       // Call the refresh callback if it exists
       if (state.refreshCallback) {
@@ -312,6 +344,11 @@ export function useBookings() {
       dispatch({ type: 'OPEN_PAYMENT_MODAL', payload: booking }),
 
     closePaymentModal: () => dispatch({ type: 'CLOSE_PAYMENT_MODAL' }),
+
+    openRoomChangeModal: (booking: Booking, room: any) =>
+      dispatch({ type: 'OPEN_ROOM_CHANGE_MODAL', payload: { booking, room } }),
+
+    closeRoomChangeModal: () => dispatch({ type: 'CLOSE_ROOM_CHANGE_MODAL' }),
 
     refreshBookings: () => dispatch({ type: 'REFRESH_BOOKINGS' }),
 

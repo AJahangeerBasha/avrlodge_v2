@@ -664,3 +664,55 @@ export const checkDocumentTypeExists = async (
     throw error
   }
 }
+
+// Update room ID for all documents of a specific reservation and old room
+export const updateRoomCheckinDocuments = async (
+  reservationId: string,
+  oldRoomId: string,
+  newRoomId: string,
+  userId?: string
+): Promise<void> => {
+  try {
+    // Get all documents for the old room
+    const documents = await getRoomCheckinDocuments({
+      reservationId,
+      roomId: oldRoomId,
+      isActive: true
+    })
+
+    if (documents.length === 0) {
+      console.log('No documents found to update')
+      return
+    }
+
+    // Use batch to update all documents atomically
+    const batch = writeBatch(db)
+
+    for (const document of documents) {
+      const docRef = doc(db, COLLECTION_NAME, document.id)
+      batch.update(docRef, {
+        roomId: newRoomId,
+        updatedAt: Timestamp.now(),
+        updatedBy: userId || document.updatedBy
+      })
+    }
+
+    await batch.commit()
+
+    // Create audit logs for all updated documents
+    for (const document of documents) {
+      await createAuditLog(document.id, 'updated', userId || document.updatedBy, {
+        roomChange: {
+          oldRoomId,
+          newRoomId,
+          reservationId
+        }
+      })
+    }
+
+    console.log(`Updated ${documents.length} documents from room ${oldRoomId} to ${newRoomId}`)
+  } catch (error) {
+    console.error('Error updating room check-in documents:', error)
+    throw error
+  }
+}

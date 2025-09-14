@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useBookings } from '@/contexts/BookingsContext'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, User, Hash, Calendar, Clock, MapPin, Mail, Users, Home, DollarSign, LogIn, LogOut, X, AlertTriangle, History, FileText, Eye, CreditCard, ChevronDown, ChevronUp } from 'lucide-react'
+import { Phone, User, Hash, Calendar, Clock, MapPin, Mail, Users, Home, DollarSign, LogIn, LogOut, X, AlertTriangle, History, FileText, Eye, CreditCard, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -517,6 +517,16 @@ export default function FirebaseBookingCard({
                           className="px-3 py-1 text-xs bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors font-medium"
                         >
                           Check Out
+                        </button>
+                      )}
+                      {/* Room Change Button */}
+                      {(room.room_status === 'pending' || room.room_status === 'checked_in') && (
+                        <button
+                          onClick={() => actions.openRoomChangeModal(booking, room)}
+                          className="px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium flex items-center gap-1"
+                        >
+                          <RefreshCw className="w-3 h-3" />
+                          Change Room
                         </button>
                       )}
                     </div>

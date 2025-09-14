@@ -2,9 +2,10 @@ import { useBookings } from '@/contexts/BookingsContext'
 import { FirebasePaymentModal } from './FirebasePaymentModal'
 import RoomCheckInModal from './RoomCheckInModal'
 import RoomCheckOutModal from './RoomCheckOutModal'
+import RoomChangeModal from './RoomChangeModal'
 
 export function BookingModalManager() {
-  const { paymentModal, checkInModal, checkOutModal, actions } = useBookings()
+  const { paymentModal, checkInModal, checkOutModal, roomChangeModal, actions } = useBookings()
 
   return (
     <>
@@ -44,6 +45,20 @@ export function BookingModalManager() {
           onClose={actions.closeCheckOutModal}
           onCheckOutComplete={() => {
             actions.closeCheckOutModal()
+            actions.refreshBookings()
+          }}
+        />
+      )}
+
+      {/* Room Change Modal */}
+      {roomChangeModal.booking && roomChangeModal.room && (
+        <RoomChangeModal
+          booking={roomChangeModal.booking}
+          room={roomChangeModal.room}
+          isOpen={roomChangeModal.isOpen}
+          onClose={actions.closeRoomChangeModal}
+          onSuccess={() => {
+            actions.closeRoomChangeModal()
             actions.refreshBookings()
           }}
         />

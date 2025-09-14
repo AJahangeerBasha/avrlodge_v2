@@ -6,7 +6,7 @@ This file contains project-specific information for Claude Code to better unders
 - **Name**: AVR Lodge v2
 - **Type**: Resort/Lodge management system
 - **Platform**: Web application (React + TypeScript + Vite)
-- **Backend**: Firebase (Firestore, Auth, Storage)
+- **Backend**: Firebase (Firestore, Auth) + Supabase (Storage)
 - **Styling**: Tailwind CSS + shadcn/ui
 
 ## Development Setup
@@ -19,7 +19,7 @@ This file contains project-specific information for Claude Code to better unders
 - **Project ID**: avrlodgev2
 - **Authentication**: Email/Password + Google OAuth
 - **Database**: Firestore (asia-east1)
-- **Storage**: Firebase Storage
+- **Storage**: Supabase Storage
 - **Plan**: Spark (Free) - No Cloud Functions
 
 ### Firebase Services
@@ -112,7 +112,7 @@ This file contains project-specific information for Claude Code to better unders
      - `reservationId?: string` (reference to reservations)
      - `roomId: string` (reference to rooms)
      - `documentType: 'aadhar' | 'driving_license' | 'voter_id' | 'passport' | 'pan_card' | 'other'`
-     - `fileUrl: string` (Firebase Storage URL)
+     - `fileUrl: string` (Supabase Storage URL)
      - `fileName: string`
      - `uploadedAt: timestamp`
      - `uploadedBy?: string` (user uid)
@@ -205,7 +205,8 @@ src/
 │   ├── firebase.ts     # Firebase configuration
 │   ├── auth.ts         # Authentication services
 │   ├── firestore.ts    # Firestore operations
-│   ├── storage.ts      # Firebase Storage operations
+│   ├── supabase.ts     # Supabase client configuration
+│   ├── supabaseStorage.ts # Supabase Storage operations
 │   ├── roles.ts        # Role management (Firestore-based)
 │   ├── redirects.ts    # Role-based redirect utilities
 │   ├── roomTypes.ts    # Room types CRUD operations
@@ -273,6 +274,157 @@ VITE_FIREBASE_MESSAGING_SENDER_ID="423109120986"
 VITE_FIREBASE_APP_ID="1:423109120986:web:69500d1e043f9cc170e6e3"
 VITE_FIREBASE_MEASUREMENT_ID="G-HSKHTM1097"
 ```
+
+## Supabase Storage Configuration
+
+### Storage Integration
+The system uses **Supabase Storage** for document management, not Firebase Storage. This hybrid approach combines Firebase's strengths (authentication, database) with Supabase's excellent file storage capabilities.
+
+### Supabase Configuration
+- **Project URL**: `https://gyscskrvuxpgysletrvz.supabase.co`
+- **Environment Variable**: `VITE_SUPABASE_ANON_KEY` (required)
+- **Storage Bucket**: `room-documents`
+- **File Access**: Private with public URL generation and signed URL fallback
+
+### Storage Structure
+```
+room-documents/
+├── reservations/
+│   └── {reservationId}/
+│       └── {roomId}/
+│           ├── aadhar_card_image.jpg
+│           ├── driving_license_scan.pdf
+│           └── passport_photo.png
+└── temp/
+    └── uploads/
+        └── {tempId}/
+            └── pending_files...
+```
+
+### File Upload Logic
+```typescript
+// 1. Upload file to Supabase Storage
+const uploadFile = async (path: string, file: File | Blob) => {
+  const { data, error } = await supabase.storage
+    .from('room-documents')
+    .upload(path, file, {
+      cacheControl: '3600',
+      upsert: false
+    })
+
+  return { data, error }
+}
+
+// 2. Get public URL for file access
+const getFileDownloadURL = async (path: string): Promise<string> => {
+  const { data } = supabase.storage
+    .from('room-documents')
+    .getPublicUrl(path)
+
+  return data.publicUrl
+}
+
+// 3. Create signed URL for private files (fallback)
+const createSignedUrl = async (path: string): Promise<string> => {
+  const { data, error } = await supabase.storage
+    .from('room-documents')
+    .createSignedUrl(path, 3600) // 1 hour expiry
+
+  return data?.signedUrl || ''
+}
+```
+
+### Document Preview System
+The document preview system has been optimized for Supabase Storage:
+
+#### URL Resolution Logic
+1. **Check existing URL**: If `fileUrl` already contains `supabase.co`, use as-is
+2. **Generate public URL**: Use `supabase.storage.from('room-documents').getPublicUrl(path)`
+3. **Fallback to signed URL**: If public URL fails, create temporary signed URL
+4. **Error handling**: Show meaningful error messages with debugging info
+
+#### Preview Features
+- **Image Preview**: Full-size modal preview for JPG, PNG, GIF, BMP, WebP
+- **PDF Preview**: Iframe-based preview with fallback to external link
+- **Thumbnail Generation**: 64x64px thumbnails in document list
+- **File Type Detection**: Smart detection based on file extension
+- **Error Recovery**: Multiple fallback strategies for failed loads
+
+#### Document List UX
+```typescript
+// Compact list design with thumbnails
+<div className="space-y-3">
+  {documents.map(doc => (
+    <div className="flex items-center gap-3 p-3 border rounded-lg">
+      {/* 64x64px thumbnail or file icon */}
+      <div className="w-16 h-16">
+        {isImage ? <img src={getSupabasePublicURL(doc)} /> : <FileIcon />}
+      </div>
+
+      {/* Document info */}
+      <div className="flex-1">
+        <h4>{doc.documentType}</h4>
+        <p>{doc.fileName}</p>
+        <span>{formatDate(doc.uploadedAt)}</span>
+      </div>
+
+      {/* Preview button */}
+      <Button onClick={() => openPreview(doc)}>
+        Preview
+      </Button>
+    </div>
+  ))}
+</div>
+```
+
+### Storage Validation & Security
+```typescript
+// File validation rules
+const STORAGE_CONFIG = {
+  bucket: 'room-documents',
+  maxFileSize: 5242880, // 5MB
+  allowedMimeTypes: [
+    'image/jpeg',
+    'image/png',
+    'image/jpg',
+    'application/pdf'
+  ],
+  allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+  publicAccess: false // Files require authentication
+}
+
+// Upload validation
+const validateFile = (file: File) => {
+  if (file.size > STORAGE_CONFIG.maxFileSize) {
+    throw new Error('File too large (max 5MB)')
+  }
+
+  if (!STORAGE_CONFIG.allowedMimeTypes.includes(file.type)) {
+    throw new Error('Invalid file type')
+  }
+
+  return true
+}
+```
+
+### Integration Points
+- **Room Check-in**: Documents uploaded during room check-in process
+- **Firestore Metadata**: File metadata stored in `/roomCheckinDocuments` collection
+- **Admin Dashboard**: Document viewing and management in booking cards
+- **Preview System**: Modal-based preview with Supabase URL resolution
+
+### Environment Setup
+```bash
+# Add to .env.local
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+```
+
+### Bucket Configuration (Supabase Dashboard)
+1. **Create Bucket**: `room-documents`
+2. **Set Privacy**: Private (not publicly readable)
+3. **File Size Limit**: 5MB per file
+4. **Allowed Types**: `image/*`, `application/pdf`
+5. **RLS Policies**: Configure based on user authentication
 
 ## Role Management
 Since we're using Firebase Spark plan (free), role management is handled via Firestore collections instead of Custom Claims:
@@ -361,7 +513,7 @@ Since we're using Firebase Spark plan (free), role management is handled via Fir
 
 - **Room Check-in Documents**: Digital document management system
   - Document types: Aadhar, Driving License, Voter ID, Passport, PAN Card, Other
-  - Firebase Storage integration for file uploads
+  - Supabase Storage integration for file uploads
   - Document validation with file type and size restrictions
   - Room and reservation-specific document organization
   - Audit trails for document uploads and deletions
@@ -433,7 +585,7 @@ Since we're using Firebase Spark plan (free), role management is handled via Fir
 - **Soft Delete**: Preserve audit trail while removing charges
 
 ### Document Management System
-- **Digital Document Storage**: Firebase Storage integration for secure file management
+- **Digital Document Storage**: Supabase Storage integration for secure file management
 - **Document Type Validation**: Support for 6 Indian identity document types
 - **File Validation**: Size limits (5MB), format restrictions (JPG, PNG, PDF)
 - **Upload Management**: Bulk document uploads with progress tracking
@@ -520,7 +672,7 @@ Since we're using Firebase Spark plan (free), role management is handled via Fir
 - **Database Migration**: Successfully migrated 8 PostgreSQL tables to Firestore with full relationship preservation
   - Core tables: room_types, rooms, special_charges_master, reservations, reservation_rooms, reservation_special_charges
   - Extended tables: room_checkin_documents, payments, guests
-- **Document Management System**: Complete digital document management with Firebase Storage integration
+- **Document Management System**: Complete digital document management with Supabase Storage integration
   - Support for 6 Indian identity document types (Aadhar, Driving License, Voter ID, Passport, PAN Card, Other)
   - File validation, bulk uploads, and completion tracking
   - Document audit trails and requirement management
@@ -768,3 +920,66 @@ Since we're using Firebase Spark plan (free), role management is handled via Fir
 5. **UI Updates**: Real-time synchronization and refresh
 
 This comprehensive booking system provides a complete resort management solution with real-time updates, secure payment processing, document management, and professional UI/UX design.
+
+## Document Preview System (Latest Update)
+
+### Enhanced Document Viewer
+The document preview system has been completely redesigned for better UX and Supabase Storage integration:
+
+#### **Fixed Storage Integration Issues**
+- **Problem**: Previous system tried to use Firebase Storage URLs, causing "Bucket not found" errors
+- **Solution**: Implemented proper Supabase Storage URL resolution with fallback mechanisms
+- **Result**: Documents now load correctly with proper error handling
+
+#### **Smart URL Resolution**
+```typescript
+// Multi-layer URL resolution for maximum compatibility
+const getSupabasePublicURL = (doc) => {
+  // 1. Check if already a valid Supabase URL
+  if (doc.fileUrl.includes('supabase.co')) {
+    return doc.fileUrl
+  }
+
+  // 2. Generate public URL from path
+  const { data } = supabase.storage
+    .from('room-documents')
+    .getPublicUrl(doc.fileUrl)
+
+  return data.publicUrl
+}
+
+// Fallback to signed URLs for private files
+const getSignedURL = async (doc) => {
+  const { data } = await supabase.storage
+    .from('room-documents')
+    .createSignedUrl(filePath, 3600) // 1-hour expiry
+
+  return data.signedUrl
+}
+```
+
+#### **Improved UX Design**
+- **Compact Modal**: Reduced from `max-w-4xl` to `max-w-2xl` for better screen usage
+- **List Layout**: Changed from 3-column grid to vertical list for better mobile experience
+- **Smart Thumbnails**: 64x64px image previews with fallback to file icons
+- **Room ID Optimization**: Shows last 4 characters of room ID for cleaner display
+
+#### **Document List Features**
+- **Visual Hierarchy**: Document type as primary title, filename as secondary
+- **Compact Date Format**: "14 Sep" instead of full date strings
+- **Hover Effects**: Smooth transitions and visual feedback
+- **Error Recovery**: Graceful fallback when images fail to load
+
+#### **Preview Modal Features**
+- **Full-size Image Preview**: Modal-based image viewing with proper scaling
+- **PDF Support**: Iframe-based PDF preview with external link fallback
+- **Error Debugging**: Shows actual URLs being attempted for troubleshooting
+- **Multiple Fallbacks**: Public URL → Signed URL → Error message with details
+
+#### **Technical Improvements**
+- **Hybrid Architecture**: Firebase for auth/database + Supabase for storage
+- **Real-time Updates**: Document changes reflect immediately in UI
+- **Type Safety**: Proper TypeScript interfaces for all document operations
+- **Performance**: Optimized image loading with lazy loading and caching
+
+This enhanced document system now provides a seamless, professional experience for viewing and managing reservation documents across all device types.

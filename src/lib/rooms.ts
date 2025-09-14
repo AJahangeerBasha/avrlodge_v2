@@ -111,14 +111,32 @@ export const getRoomById = async (id: string): Promise<Room | null> => {
   try {
     const docRef = doc(db, ROOMS_COLLECTION, id)
     const docSnap = await getDoc(docRef)
-    
+
     if (docSnap.exists()) {
       return convertFirestoreToRoom(docSnap)
     }
-    
+
     return null
   } catch (error) {
     console.error('Error getting room:', error)
+    throw error
+  }
+}
+
+// Get room by room number
+export const getRoomByNumber = async (roomNumber: string): Promise<Room | null> => {
+  try {
+    const roomsRef = collection(db, ROOMS_COLLECTION)
+    const q = query(roomsRef, where('roomNumber', '==', roomNumber))
+    const querySnapshot = await getDocs(q)
+
+    if (querySnapshot.empty) {
+      return null
+    }
+
+    return convertFirestoreToRoom(querySnapshot.docs[0])
+  } catch (error) {
+    console.error('Error getting room by number:', error)
     throw error
   }
 }
