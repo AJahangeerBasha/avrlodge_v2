@@ -1,0 +1,5 @@
+.claude/settings.local.json
+/.claude
+/.vite
+/dist
+/node_modules
