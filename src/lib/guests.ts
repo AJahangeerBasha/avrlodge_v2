@@ -334,10 +334,8 @@ export const getGuests = async (
       q = query(q, where('createdBy', '==', filters.createdBy))
     }
 
-    // Filter out soft deleted guests by default
-    if (filters?.isActive !== false) {
-      q = query(q, where('deletedAt', '==', null))
-    }
+    // Note: We'll filter out deleted guests client-side since Firestore
+    // doesn't match documents without the deletedAt field when querying for null
 
     // Add ordering and limit
     q = query(q, orderBy('createdAt', 'desc'))
@@ -350,6 +348,11 @@ export const getGuests = async (
     let guests = querySnapshot.docs
       .map(doc => convertGuestData(doc))
       .filter((guest): guest is Guest => guest !== null)
+
+    // Filter out soft deleted guests client-side
+    if (filters?.isActive !== false) {
+      guests = guests.filter(guest => !guest.deletedAt)
+    }
 
     // Apply client-side filters for fields that don't work well with Firestore queries
     if (filters?.name) {
@@ -545,10 +548,7 @@ export const subscribeToGuests = (
       q = query(q, where('isPrimaryGuest', '==', filters.isPrimaryGuest))
     }
     
-    // Filter out deleted guests
-    if (filters.isActive !== false) {
-      q = query(q, where('deletedAt', '==', null))
-    }
+    // Note: We'll filter deleted guests client-side
     
     q = query(q, orderBy('createdAt', 'desc'))
 
@@ -558,6 +558,11 @@ export const subscribeToGuests = (
         let guests = querySnapshot.docs
           .map(doc => convertGuestData(doc))
           .filter((guest): guest is Guest => guest !== null)
+
+        // Filter out deleted guests client-side
+        if (filters.isActive !== false) {
+          guests = guests.filter(guest => !guest.deletedAt)
+        }
 
         // Apply additional filters client-side
         if (filters.name) {

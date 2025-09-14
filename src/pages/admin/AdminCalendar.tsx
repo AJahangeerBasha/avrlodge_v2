@@ -20,6 +20,7 @@ import { getAllReservationRooms } from '@/lib/reservationRooms'
 import { getAllRooms } from '@/lib/rooms'
 import { getAllRoomTypes } from '@/lib/roomTypes'
 import { getPaymentsByReservationId } from '@/lib/payments'
+import { getPrimaryGuestByReservationId, getGuestsByReservationId } from '@/lib/guests'
 
 // Interfaces to match existing calendar components
 interface Room {
@@ -183,6 +184,20 @@ export const AdminCalendar: React.FC = () => {
             // Load reservation rooms
             const reservationRooms = await getAllReservationRooms({ reservationId: reservation.id })
 
+            // Load primary guest information
+            let primaryGuest = null
+            try {
+              primaryGuest = await getPrimaryGuestByReservationId(reservation.id)
+
+              // If no primary guest found, try to get any guest from the reservation
+              if (!primaryGuest) {
+                const allGuests = await getGuestsByReservationId(reservation.id)
+                primaryGuest = allGuests.length > 0 ? allGuests[0] : null
+              }
+            } catch (guestError) {
+              console.error(`Error fetching guest for reservation ${reservation.id}:`, guestError)
+            }
+
             // Calculate virtual status
             const virtualStatus = await calculateVirtualStatusForReservation({
               ...reservation,
@@ -196,8 +211,8 @@ export const AdminCalendar: React.FC = () => {
               guest_count: reservation.guestCount,
               status: virtualStatus, // Use virtual status instead of raw status
               reference_number: reservation.referenceNumber,
-              guest_name: reservation.guestName,
-              guest_phone: reservation.guestPhone,
+              guest_name: primaryGuest?.name || reservation.guestName || 'Guest Name Not Available',
+              guest_phone: primaryGuest?.phone || reservation.guestPhone || 'Phone Not Available',
               total_quote: reservation.totalPrice,
               reservation_rooms: reservationRooms.map(room => ({
                 room_number: room.roomNumber,
@@ -215,8 +230,8 @@ export const AdminCalendar: React.FC = () => {
               guest_count: reservation.guestCount,
               status: reservation.status,
               reference_number: reservation.referenceNumber,
-              guest_name: reservation.guestName,
-              guest_phone: reservation.guestPhone,
+              guest_name: reservation.guestName || 'Guest Name Not Available',
+              guest_phone: reservation.guestPhone || 'Phone Not Available',
               total_quote: reservation.totalPrice
             }
           }

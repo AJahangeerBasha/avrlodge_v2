@@ -187,7 +187,7 @@ export default function CalendarGrid({
 
     // Get reservation status for occupied rooms
     const status = capacityData.reservation?.status?.toLowerCase() || 'occupied'
-
+    console.log('status::', status)
     switch (status) {
       case 'checked_in':
         // CheckedIn → Blue
@@ -231,29 +231,40 @@ export default function CalendarGrid({
           ringColor: 'focus:ring-orange-400'
         }
       case 'checked_out':
-        // CheckedOut → Red
+        // CheckedOut → Gray (indicates past stay, no longer occupying)
+        // return {
+        //   badgeBg: 'bg-gray-400',
+        //   badgeBorder: 'border-gray-400',
+        //   badgeText: 'text-gray-900',
+        //   cellBg: 'bg-gray-50/30',
+        //   cellHover: 'hover:bg-gray-100/50',
+        //   cellFocus: 'focus:bg-gray-100/40',
+        //   statusIcon: '⚪',
+        //   statusLabel: 'Checked Out',
+        //   ringColor: 'focus:ring-gray-400'
+        // }
+        return {
+        badgeBg: 'bg-green-400',
+        badgeBorder: 'border-green-400',
+        badgeText: 'text-green-900',
+        cellBg: 'bg-green-50/30',
+        cellHover: 'hover:bg-green-100/50',
+        cellFocus: 'focus:bg-green-100/40',
+        statusIcon: '🟢',
+        statusLabel: 'Available',
+        ringColor: 'focus:ring-green-400'
+      }
+      case 'cancelled':
         return {
           badgeBg: 'bg-red-400',
           badgeBorder: 'border-red-400',
           badgeText: 'text-red-900',
           cellBg: 'bg-red-50/30',
-          cellHover: 'hover:bg-red-100/50',
-          cellFocus: 'focus:bg-red-100/40',
+          cellHover: 'hover:bg-red-100/40',
+          cellFocus: 'focus:bg-red-100/30',
           statusIcon: '🔴',
-          statusLabel: 'Checked Out',
-          ringColor: 'focus:ring-red-400'
-        }
-      case 'cancelled':
-        return {
-          badgeBg: 'bg-purple-400',
-          badgeBorder: 'border-purple-400',
-          badgeText: 'text-purple-900',
-          cellBg: 'bg-purple-50/30',
-          cellHover: 'hover:bg-purple-100/40',
-          cellFocus: 'focus:bg-purple-100/30',
-          statusIcon: '🟣',
           statusLabel: 'Cancelled',
-          ringColor: 'focus:ring-purple-400'
+          ringColor: 'focus:ring-red-400'
         }
       default:
         // Default occupied (fallback)
@@ -311,12 +322,12 @@ export default function CalendarGrid({
       const getStatusColor = (status: string) => {
         switch (status?.toLowerCase()) {
           case 'checked_in': return '🔵 Checked In'
-          case 'checked_out': return '🔴 Checked Out'
+          case 'checked_out': return '⚪ Checked Out'
           case 'confirmed':
           case 'booking': return '🟡 Booking'
           case 'pending':
           case 'reservation': return '🟠 Reservation'
-          case 'cancelled': return '❌ Cancelled'
+          case 'cancelled': return '🔴 Cancelled'
           default: return `📊 ${status || 'Unknown'}`
         }
       }
