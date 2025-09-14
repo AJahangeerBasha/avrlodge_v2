@@ -244,16 +244,16 @@ export default function CalendarGrid({
         //   ringColor: 'focus:ring-gray-400'
         // }
         return {
-        badgeBg: 'bg-green-400',
-        badgeBorder: 'border-green-400',
-        badgeText: 'text-green-900',
-        cellBg: 'bg-green-50/30',
-        cellHover: 'hover:bg-green-100/50',
-        cellFocus: 'focus:bg-green-100/40',
-        statusIcon: '🟢',
-        statusLabel: 'Available',
-        ringColor: 'focus:ring-green-400'
-      }
+          badgeBg: 'bg-green-400',
+          badgeBorder: 'border-green-400',
+          badgeText: 'text-green-900',
+          cellBg: 'bg-green-50/30',
+          cellHover: 'hover:bg-green-100/50',
+          cellFocus: 'focus:bg-green-100/40',
+          statusIcon: '🟢',
+          statusLabel: 'Available',
+          ringColor: 'focus:ring-green-400'
+        }
       case 'cancelled':
         return {
           badgeBg: 'bg-red-400',

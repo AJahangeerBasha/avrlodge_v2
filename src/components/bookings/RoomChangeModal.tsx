@@ -199,6 +199,28 @@ export default function RoomChangeModal({
 
       const newReservationRoomId = await createReservationRoom(newRoomData, currentUser.uid)
 
+      // Step 5: Create room change history entry
+      try {
+        await createRoomChangeHistory({
+          reservationId: booking.id,
+          fromRoomId: oldRoom.id,
+          fromRoomNumber: room.room_number,
+          fromRoomType: room.room_type,
+          toRoomId: selectedRoom.id,
+          toRoomNumber: selectedRoom.roomNumber,
+          toRoomType: selectedRoom.roomType?.name,
+          changeReason: 'Manual room change',
+          guestCount: room.guest_count,
+          preservedStatus: room.room_status,
+          preservedCheckInDate: room.check_in_datetime,
+          preservedCheckOutDate: room.check_out_datetime,
+          notes: `Room changed from ${room.room_number} to ${selectedRoom.roomNumber} by admin`
+        }, currentUser.uid, currentUser.displayName || currentUser.email || 'Admin User')
+      } catch (historyError) {
+        console.warn('Failed to create room change history:', historyError)
+        // Don't fail the room change if history creation fails
+      }
+
       toast({
         title: "Room Changed Successfully",
         description: `Room changed from ${room.room_number} to ${selectedRoom.roomNumber}`,
@@ -230,14 +252,14 @@ export default function RoomChangeModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4"
         onClick={onClose}
       >
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+          className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col relative z-50"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -318,13 +340,13 @@ export default function RoomChangeModal({
                   Room Type
                 </Label>
                 <Select value={roomTypeFilter} onValueChange={setRoomTypeFilter}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-white border border-gray-300">
                     <SelectValue placeholder="All room types" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Room Types</SelectItem>
+                  <SelectContent className="bg-white border border-gray-200 shadow-lg z-[100] max-h-60 overflow-y-auto">
+                    <SelectItem value="all" className="hover:bg-gray-100">All Room Types</SelectItem>
                     {roomTypes.map(type => (
-                      <SelectItem key={type.id} value={type.id}>
+                      <SelectItem key={type.id} value={type.id} className="hover:bg-gray-100">
                         {type.name}
                       </SelectItem>
                     ))}
@@ -444,21 +466,6 @@ export default function RoomChangeModal({
             {/* Confirmation Input */}
             {selectedRoom && (
               <div className="mt-6">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-red-800 font-medium mb-1">Important Notes:</p>
-                      <ul className="text-xs text-red-700 space-y-1">
-                        <li>• This will delete the current room assignment and create a new one</li>
-                        <li>• Any uploaded documents will be moved to the new room</li>
-                        <li>• Check-in status and dates will be preserved</li>
-                        <li>• This action cannot be undone</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
                 <Label className="text-sm font-medium text-gray-700 mb-2 block">
                   Type "CHANGE" to confirm room change
                 </Label>

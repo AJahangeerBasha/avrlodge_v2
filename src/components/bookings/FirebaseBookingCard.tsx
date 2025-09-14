@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useBookings } from '@/contexts/BookingsContext'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, User, Hash, Calendar, Clock, MapPin, Mail, Users, Home, DollarSign, LogIn, LogOut, X, AlertTriangle, History, FileText, Eye, CreditCard, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react'
+import { Phone, User, Hash, Calendar, Clock, MapPin, Mail, Users, Home, DollarSign, LogIn, LogOut, X, AlertTriangle, History, FileText, Eye, CreditCard, ChevronDown, ChevronUp, RefreshCw, Receipt, RotateCcw } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,6 +16,7 @@ import { updateReservationRoom } from '@/lib/reservationRooms'
 import { updateReservationStatus } from '@/lib/reservations'
 import { getPaymentsByReservationId } from '@/lib/payments'
 import { getRoomCheckinDocumentsByReservationId } from '@/lib/roomCheckinDocuments'
+import { getReservationSpecialChargesByReservationId } from '@/lib/reservationSpecialCharges'
 import { supabase } from '@/lib/supabase'
 
 interface Booking {
@@ -76,8 +77,13 @@ export default function FirebaseBookingCard({
   const [selectedDocument, setSelectedDocument] = useState<any>(null)
   const [payments, setPayments] = useState<any[]>([])
   const [documents, setDocuments] = useState<any[]>([])
+  const [specialCharges, setSpecialCharges] = useState<any[]>([])
   const [loadingPayments, setLoadingPayments] = useState(true)
   const [loadingDocuments, setLoadingDocuments] = useState(false)
+  const [loadingSpecialCharges, setLoadingSpecialCharges] = useState(true)
+  const [loadingRoomHistory, setLoadingRoomHistory] = useState(true)
+  const [showSpecialCharges, setShowSpecialCharges] = useState(false)
+  const [showRoomHistory, setShowRoomHistory] = useState(false)
   const [processing, setProcessing] = useState(false)
   const { actions } = useBookings()
   const { toast } = useToast()
@@ -260,6 +266,49 @@ export default function FirebaseBookingCard({
     }
   };
 
+  // Load special charges
+  const loadSpecialCharges = async () => {
+    try {
+      setLoadingSpecialCharges(true)
+      console.log('BookingCard: Loading special charges for booking', booking.reference_number)
+
+      // Try Firebase API first
+      let charges = []
+      try {
+        charges = await getReservationSpecialChargesByReservationId(booking.id)
+        // Filter out soft-deleted charges
+        charges = charges.filter(charge => !charge.deletedAt)
+      } catch (apiError) {
+        console.warn('Firebase special charges API failed, using booking data:', apiError)
+      }
+
+      // If no charges from API but booking has special charges, use those as fallback
+      if (charges.length === 0 && booking.reservation_special_charges && booking.reservation_special_charges.length > 0) {
+        charges = booking.reservation_special_charges.map(charge => ({
+          id: charge.id,
+          totalAmount: charge.total_amount,
+          total_amount: charge.total_amount,
+          quantity: charge.quantity,
+          customRate: charge.custom_rate,
+          custom_rate: charge.custom_rate,
+          customDescription: charge.custom_description,
+          custom_description: charge.custom_description,
+          special_charges_master: charge.special_charges_master,
+          createdAt: booking.created_at
+        }))
+      }
+
+      console.log('BookingCard: Loaded', charges.length, 'special charges')
+      setSpecialCharges(charges)
+    } catch (error) {
+      console.error('Error loading special charges:', error)
+      // Don't show error toast for special charges as they're optional
+      setSpecialCharges([])
+    } finally {
+      setLoadingSpecialCharges(false)
+    }
+  };
+
   // Calculate payment totals from actual payment history
   const calculatePaymentTotals = () => {
     if (payments.length === 0) {
@@ -281,18 +330,21 @@ export default function FirebaseBookingCard({
   // Load payment history on component mount and when booking data changes
   useEffect(() => {
     loadPaymentHistory()
+    loadSpecialCharges()
   }, [booking.id, booking.total_paid, booking.remaining_balance])
 
   // Refresh data when parent calls onPaymentUpdate
   useEffect(() => {
     // Re-load payments when payment updates occur
     loadPaymentHistory()
+    loadSpecialCharges()
   }, [booking])
 
   // Also refresh when onPaymentUpdate function changes (indicates parent update)
   useEffect(() => {
     if (onPaymentUpdate) {
       loadPaymentHistory()
+      loadSpecialCharges()
     }
   }, [onPaymentUpdate])
 
@@ -683,22 +735,108 @@ export default function FirebaseBookingCard({
           </div>
         )}
 
-        {/* Contact Info */}
-        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-          <div className="flex items-center space-x-1">
-            <Mail className="h-4 w-4" />
-            <span>{booking.guest_email || 'No email'}</span>
+        {/* Special Charges - Accordion - Only show if charges exist or are loading */}
+        {(loadingSpecialCharges || specialCharges.length > 0) && (
+          <div>
+            {/* Accordion Header */}
+            <button
+              onClick={() => setShowSpecialCharges(!showSpecialCharges)}
+              className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Receipt className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-700">Special Charges</span>
+                {loadingSpecialCharges && (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                )}
+                <span className="text-xs text-gray-500">({specialCharges.length} items)</span>
+              </div>
+              {showSpecialCharges ? (
+                <ChevronUp className="w-4 h-4 text-gray-600" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-gray-600" />
+              )}
+            </button>
+
+            {/* Accordion Content */}
+            <AnimatePresence>
+              {showSpecialCharges && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-2">
+                    {loadingSpecialCharges ? (
+                      <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                        <div className="flex items-center justify-center py-2">
+                          <span className="text-xs text-gray-500">Loading special charges...</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {specialCharges.map((charge, index) => (
+                          <div key={charge.id || index} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Receipt className="w-3 h-3 text-blue-600" />
+                                  <span className="text-sm font-semibold text-gray-900">
+                                    {charge.specialCharge?.chargeName || charge.special_charges_master?.charge_name || 'Special Charge'}
+                                  </span>
+                                  <span className="text-xs text-gray-500 bg-white px-2 py-0.5 rounded-full">
+                                    {charge.quantity || 1} × ₹{charge.customRate || charge.custom_rate || charge.specialCharge?.defaultRate || charge.special_charges_master?.default_rate || 0}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-gray-600">
+                                  {charge.customDescription || charge.custom_description || charge.specialCharge?.description || 'Additional service'}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Rate: {charge.specialCharge?.rateType || charge.special_charges_master?.rate_type || 'fixed'} •
+                                  Total: ₹{(charge.totalAmount || charge.total_amount || 0).toLocaleString()}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-semibold text-green-600">
+                                  ₹{(charge.totalAmount || charge.total_amount || 0).toLocaleString()}
+                                </p>
+                                <p className="text-xs text-gray-400">
+                                  {charge.createdAt
+                                    ? new Date(charge.createdAt).toLocaleDateString('en-IN', {
+                                        day: '2-digit',
+                                        month: 'short'
+                                      })
+                                    : 'Unknown'
+                                  }
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+
+                        {/* Special Charges Total */}
+                        {specialCharges.length > 0 && (
+                          <div className="bg-blue-50 rounded-lg p-3 border border-blue-100 mt-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium text-blue-800">
+                                Total Special Charges
+                              </span>
+                              <span className="text-sm font-semibold text-blue-800">
+                                ₹{specialCharges.reduce((sum, charge) => sum + (charge.totalAmount || charge.total_amount || 0), 0).toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-          <div className="flex items-center space-x-1">
-            <Phone className="h-4 w-4" />
-            <span>{booking.guest_phone}</span>
-          </div>
-          {booking.guest_count && (
-            <div className="px-2 py-1 bg-gray-100 rounded text-xs">
-              {booking.guest_count} guest{booking.guest_count !== 1 ? 's' : ''}
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Payment Actions */}
         {showActions && calculatePaymentTotals().remainingBalance > 0 && getCalculatedStatus() !== 'cancelled' && (

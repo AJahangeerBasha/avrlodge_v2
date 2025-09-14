@@ -486,6 +486,38 @@
         { "fieldPath": "guestId", "order": "ASCENDING" },
         { "fieldPath": "performedAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "roomChangeHistory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "reservationId", "order": "ASCENDING" },
+        { "fieldPath": "changeDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "roomChangeHistory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "fromRoomId", "order": "ASCENDING" },
+        { "fieldPath": "changeDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "roomChangeHistory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "toRoomId", "order": "ASCENDING" },
+        { "fieldPath": "changeDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "roomChangeHistory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "changedBy", "order": "ASCENDING" },
+        { "fieldPath": "changeDate", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

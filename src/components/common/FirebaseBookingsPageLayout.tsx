@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, startOfMonth, endOfMonth, addMonths, subMonths, startOfDay, endOfDay, addDays, subDays } from 'date-fns'
-import { FileText, Search, Filter } from 'lucide-react'
+import { FileText, Search, Filter, RefreshCw } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import FirebaseBookingCard from '@/components/bookings/FirebaseBookingCard'
 import ModernPageLayout from '@/components/common/ModernPageLayout'
@@ -88,8 +88,11 @@ interface FirebaseBookingsPageLayoutProps {
 
 export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPageLayoutProps) {
   const [searchTerm, setSearchTerm] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [searching, setSearching] = useState(false)
   const { currentUser } = useAuth()
   const { actions } = useBookings()
   
@@ -505,18 +508,18 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
     loadBookings()
   }, [loadBookings])
 
-  const handleSearch = async (term: string) => {
-    setSearchTerm(term)
-    if (!term.trim()) {
-      // If search is cleared, go back to filter mode
-      setIsSearchMode(false)
-      loadBookings()
+  // Handle search button click
+  const handleSearchClick = async () => {
+    const term = searchQuery.trim()
+    if (!term) {
+      // If search is empty, clear search mode
+      handleClearSearch()
       return
     }
-    
-    // Switch to search mode
+
+    setSearchTerm(term)
     setIsSearchMode(true)
-    setLoading(true)
+    setSearching(true)
     try {
       // Load all bookings and filter client-side
       const reservations = await getAllReservations()
@@ -607,7 +610,22 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
         variant: "destructive",
       })
     } finally {
-      setLoading(false)
+      setSearching(false)
+    }
+  }
+
+  // Handle clear search
+  const handleClearSearch = () => {
+    setSearchQuery('')
+    setSearchTerm('')
+    setIsSearchMode(false)
+    loadBookings()
+  }
+
+  // Handle Enter key in search input
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearchClick()
     }
   }
 
@@ -633,22 +651,100 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
     }
   }
 
+  // Handle manual refresh
+  const handleRefresh = async () => {
+    if (refreshing || loading) return
+
+    setRefreshing(true)
+    try {
+      if (isSearchMode && searchTerm.trim()) {
+        // Refresh search results
+        setSearchQuery(searchTerm)
+        await handleSearchClick()
+      } else {
+        // Refresh regular filtered results
+        await loadBookings()
+      }
+      toast({
+        title: "Refreshed",
+        description: "Bookings data has been refreshed successfully.",
+      })
+    } catch (error) {
+      console.error('Error refreshing bookings:', error)
+      toast({
+        title: "Refresh Failed",
+        description: "Failed to refresh bookings. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
   return (
     <ModernPageLayout
       title="Booking Management"
       subtitle="Search and manage all bookings"
       icon={FileText}
       headerContent={
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Search by guest name, booking ID, or room number..."
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:border-black focus:ring-black bg-white w-64"
-            disabled={loading}
-          />
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1 max-w-lg">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
+              placeholder="Search by guest name, booking ID, room number, or status..."
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:border-black focus:ring-black bg-white w-full"
+              disabled={loading || searching}
+            />
+          </div>
+
+          {/* Search Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleSearchClick}
+            disabled={searching || loading}
+            className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+              searching || loading
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}
+          >
+            <Search className={`h-4 w-4 ${searching ? 'animate-pulse' : ''}`} />
+            <span>Search</span>
+          </motion.button>
+
+          {/* Clear Search Button */}
+          {isSearchMode && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleClearSearch}
+              className="px-3 py-2 rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
+              title="Clear search"
+            >
+              ✕
+            </motion.button>
+          )}
+
+          {/* Refresh Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleRefresh}
+            disabled={refreshing || loading || searching}
+            className={`p-2 rounded-lg transition-colors ${
+              refreshing || loading || searching
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+            }`}
+            title="Refresh bookings"
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+          </motion.button>
         </div>
       }
     >
@@ -819,7 +915,7 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
               </p>
               {isSearchMode && (
                 <button
-                  onClick={() => handleSearch('')}
+                  onClick={handleClearSearch}
                   className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
                 >
                   Clear Search
