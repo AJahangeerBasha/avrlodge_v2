@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { format, addDays, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns'
-import { Calendar, Download, Filter } from 'lucide-react'
+import { Calendar, Download, Filter, RefreshCw } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/hooks/use-toast'
+import { useCalendarStore } from '@/stores/calendarStore'
 
 // Import existing calendar components
 import CalendarHeader from '@/components/calendar/CalendarHeader'
@@ -50,17 +51,36 @@ interface Reservation {
 }
 
 export const AdminCalendar: React.FC = () => {
-  const [rooms, setRooms] = useState<Room[]>([])
-  const [reservations, setReservations] = useState<Reservation[]>([])
-  const [selectedDate, setSelectedDate] = useState(new Date())
-  const [isLoading, setIsLoading] = useState(true)
-  const [showFilters, setShowFilters] = useState(false)
-  const [selectedRoomType, setSelectedRoomType] = useState<string>('all')
-  const [selectedStatus, setSelectedStatus] = useState<string>('all')
-  const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('month')
+  // Use calendar store for state management
+  const {
+    rooms,
+    reservations,
+    selectedDate,
+    viewMode,
+    showFilters,
+    isLoading,
+    lastRefreshTime,
+    filters,
+    setRooms,
+    setReservations,
+    setSelectedDate,
+    setViewMode,
+    setShowFilters,
+    setIsLoading,
+    setLastRefreshTime,
+    setSelectedRoomType,
+    setSelectedStatus,
+    getFilteredRooms,
+    getFilteredReservations,
+    getRoomTypes,
+    getStatusTypes,
+  } = useCalendarStore()
 
   const { currentUser } = useAuth()
   const { toast } = useToast()
+
+  // Local state for refresh animation
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   // Virtual status calculation function (same as booking card)
   const calculateVirtualStatusForReservation = async (reservation: any): Promise<string> => {
@@ -112,10 +132,14 @@ export const AdminCalendar: React.FC = () => {
     }
   }
 
-  const loadCalendarData = useCallback(async () => {
+  const loadCalendarData = useCallback(async (isRefresh = false) => {
     if (!currentUser) return
 
-    setIsLoading(true)
+    if (isRefresh) {
+      setIsRefreshing(true)
+    } else {
+      setIsLoading(true)
+    }
     try {
       console.log('Loading admin calendar data...')
 
@@ -241,23 +265,42 @@ export const AdminCalendar: React.FC = () => {
       console.log('Transformed reservations:', transformedReservations.length)
       setReservations(transformedReservations.filter(r => r.status !== 'cancelled'))
 
+      // Update refresh timestamp
+      setLastRefreshTime(new Date().toISOString())
+
+      // Show success message for manual refresh
+      if (isRefresh) {
+        toast({
+          title: "Calendar Refreshed",
+          description: "Latest data has been loaded successfully.",
+        })
+      }
+
     } catch (error) {
       console.error('Error loading calendar data:', error)
       toast({
-        title: "Loading Error",
+        title: isRefresh ? "Refresh Error" : "Loading Error",
         description: "Failed to load calendar data. Please try again.",
         variant: "destructive",
       })
-      setReservations([])
-      setRooms([])
+      if (!isRefresh) {
+        setReservations([])
+        setRooms([])
+      }
     } finally {
       setIsLoading(false)
+      setIsRefreshing(false)
     }
-  }, [currentUser, selectedDate, viewMode, toast])
+  }, [currentUser, selectedDate, viewMode, toast, setRooms, setReservations, setIsLoading, setLastRefreshTime])
 
   // Load data on component mount and when dependencies change
   useEffect(() => {
     loadCalendarData()
+  }, [loadCalendarData])
+
+  // Refresh handler
+  const handleRefresh = useCallback(async () => {
+    await loadCalendarData(true)
   }, [loadCalendarData])
 
   // Generate date range based on view mode
@@ -349,18 +392,11 @@ export const AdminCalendar: React.FC = () => {
     URL.revokeObjectURL(url)
   }
 
-  // Filter rooms and reservations
-  const filteredRooms = selectedRoomType === 'all'
-    ? rooms
-    : rooms.filter(room => room.room_type === selectedRoomType)
-
-  const roomTypes = Array.from(new Set(rooms.map(room => room.room_type))).map(type => ({ value: type, label: type }))
-
-  const filteredReservations = selectedStatus === 'all'
-    ? reservations
-    : reservations.filter(reservation => reservation.status === selectedStatus)
-
-  const statusTypes = Array.from(new Set(reservations.map(reservation => reservation.status))).map(status => ({ value: status, label: status }))
+  // Get filtered data from store
+  const filteredRooms = getFilteredRooms()
+  const filteredReservations = getFilteredReservations()
+  const roomTypes = getRoomTypes()
+  const statusTypes = getStatusTypes()
 
   if (isLoading) {
     return (
@@ -371,7 +407,7 @@ export const AdminCalendar: React.FC = () => {
       >
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-          <span className="ml-3 text-gray-600">Loading admin calendar...</span>
+          <span className="ml-3 text-gray-600">Loading calendar...</span>
         </div>
       </ModernPageLayout>
     )
@@ -388,6 +424,17 @@ export const AdminCalendar: React.FC = () => {
       actions={
         <div className="flex items-center gap-3">
           <CalendarViewModeSelector viewMode={viewMode} onViewModeChange={setViewMode} />
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title={lastRefreshTime ? `Last refreshed: ${new Date(lastRefreshTime).toLocaleTimeString()}` : 'Refresh calendar data'}
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+          </motion.button>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -413,9 +460,9 @@ export const AdminCalendar: React.FC = () => {
       <CalendarFilters
         showFilters={showFilters}
         setShowFilters={setShowFilters}
-        selectedRoomType={selectedRoomType}
+        selectedRoomType={filters.selectedRoomType}
         setSelectedRoomType={setSelectedRoomType}
-        selectedStatus={selectedStatus}
+        selectedStatus={filters.selectedStatus}
         setSelectedStatus={setSelectedStatus}
         roomTypes={roomTypes}
         statusTypes={statusTypes}
