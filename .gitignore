@@ -1,5 +1,12 @@
-.claude/settings.local.json
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+.config\
+.next
+.vercel
+/logs
 /.claude
-/.vite
-/dist
-/node_modules
+/ui-design
