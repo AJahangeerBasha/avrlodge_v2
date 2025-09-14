@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
@@ -51,21 +51,21 @@ export function FirebasePaymentModal({
   const { currentUser } = useAuth()
 
   // Calculate payment totals from actual payment history
-  const calculatePaymentTotals = () => {
+  const calculatePaymentTotals = useCallback(() => {
     const totalPaid = payments
       .filter(payment => payment.paymentStatus === 'completed')
       .reduce((sum, payment) => sum + (payment.amount || 0), 0)
 
     const remainingBalance = Math.max(0, (booking.total_quote || 0) - totalPaid)
     return { totalPaid, remainingBalance }
-  }
+  }, [payments, booking.total_quote])
 
   // Load payment history when modal opens
   useEffect(() => {
     if (isOpen) {
       loadPaymentHistory()
     }
-  }, [isOpen, booking.id])
+  }, [isOpen, loadPaymentHistory])
 
   // Update amount when payments change
   useEffect(() => {
@@ -73,9 +73,9 @@ export function FirebasePaymentModal({
       const { remainingBalance } = calculatePaymentTotals()
       setAmount(remainingBalance.toString())
     }
-  }, [payments, loadingPayments])
+  }, [payments, loadingPayments, calculatePaymentTotals])
 
-  const loadPaymentHistory = async () => {
+  const loadPaymentHistory = useCallback(async () => {
     try {
       setLoadingPayments(true)
       const paymentHistory = await getPaymentsByReservationId(booking.id)
@@ -85,7 +85,7 @@ export function FirebasePaymentModal({
     } finally {
       setLoadingPayments(false)
     }
-  }
+  }, [booking.id])
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {

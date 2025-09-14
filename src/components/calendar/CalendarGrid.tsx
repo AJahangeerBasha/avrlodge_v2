@@ -489,7 +489,7 @@ ${getStatusColor(reservation.status)}`
                               if (tooltipContent) {
                                 const rect = e.currentTarget.getBoundingClientRect()
                                 const viewportWidth = window.innerWidth
-                                const viewportHeight = window.innerHeight
+                                const _viewportHeight = window.innerHeight
                                 const isMobile = viewportWidth < 768
 
                                 // Smart positioning to keep tooltip in viewport

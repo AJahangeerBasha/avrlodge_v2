@@ -212,7 +212,7 @@ export function RoomCheckInModal({
 
     for (const doc of docsToUpload) {
       try {
-        const result = await uploadSingleDocument(
+        const _result = await uploadSingleDocument(
           {
             file: doc.file,
             documentType: doc.documentType,

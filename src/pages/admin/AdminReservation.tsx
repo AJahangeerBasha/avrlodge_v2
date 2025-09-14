@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Calendar, Users, CreditCard, Plus, Trash2, X, MapPin, DollarSign } from 'lucide-react';
@@ -122,12 +122,12 @@ export const AdminReservation: React.FC = () => {
   // Load initial data
   useEffect(() => {
     loadInitialData();
-  }, []);
+  }, [loadInitialData]);
 
   // Ensure we always start at step 1
   useEffect(() => {
     setCurrentStep(1);
-  }, []);
+  }, [setCurrentStep]);
 
   // Scroll to top when step changes
   useEffect(() => {
@@ -139,7 +139,7 @@ export const AdminReservation: React.FC = () => {
     if (isEditMode && editReservationId) {
       loadReservationForEdit(editReservationId);
     }
-  }, [isEditMode, editReservationId]);
+  }, [isEditMode, editReservationId, loadReservationForEdit]);
 
   // Focus on guest name input when on step 1
   useEffect(() => {
@@ -156,9 +156,9 @@ export const AdminReservation: React.FC = () => {
     if (checkInDate && checkOutDate) {
       loadAvailableRooms();
     }
-  }, [checkInDate, checkOutDate]);
+  }, [checkInDate, checkOutDate, loadAvailableRooms]);
 
-  const loadInitialData = async () => {
+  const loadInitialData = useCallback(async () => {
     try {
       console.log('Loading initial data...');
 
@@ -188,9 +188,9 @@ export const AdminReservation: React.FC = () => {
       console.error('Error details:', error.message);
       setError('Failed to load initial data: ' + error.message);
     }
-  };
+  }, [setRoomTypes, setSpecialChargesMaster, setError]);
 
-  const loadAvailableRooms = async () => {
+  const loadAvailableRooms = useCallback(async () => {
     if (!checkInDate || !checkOutDate) {
       setAvailableRooms([]);
       return;
@@ -210,9 +210,9 @@ export const AdminReservation: React.FC = () => {
       console.error('Error loading available rooms:', error);
       setError('Failed to load available rooms');
     }
-  };
+  }, [checkInDate, checkOutDate, isEditMode, editReservationId, setAvailableRooms, setError]);
 
-  const loadReservationForEdit = async (reservationId: string) => {
+  const loadReservationForEdit = useCallback(async (reservationId: string) => {
     setIsLoadingReservation(true);
     try {
       // Get reservation basic data
@@ -276,7 +276,7 @@ export const AdminReservation: React.FC = () => {
     } finally {
       setIsLoadingReservation(false);
     }
-  };
+  }, [navigate, setError]);
 
   const handleNext = () => {
     if (currentStep === 3) {

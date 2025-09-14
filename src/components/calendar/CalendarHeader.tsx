@@ -17,10 +17,10 @@ export default function CalendarHeader({
   selectedDate,
   onPreviousMonth,
   onNextMonth,
-  totalRooms,
-  totalCapacity,
-  totalTariff,
-  activeReservations,
+  totalRooms: _totalRooms,
+  totalCapacity: _totalCapacity,
+  totalTariff: _totalTariff,
+  activeReservations: _activeReservations,
   viewMode = 'month'
 }: CalendarHeaderProps) {
   return (

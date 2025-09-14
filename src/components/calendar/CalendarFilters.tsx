@@ -17,7 +17,7 @@ interface CalendarFiltersProps {
 
 export default function CalendarFilters({
   showFilters,
-  setShowFilters,
+  setShowFilters: _setShowFilters,
   selectedRoomType,
   setSelectedRoomType,
   selectedStatus,

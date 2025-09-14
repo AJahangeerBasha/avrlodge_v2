@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Home, ArrowRight, Search, Users, DollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -68,7 +68,7 @@ export default function RoomChangeModal({
   const { currentUser } = useAuth()
 
   // Load available rooms
-  const loadAvailableRooms = async () => {
+  const loadAvailableRooms = useCallback(async () => {
     try {
       setLoadingRooms(true)
       const rooms = await getRoomsWithType({
@@ -86,7 +86,7 @@ export default function RoomChangeModal({
     } finally {
       setLoadingRooms(false)
     }
-  }
+  }, [toast])
 
   // Load rooms when modal opens
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function RoomChangeModal({
       setRoomTypeFilter('all')
       setConfirmation('')
     }
-  }, [isOpen])
+  }, [isOpen, loadAvailableRooms])
 
   // Filter available rooms
   const filteredRooms = availableRooms.filter(roomOption => {
@@ -195,7 +195,7 @@ export default function RoomChangeModal({
         checkInNotes: null
       }
 
-      const newReservationRoomId = await createReservationRoom(newRoomData, currentUser.uid)
+      const _newReservationRoomId = await createReservationRoom(newRoomData, currentUser.uid)
 
       // Step 5: Create room change history entry
       try {
