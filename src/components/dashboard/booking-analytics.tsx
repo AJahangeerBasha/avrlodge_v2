@@ -184,7 +184,7 @@ export function BookingAnalytics({ bookings }: BookingAnalyticsProps) {
           </div>
           
           <div className="space-y-4">
-            {Object.entries(analytics.monthlyData).map(([month, count], index) => (
+            {Object.entries(analytics.monthlyData).map(([month, count], _index) => (
               <div key={month} className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {month}
@@ -226,7 +226,7 @@ export function BookingAnalytics({ bookings }: BookingAnalyticsProps) {
           <div className="space-y-4">
             {Object.entries(analytics.roomTypeData)
               .sort(([,a], [,b]) => (b as number) - (a as number))
-              .map(([roomType, count], index) => (
+              .map(([roomType, count], _index) => (
                 <div key={roomType} className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     {roomType}
@@ -267,7 +267,7 @@ export function BookingAnalytics({ bookings }: BookingAnalyticsProps) {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {Object.entries(analytics.statusData).map(([status, count], index) => (
+          {Object.entries(analytics.statusData).map(([status, count], _index) => (
             <div key={status} className="text-center">
               <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 {Number(count)}

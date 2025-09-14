@@ -226,35 +226,39 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
           start: startOfWeek(now, { weekStartsOn: 1 }), // Monday
           end: endOfWeek(now, { weekStartsOn: 1 })      // Sunday
         }
-      case 'last_week':
+      case 'last_week': {
         const lastWeek = subWeeks(now, 1)
         return {
           start: startOfWeek(lastWeek, { weekStartsOn: 1 }),
           end: endOfWeek(lastWeek, { weekStartsOn: 1 })
         }
-      case 'next_week':
+      }
+      case 'next_week': {
         const nextWeek = addWeeks(now, 1)
         return {
           start: startOfWeek(nextWeek, { weekStartsOn: 1 }),
           end: endOfWeek(nextWeek, { weekStartsOn: 1 })
         }
+      }
       case 'current_month':
         return {
           start: startOfMonth(now),
           end: endOfMonth(now)
         }
-      case 'previous_month':
+      case 'previous_month': {
         const previousMonth = subMonths(now, 1)
         return {
           start: startOfMonth(previousMonth),
           end: endOfMonth(previousMonth)
         }
-      case 'next_month':
+      }
+      case 'next_month': {
         const nextMonth = addMonths(now, 1)
         return {
           start: startOfMonth(nextMonth),
           end: endOfMonth(nextMonth)
         }
+      }
       case 'all':
         // Return a very wide date range to get all bookings
         return {

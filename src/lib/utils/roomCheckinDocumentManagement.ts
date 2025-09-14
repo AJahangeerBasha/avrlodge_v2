@@ -472,7 +472,9 @@ export const prepareDocumentUpload = (
     let sanitizedFileName = fileName.trim()
     
     // Remove potentially dangerous characters but keep essential ones
-    sanitizedFileName = sanitizedFileName.replace(/[<>:"/\\|?*\x00-\x1f]/g, '_')
+    sanitizedFileName = sanitizedFileName.replace(/[<>:"/\\|?*]/g, '_')
+    // Remove control characters (0-31)
+    sanitizedFileName = sanitizedFileName.replace(/[\x00-\x1F]/g, '_') // eslint-disable-line no-control-regex
     
     // Ensure file name isn't too long
     if (sanitizedFileName.length > 200) {

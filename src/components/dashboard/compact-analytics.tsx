@@ -157,7 +157,7 @@ export function CompactAnalytics({ bookings }: CompactAnalyticsProps) {
           </div>
           
           <div className="space-y-2">
-            {Object.entries(analytics.monthlyData).map(([month, count], index) => (
+            {Object.entries(analytics.monthlyData).map(([month, count], _index) => (
               <div key={month} className="flex items-center justify-between">
                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
                   {month}
@@ -237,7 +237,7 @@ export function CompactAnalytics({ bookings }: CompactAnalyticsProps) {
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {Object.entries(analytics.statusData).map(([status, count], index) => (
+          {Object.entries(analytics.statusData).map(([status, count], _index) => (
             <div key={status} className="text-center">
               <div className="text-lg font-bold text-gray-900 dark:text-white">
                 {count as number}

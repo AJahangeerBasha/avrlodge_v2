@@ -121,6 +121,8 @@ export const AdminCalendar: React.FC = () => {
           return 'booking' // Payment made = booking status
         }
       } catch (error) {
+        // Silently ignore calculation errors for display purposes
+        console.warn('Error calculating booking status:', error)
       }
 
       // Default to reservation for new bookings with no payment
@@ -152,7 +154,7 @@ export const AdminCalendar: React.FC = () => {
           startDate = format(dateForLoading, 'yyyy-MM-dd')
           endDate = format(dateForLoading, 'yyyy-MM-dd')
           break
-        case 'week':
+        case 'week': {
           const dayOfWeek = dateForLoading.getDay()
           const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
           const weekStart = addDays(dateForLoading, -daysFromMonday)
@@ -160,6 +162,7 @@ export const AdminCalendar: React.FC = () => {
           startDate = format(weekStart, 'yyyy-MM-dd')
           endDate = format(weekEnd, 'yyyy-MM-dd')
           break
+        }
         case 'month':
         default:
           startDate = format(startOfMonth(dateForLoading), 'yyyy-MM-dd')
@@ -311,12 +314,13 @@ export const AdminCalendar: React.FC = () => {
         start = date
         end = date
         break
-      case 'week':
+      case 'week': {
         const dayOfWeek = date.getDay()
         const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
         start = addDays(date, -daysFromMonday)
         end = addDays(start, 6)
         break
+      }
       case 'month':
       default:
         start = startOfMonth(date)

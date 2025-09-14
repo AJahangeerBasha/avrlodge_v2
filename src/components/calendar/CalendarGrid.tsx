@@ -426,7 +426,7 @@ ${getStatusColor(reservation.status)}`
                   variants={rowVariants}
                   className="bg-gray-100 border-b-2 border-gray-300 h-16"
                 >
-                  {dates.map((date, index) => (
+                  {dates.map((date, _index) => (
                     <motion.th
                       key={date.toISOString()}
                       variants={cellVariants}
@@ -441,13 +441,13 @@ ${getStatusColor(reservation.status)}`
                 </motion.tr>
               </thead>
               <tbody>
-                {rooms.map((room, roomIndex) => (
+                {rooms.map((room, _roomIndex) => (
                   <motion.tr
                     key={room.id}
                     variants={rowVariants}
                     className={`border-b border-gray-200 h-16`}
                   >
-                    {dates.map((date, dateIndex) => {
+                    {dates.map((date, _dateIndex) => {
                       const capacityData = getRoomCapacityForDate(room.room_number, date)
                       const colors = getStatusBasedColors(capacityData)
 

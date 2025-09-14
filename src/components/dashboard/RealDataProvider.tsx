@@ -383,7 +383,7 @@ export function RealDataProvider({ children, filter, dateRange }: RealDataProvid
       }
     })
 
-    const revenueTrend = trendPeriods.map((period, index) => {
+    const revenueTrend = trendPeriods.map((period, _index) => {
       const periodReservations = reservations.filter(r => {
         const checkinDate = new Date(r.check_in_date)
         const checkoutDate = new Date(r.check_out_date)

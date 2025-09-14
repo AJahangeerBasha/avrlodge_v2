@@ -520,8 +520,8 @@ export default function FirebaseBookingCard({
               </div>
             </div>
             <div className="space-y-2">
-              {booking.reservation_rooms.map((room, index) => (
-                <div key={room.id || index} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+              {booking.reservation_rooms.map((room, _index) => (
+                <div key={room.id || _index} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 mb-2">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                       <span className="font-medium text-gray-900 text-sm">Room {room.room_number}</span>
@@ -664,8 +664,8 @@ export default function FirebaseBookingCard({
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        {payments.map((payment, index) => (
-                          <div key={payment.id || index} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                        {payments.map((payment, _index) => (
+                          <div key={payment.id || _index} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
                             <div className="flex justify-between items-start">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
@@ -767,8 +767,8 @@ export default function FirebaseBookingCard({
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        {specialCharges.map((charge, index) => (
-                          <div key={charge.id || index} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                        {specialCharges.map((charge, _index) => (
+                          <div key={charge.id || _index} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
                             <div className="flex justify-between items-start">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
@@ -929,8 +929,8 @@ export default function FirebaseBookingCard({
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {documents.map((doc, index) => (
-                      <div key={doc.id || index} className="bg-white rounded-lg p-3 border border-gray-200 hover:shadow-md transition-all duration-200 hover:border-blue-300">
+                    {documents.map((doc, _index) => (
+                      <div key={doc.id || _index} className="bg-white rounded-lg p-3 border border-gray-200 hover:shadow-md transition-all duration-200 hover:border-blue-300">
                         <div className="flex items-center gap-3">
                           {/* Thumbnail or Icon */}
                           {isImageFile(doc.fileName) && doc.fileUrl ? (
