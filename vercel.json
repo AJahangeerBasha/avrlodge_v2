@@ -5,11 +5,6 @@
   "installCommand": "npm install",
   "framework": "vite",
   "regions": ["bom1"],
-  "functions": {
-    "app/api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/((?!api/).*)",
