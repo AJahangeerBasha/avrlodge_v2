@@ -55,31 +55,54 @@ googleProvider.setCustomParameters({
 
 export const signInWithGoogle = async (): Promise<UserCredential> => {
   const result = await signInWithPopup(auth, googleProvider);
-  
-  // Create user document in Firestore if it doesn't exist
+
+  // Create user document in Firestore ONLY if it doesn't exist
   if (result.user) {
-    await createUserDocument(result.user);
+    const { getDocument } = await import('./firestore');
+    const existingUser = await getDocument('users', result.user.uid);
+    if (!existingUser) {
+      await createUserDocument(result.user);
+    }
   }
-  
+
   return result;
 };
 
-// Create user document with role
+// Create user document with role (safe - preserves existing data)
 export const createUserDocument = async (user: User, additionalData: any = {}): Promise<void> => {
   const { uid, displayName, email, photoURL } = user;
-  
-  const userData = {
-    displayName: displayName || '',
-    email: email || '',
-    photoURL: photoURL || '',
-    role: 'guest', // Default role
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    ...additionalData,
-  };
+
+  // Import doc, setDoc and getDoc
+  const { doc, setDoc, getDoc } = await import('firebase/firestore');
+  const { db } = await import('./firebase');
 
   try {
-    await setDocument('users', uid, userData);
+    const docRef = doc(db, 'users', uid);
+    const existingDoc = await getDoc(docRef);
+
+    if (existingDoc.exists()) {
+      // User document exists - only update profile fields, preserve role
+      const updateData = {
+        displayName: displayName || existingDoc.data().displayName || '',
+        email: email || existingDoc.data().email || '',
+        photoURL: photoURL || existingDoc.data().photoURL || '',
+        updatedAt: new Date().toISOString(),
+        // Don't include role - preserve existing role
+      };
+      await setDoc(docRef, updateData, { merge: true });
+    } else {
+      // New user - create with default role
+      const userData = {
+        displayName: displayName || '',
+        email: email || '',
+        photoURL: photoURL || '',
+        role: 'guest', // Default role for new users only
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...additionalData,
+      };
+      await setDoc(docRef, userData);
+    }
   } catch (error) {
     console.error('Error creating user document:', error);
   }

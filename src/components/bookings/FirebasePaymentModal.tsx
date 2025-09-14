@@ -144,9 +144,7 @@ export function FirebasePaymentModal({
         paymentDate: new Date().toISOString()
       }
 
-      console.log('Creating payment with data:', paymentData)
       await createPayment(paymentData, currentUser.uid)
-      console.log('Payment created successfully')
       
       toast({
         title: "Payment Successful",

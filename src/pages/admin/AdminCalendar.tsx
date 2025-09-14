@@ -121,7 +121,6 @@ export const AdminCalendar: React.FC = () => {
           return 'booking' // Payment made = booking status
         }
       } catch (error) {
-        console.log('Could not load payments for reservation', reservation.id)
       }
 
       // Default to reservation for new bookings with no payment
@@ -141,7 +140,8 @@ export const AdminCalendar: React.FC = () => {
       setIsLoading(true)
     }
     try {
-      console.log('Loading admin calendar data...')
+      // Ensure selectedDate is a Date object for data loading
+      const dateForLoading = selectedDate instanceof Date ? selectedDate : new Date(selectedDate)
 
       // Determine date range based on viewMode
       let startDate: string
@@ -149,21 +149,21 @@ export const AdminCalendar: React.FC = () => {
 
       switch (viewMode) {
         case 'day':
-          startDate = format(selectedDate, 'yyyy-MM-dd')
-          endDate = format(selectedDate, 'yyyy-MM-dd')
+          startDate = format(dateForLoading, 'yyyy-MM-dd')
+          endDate = format(dateForLoading, 'yyyy-MM-dd')
           break
         case 'week':
-          const dayOfWeek = selectedDate.getDay()
+          const dayOfWeek = dateForLoading.getDay()
           const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
-          const weekStart = addDays(selectedDate, -daysFromMonday)
+          const weekStart = addDays(dateForLoading, -daysFromMonday)
           const weekEnd = addDays(weekStart, 6)
           startDate = format(weekStart, 'yyyy-MM-dd')
           endDate = format(weekEnd, 'yyyy-MM-dd')
           break
         case 'month':
         default:
-          startDate = format(startOfMonth(selectedDate), 'yyyy-MM-dd')
-          endDate = format(endOfMonth(selectedDate), 'yyyy-MM-dd')
+          startDate = format(startOfMonth(dateForLoading), 'yyyy-MM-dd')
+          endDate = format(endOfMonth(dateForLoading), 'yyyy-MM-dd')
           break
       }
 
@@ -186,7 +186,6 @@ export const AdminCalendar: React.FC = () => {
         }
       })
 
-      console.log('Transformed rooms:', transformedRooms.length)
       setRooms(transformedRooms)
 
       // Load all reservations
@@ -262,7 +261,6 @@ export const AdminCalendar: React.FC = () => {
         })
       )
 
-      console.log('Transformed reservations:', transformedReservations.length)
       setReservations(transformedReservations.filter(r => r.status !== 'cancelled'))
 
       // Update refresh timestamp
@@ -336,19 +334,21 @@ export const AdminCalendar: React.FC = () => {
     return dates
   }
 
-  const dates = generateDateRange(selectedDate, viewMode)
+  // Ensure selectedDate is a Date object (fallback for hydration issues)
+  const safeSelectedDate = selectedDate instanceof Date ? selectedDate : new Date(selectedDate)
+  const dates = generateDateRange(safeSelectedDate, viewMode)
 
   // Navigation handlers
   const handlePrevious = () => {
     switch (viewMode) {
       case 'day':
-        setSelectedDate(addDays(selectedDate, -1))
+        setSelectedDate(addDays(safeSelectedDate, -1))
         break
       case 'week':
-        setSelectedDate(addDays(selectedDate, -7))
+        setSelectedDate(addDays(safeSelectedDate, -7))
         break
       case 'month':
-        setSelectedDate(subMonths(selectedDate, 1))
+        setSelectedDate(subMonths(safeSelectedDate, 1))
         break
     }
   }
@@ -356,19 +356,18 @@ export const AdminCalendar: React.FC = () => {
   const handleNext = () => {
     switch (viewMode) {
       case 'day':
-        setSelectedDate(addDays(selectedDate, 1))
+        setSelectedDate(addDays(safeSelectedDate, 1))
         break
       case 'week':
-        setSelectedDate(addDays(selectedDate, 7))
+        setSelectedDate(addDays(safeSelectedDate, 7))
         break
       case 'month':
-        setSelectedDate(addMonths(selectedDate, 1))
+        setSelectedDate(addMonths(safeSelectedDate, 1))
         break
     }
   }
 
   const handleCellClick = (roomNumber: string, date: Date, capacityData: any) => {
-    console.log('Admin calendar cell clicked:', { roomNumber, date, capacityData })
     // Admin-specific actions can be implemented here
   }
 
@@ -376,7 +375,7 @@ export const AdminCalendar: React.FC = () => {
     const data = {
       rooms,
       reservations,
-      selectedDate: format(selectedDate, 'yyyy-MM'),
+      selectedDate: format(safeSelectedDate, 'yyyy-MM'),
       exportDate: new Date().toISOString(),
       role: 'admin'
     }
@@ -385,7 +384,7 @@ export const AdminCalendar: React.FC = () => {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `admin-calendar-${format(selectedDate, 'yyyy-MM')}.json`
+    a.download = `admin-calendar-${format(safeSelectedDate, 'yyyy-MM')}.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -474,7 +473,7 @@ export const AdminCalendar: React.FC = () => {
 
       {/* Calendar Statistics */}
       <CalendarHeader
-        selectedDate={selectedDate}
+        selectedDate={safeSelectedDate}
         onPreviousMonth={handlePrevious}
         onNextMonth={handleNext}
         totalRooms={filteredRooms.length}

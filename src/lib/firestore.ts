@@ -30,10 +30,8 @@ export const createDocument = async (collectionName: string, data: DocumentData)
 
 export const setDocument = async (collectionName: string, docId: string, data: DocumentData): Promise<void> => {
   try {
-    console.log(`Setting document: ${collectionName}/${docId}`, data);
     const docRef = doc(db, collectionName, docId);
     await setDoc(docRef, data);
-    console.log(`Document set successfully: ${collectionName}/${docId}`);
   } catch (error) {
     console.error(`Error setting document ${collectionName}/${docId}:`, error);
     throw error;
@@ -42,12 +40,10 @@ export const setDocument = async (collectionName: string, docId: string, data: D
 
 export const getDocument = async (collectionName: string, docId: string): Promise<DocumentData | null> => {
   try {
-    console.log(`Fetching document: ${collectionName}/${docId}`);
     const docRef = doc(db, collectionName, docId);
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists()) {
-      console.log(`Document found: ${collectionName}/${docId}`);
       return { id: docSnap.id, ...docSnap.data() };
     }
     console.log(`Document not found: ${collectionName}/${docId}`);

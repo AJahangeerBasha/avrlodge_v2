@@ -232,9 +232,7 @@ export default function FirebaseBookingCard({
   const loadPaymentHistory = async () => {
     try {
       setLoadingPayments(true)
-      console.log('BookingCard: Loading payment history for booking', booking.reference_number)
       const paymentHistory = await getPaymentsByReservationId(booking.id)
-      console.log('BookingCard: Loaded', paymentHistory.length, 'payments')
       setPayments(paymentHistory)
     } catch (error) {
       console.error('Error loading payment history:', error)
@@ -270,7 +268,6 @@ export default function FirebaseBookingCard({
   const loadSpecialCharges = async () => {
     try {
       setLoadingSpecialCharges(true)
-      console.log('BookingCard: Loading special charges for booking', booking.reference_number)
 
       // Try Firebase API first
       let charges = []
@@ -298,7 +295,6 @@ export default function FirebaseBookingCard({
         }))
       }
 
-      console.log('BookingCard: Loaded', charges.length, 'special charges')
       setSpecialCharges(charges)
     } catch (error) {
       console.error('Error loading special charges:', error)

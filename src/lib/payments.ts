@@ -39,8 +39,9 @@ import {
   PaymentAnalytics
 } from './types/payments'
 import { generateUniqueReceiptNumber } from './utils/receiptNumber'
+import { COLLECTIONS } from './constants/collections'
 
-const COLLECTION_NAME = 'payments'
+const COLLECTION_NAME = COLLECTIONS.PAYMENTS
 const AUDIT_COLLECTION_NAME = 'paymentAudits'
 
 // Helper function to convert Firestore timestamp to ISO string

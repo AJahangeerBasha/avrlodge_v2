@@ -163,11 +163,17 @@ export const useCalendarStore = create<CalendarState>()(
         name: 'calendar-store',
         // Only persist certain state, not the data itself
         partialize: (state) => ({
-          selectedDate: state.selectedDate,
+          selectedDate: state.selectedDate.toISOString(), // Serialize Date to string
           viewMode: state.viewMode,
           showFilters: state.showFilters,
           filters: state.filters,
         }),
+        // Custom deserializer to convert date string back to Date object
+        onRehydrateStorage: () => (state) => {
+          if (state && typeof state.selectedDate === 'string') {
+            state.selectedDate = new Date(state.selectedDate);
+          }
+        },
       }
     ),
     {

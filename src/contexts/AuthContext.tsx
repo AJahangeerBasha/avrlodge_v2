@@ -78,32 +78,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     let roleUnsubscribe: (() => void) | null = null;
 
     const unsubscribe = onAuthStateChange(async (user) => {
-      console.log('Auth state changed:', user ? 'User logged in' : 'User logged out');
       setCurrentUser(user);
-      
+
       // Clean up previous role subscription
       if (roleUnsubscribe) {
         roleUnsubscribe();
         roleUnsubscribe = null;
       }
-      
+
       if (user) {
         try {
-          console.log('Initializing user role for:', user.uid);
-          
           // Initialize user role if needed
           await initializeUserRole(user);
-          console.log('User role initialized');
-          
+
           // Get initial user role and claims
           const { role, claims } = await getUserRoleAndClaims(user);
-          console.log('User role retrieved:', role);
           setUserRole(role);
           setUserClaims(claims);
 
           // Subscribe to real-time role updates
           roleUnsubscribe = subscribeToUserRole(user.uid, (newRole) => {
-            console.log('Role updated in real-time:', newRole);
             setUserRole(newRole);
             setUserClaims({
               role: newRole,
@@ -114,7 +108,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           });
         } catch (error) {
           console.error('Error setting up user role:', error);
-          console.error('Full error details:', error);
           setUserRole(ROLES.GUEST);
           setUserClaims({ role: ROLES.GUEST, guest: true });
         }
