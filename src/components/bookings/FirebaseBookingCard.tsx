@@ -16,6 +16,7 @@ import { updateReservationRoom } from '@/lib/reservationRooms'
 import { updateReservationStatus } from '@/lib/reservations'
 import { getPaymentsByReservationId } from '@/lib/payments'
 import { getRoomCheckinDocumentsByReservationId } from '@/lib/roomCheckinDocuments'
+import { supabase } from '@/lib/supabase'
 
 interface Booking {
   id: string
@@ -72,6 +73,7 @@ export default function FirebaseBookingCard({
   const [cancellationConfirmation, setCancellationConfirmation] = useState('')
   const [showDocuments, setShowDocuments] = useState(false)
   const [showPaymentHistory, setShowPaymentHistory] = useState(false)
+  const [selectedDocument, setSelectedDocument] = useState<any>(null)
   const [payments, setPayments] = useState<any[]>([])
   const [documents, setDocuments] = useState<any[]>([])
   const [loadingPayments, setLoadingPayments] = useState(true)
@@ -247,10 +249,10 @@ export default function FirebaseBookingCard({
       const docs = await getRoomCheckinDocumentsByReservationId(booking.id)
       setDocuments(docs)
     } catch (error) {
-      console.error('Error loading documents:', error)
+      console.error('FirebaseBookingCard: Error loading documents:', error)
       toast({
         title: "Error",
-        description: "Failed to load documents.",
+        description: `Failed to load documents: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       })
     } finally {
@@ -310,6 +312,75 @@ export default function FirebaseBookingCard({
         return 'bg-yellow-100 text-yellow-700 border-yellow-200'
       default:
         return 'bg-gray-100 text-gray-700 border-gray-200'
+    }
+  }
+
+  // Helper function to determine if file is an image
+  const isImageFile = (fileName: string): boolean => {
+    if (!fileName) return false
+    const extension = fileName.toLowerCase().split('.').pop()
+    return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(extension || '')
+  }
+
+  // Helper function to determine if file is a PDF
+  const isPdfFile = (fileName: string): boolean => {
+    if (!fileName) return false
+    const extension = fileName.toLowerCase().split('.').pop()
+    return extension === 'pdf'
+  }
+
+  // Handle document preview
+  const handleDocumentPreview = (doc: any) => {
+    setSelectedDocument(doc)
+  }
+
+  // Close document preview
+  const closeDocumentPreview = () => {
+    setSelectedDocument(null)
+  }
+
+  // Get proper Supabase public URL for a document
+  const getSupabasePublicURL = (doc: any): string => {
+    if (!doc.fileUrl) return ''
+
+    // If it's already a full Supabase URL, return as is
+    if (doc.fileUrl.includes('supabase.co')) {
+      return doc.fileUrl
+    }
+
+    // If it's a path, construct the public URL
+    const { data } = supabase.storage
+      .from('room-documents')
+      .getPublicUrl(doc.fileUrl)
+
+    return data.publicUrl
+  }
+
+  // Create a signed URL for private files (fallback)
+  const getSignedURL = async (doc: any): Promise<string> => {
+    try {
+      if (!doc.fileUrl) return ''
+
+      // Extract path from fileUrl if it's a full URL
+      let filePath = doc.fileUrl
+      if (filePath.includes('supabase.co')) {
+        const url = new URL(filePath)
+        filePath = url.pathname.split('/object/public/room-documents/')[1] || url.pathname
+      }
+
+      const { data, error } = await supabase.storage
+        .from('room-documents')
+        .createSignedUrl(filePath, 3600) // 1 hour expiry
+
+      if (error) {
+        console.error('Error creating signed URL:', error)
+        return doc.fileUrl // fallback to original URL
+      }
+
+      return data.signedUrl
+    } catch (error) {
+      console.error('Error in getSignedURL:', error)
+      return doc.fileUrl // fallback to original URL
     }
   }
 
@@ -680,21 +751,21 @@ export default function FirebaseBookingCard({
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+              className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-blue-600" />
+              {/* Compact Header */}
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Uploaded Documents
+                    <h3 className="text-base font-semibold text-gray-900">
+                      Documents
                     </h3>
-                    <p className="text-sm text-gray-500">
-                      {booking.reference_number} • All rooms
+                    <p className="text-xs text-gray-500">
+                      {booking.reference_number}
                     </p>
                   </div>
                 </div>
@@ -702,75 +773,248 @@ export default function FirebaseBookingCard({
                   onClick={() => setShowDocuments(false)}
                   className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Content */}
-              <div className="flex-1 overflow-y-auto p-6">
+              {/* Compact Content */}
+              <div className="flex-1 overflow-y-auto p-4">
                 {loadingDocuments ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     <span className="ml-2 text-gray-600">Loading documents...</span>
                   </div>
                 ) : documents.length === 0 ? (
-                  <div className="text-center py-8">
-                    <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">No documents found for this reservation.</p>
+                  <div className="text-center py-6">
+                    <FileText className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500 text-sm">No documents found</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-3">
                     {documents.map((doc, index) => (
-                      <div key={doc.id || index} className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-blue-600" />
-                            <span className="font-medium text-gray-900 capitalize">
-                              {doc.documentType?.replace('_', ' ') || 'Document'}
-                            </span>
+                      <div key={doc.id || index} className="bg-white rounded-lg p-3 border border-gray-200 hover:shadow-md transition-all duration-200 hover:border-blue-300">
+                        <div className="flex items-center gap-3">
+                          {/* Thumbnail or Icon */}
+                          {isImageFile(doc.fileName) && doc.fileUrl ? (
+                            <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
+                              <img
+                                src={getSupabasePublicURL(doc)}
+                                alt={doc.fileName}
+                                className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                                onClick={() => handleDocumentPreview(doc)}
+                                onError={async (e) => {
+                                  const target = e.target as HTMLImageElement
+                                  try {
+                                    const signedUrl = await getSignedURL(doc)
+                                    if (signedUrl !== doc.fileUrl) {
+                                      target.src = signedUrl
+                                      return
+                                    }
+                                  } catch (error) {
+                                    console.error('Fallback signed URL failed:', error)
+                                  }
+                                  // Fallback to file icon
+                                  const iconDiv = document.createElement('div')
+                                  iconDiv.className = 'w-full h-full flex items-center justify-center bg-gray-100'
+                                  iconDiv.innerHTML = '<svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg>'
+                                  target.parentNode?.replaceChild(iconDiv, target)
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-blue-50 flex items-center justify-center">
+                              <FileText className="w-6 h-6 text-blue-600" />
+                            </div>
+                          )}
+
+                          {/* Document Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <h4 className="font-medium text-gray-900 text-sm capitalize truncate">
+                                {doc.documentType?.replace('_', ' ') || 'Document'}
+                              </h4>
+                              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full whitespace-nowrap ml-2">
+                                Room {doc.roomId?.slice(-4) || 'Unknown'}
+                              </span>
+                            </div>
+
+                            <p className="text-xs text-gray-500 mb-2 truncate">
+                              {doc.fileName}
+                            </p>
+
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-400">
+                                {doc.uploadedAt
+                                  ? new Date(doc.uploadedAt).toLocaleDateString('en-IN', {
+                                      day: '2-digit',
+                                      month: 'short'
+                                    })
+                                  : 'Unknown'
+                                }
+                              </span>
+
+                              {doc.fileUrl && (
+                                <Button
+                                  onClick={() => handleDocumentPreview(doc)}
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 text-xs text-blue-600 border-blue-200 hover:bg-blue-50 px-3"
+                                >
+                                  <Eye className="w-3 h-3 mr-1" />
+                                  Preview
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </div>
-
-                        <p className="text-sm text-gray-600 mb-2">
-                          Room: {doc.roomId || 'Unknown'}
-                        </p>
-
-                        <p className="text-xs text-gray-500 mb-3">
-                          Uploaded: {doc.uploadedAt
-                            ? new Date(doc.uploadedAt).toLocaleDateString('en-IN')
-                            : 'Unknown date'
-                          }
-                        </p>
-
-                        <div className="flex gap-2">
-                          {doc.fileUrl && (
-                            <a
-                              href={doc.fileUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1"
-                            >
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
-                              >
-                                <Eye className="w-3 h-3 mr-1" />
-                                View
-                              </Button>
-                            </a>
-                          )}
-                        </div>
-
-                        {doc.fileName && (
-                          <p className="text-xs text-gray-400 mt-2 truncate">
-                            {doc.fileName}
-                          </p>
-                        )}
                       </div>
                     ))}
                   </div>
                 )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Document Preview Modal */}
+      <AnimatePresence>
+        {selectedDocument && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
+            onClick={closeDocumentPreview}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 capitalize">
+                      {selectedDocument.documentType?.replace('_', ' ') || 'Document'}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {selectedDocument.fileName}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={closeDocumentPreview}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Preview Content */}
+              <div className="flex-1 overflow-auto p-4 bg-gray-50">
+                <div className="flex items-center justify-center min-h-full">
+                  {isImageFile(selectedDocument.fileName) ? (
+                    <div className="max-w-full max-h-full">
+                      <img
+                        src={getSupabasePublicURL(selectedDocument)}
+                        alt={selectedDocument.fileName}
+                        className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+                        onError={async (e) => {
+                          const target = e.target as HTMLImageElement
+
+                          // Try signed URL as fallback
+                          try {
+                            const signedUrl = await getSignedURL(selectedDocument)
+                            if (signedUrl !== selectedDocument.fileUrl && signedUrl !== target.src) {
+                              target.src = signedUrl
+                              return
+                            }
+                          } catch (error) {
+                            console.error('Fallback signed URL failed:', error)
+                          }
+
+                          // If all fails, show error message
+                          target.style.display = 'none'
+                          const errorDiv = document.createElement('div')
+                          errorDiv.className = 'text-center py-8'
+                          errorDiv.innerHTML = `
+                            <div class="text-gray-400 mb-2">
+                              <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                              </svg>
+                            </div>
+                            <p class="text-gray-500">Unable to load image preview</p>
+                            <p class="text-xs text-gray-400 mt-1">Trying Supabase URL: ${getSupabasePublicURL(selectedDocument)}</p>
+                            <p class="text-xs text-gray-400 mt-1">Original URL: ${selectedDocument.fileUrl}</p>
+                          `
+                          target.parentNode?.appendChild(errorDiv)
+                        }}
+                      />
+                    </div>
+                  ) : isPdfFile(selectedDocument.fileName) ? (
+                    <div className="w-full h-full min-h-[500px]">
+                      <iframe
+                        src={getSupabasePublicURL(selectedDocument)}
+                        className="w-full h-full border-0 rounded-lg"
+                        title={selectedDocument.fileName}
+                        onError={() => {
+                          // Handle PDF loading error
+                        }}
+                      />
+                      {/* Fallback for PDF */}
+                      <div className="text-center py-8 text-gray-500">
+                        <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                        <p>PDF preview not available</p>
+                        <a
+                          href={getSupabasePublicURL(selectedDocument)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center mt-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Open in New Tab
+                        </a>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                      <p className="text-gray-500 mb-2">Preview not available for this file type</p>
+                      <p className="text-xs text-gray-400 mb-4">{selectedDocument.fileName}</p>
+                      <a
+                        href={getSupabasePublicURL(selectedDocument)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Open in New Tab
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 border-t border-gray-200 bg-white">
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div>
+                    <span className="font-medium">Room:</span> {selectedDocument.roomId}
+                  </div>
+                  <div>
+                    <span className="font-medium">Uploaded:</span> {selectedDocument.uploadedAt
+                      ? new Date(selectedDocument.uploadedAt).toLocaleDateString('en-IN')
+                      : 'Unknown date'
+                    }
+                  </div>
+                </div>
               </div>
             </motion.div>
           </motion.div>
