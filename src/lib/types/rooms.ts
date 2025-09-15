@@ -40,6 +40,7 @@ export interface RoomFilters {
   roomTypeId?: string
   floorNumber?: number
   isActive?: boolean
+  searchTerm?: string
 }
 
 export interface RoomStats {

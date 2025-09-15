@@ -1,16 +1,18 @@
-import { 
-  collection, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  getDocs, 
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
   getDoc,
-  query, 
-  where, 
+  query,
+  where,
   orderBy,
   serverTimestamp,
-  Timestamp 
+  Timestamp,
+  onSnapshot,
+  Unsubscribe
 } from 'firebase/firestore'
 import { db } from './firebase'
 import { Room, CreateRoomData, UpdateRoomData, RoomFilters, RoomStats, RoomStatus } from './types/rooms'
@@ -337,11 +339,67 @@ export const getRoomsByFloor = async (floorNumber: number): Promise<Room[]> => {
 export const searchRoomsByNumber = async (searchTerm: string): Promise<Room[]> => {
   try {
     const rooms = await getAllRooms({ isActive: true })
-    return rooms.filter(room => 
+    return rooms.filter(room =>
       room.roomNumber.toLowerCase().includes(searchTerm.toLowerCase())
     )
   } catch (error) {
     console.error('Error searching rooms:', error)
     throw error
+  }
+}
+
+// Subscribe to real-time rooms updates
+export const subscribeToRooms = (
+  callback: (rooms: Room[]) => void,
+  filters?: RoomFilters
+): Unsubscribe => {
+  try {
+    let q = query(collection(db, ROOMS_COLLECTION), orderBy('createdAt', 'desc'))
+
+    if (filters?.status) {
+      q = query(q, where('status', '==', filters.status))
+    }
+
+    if (filters?.roomTypeId) {
+      q = query(q, where('roomTypeId', '==', filters.roomTypeId))
+    }
+
+    if (filters?.floorNumber !== undefined) {
+      q = query(q, where('floorNumber', '==', filters.floorNumber))
+    }
+
+    if (filters?.isActive !== undefined) {
+      q = query(q, where('isActive', '==', filters.isActive))
+    }
+
+    return onSnapshot(q, async (querySnapshot) => {
+      let rooms = querySnapshot.docs.map(convertFirestoreToRoom)
+
+      // Populate room types
+      const roomsWithType = await Promise.all(
+        rooms.map(async (room) => {
+          try {
+            const roomType = await getRoomTypeById(room.roomTypeId)
+            return {
+              ...room,
+              roomType: roomType ? {
+                id: roomType.id,
+                name: roomType.name,
+                pricePerNight: roomType.pricePerNight,
+                maxGuests: roomType.maxGuests
+              } : undefined
+            }
+          } catch (error) {
+            console.error(`Failed to load room type for room ${room.id}:`, error)
+            return room
+          }
+        })
+      )
+
+      callback(roomsWithType)
+    })
+  } catch (error) {
+    console.error('Error subscribing to rooms:', error)
+    throw new Error('Failed to subscribe to rooms')
   }
 }

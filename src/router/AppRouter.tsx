@@ -20,7 +20,7 @@ const AdminCalendar = lazy(() => import('../pages/admin/AdminCalendar').then(mod
 const AdminReservation = lazy(() => import('../pages/admin/AdminReservation').then(module => ({ default: module.AdminReservation })))
 const AdminBookings = lazy(() => import('../pages/admin/AdminBookings').then(module => ({ default: module.AdminBookings })))
 const AdminRoomTypes = lazy(() => import('../pages/admin/AdminRoomTypes').then(module => ({ default: module.AdminRoomTypes })))
-const AdminRooms = lazy(() => import('../pages/admin/AdminRooms').then(module => ({ default: module.AdminRooms })))
+const AdminRooms = lazy(() => import('../pages/admin/AdminRooms'))
 const AdminSpecialCharges = lazy(() => import('../pages/admin/AdminSpecialCharges').then(module => ({ default: module.AdminSpecialCharges })))
 const AdminAgents = lazy(() => import('../pages/admin/AdminAgents'))
 
