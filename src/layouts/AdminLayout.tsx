@@ -3,7 +3,7 @@ import { Outlet, Navigate, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { ROLES } from '@/lib/types/auth'
 import { Button } from '@/components/ui/button'
-import { LogOut, Users, Settings, BarChart3, Calendar, BookOpen, Home, Bed, DollarSign, Menu, X } from 'lucide-react'
+import { LogOut, Users, Settings, BarChart3, Calendar, BookOpen, Home, Bed, DollarSign, Menu, X, UserCheck } from 'lucide-react'
 
 export function AdminLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -49,6 +49,7 @@ export function AdminLayout() {
     { to: "/admin/room-types", icon: Home, label: "Room Types" },
     { to: "/admin/rooms", icon: Bed, label: "Rooms" },
     { to: "/admin/special-charges", icon: DollarSign, label: "Special Charges" },
+    { to: "/admin/agents", icon: UserCheck, label: "Agents" },
     { to: "/admin/settings", icon: Settings, label: "Settings" }
   ]
 

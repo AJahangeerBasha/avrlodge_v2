@@ -22,6 +22,7 @@ const AdminBookings = lazy(() => import('../pages/admin/AdminBookings').then(mod
 const AdminRoomTypes = lazy(() => import('../pages/admin/AdminRoomTypes').then(module => ({ default: module.AdminRoomTypes })))
 const AdminRooms = lazy(() => import('../pages/admin/AdminRooms').then(module => ({ default: module.AdminRooms })))
 const AdminSpecialCharges = lazy(() => import('../pages/admin/AdminSpecialCharges').then(module => ({ default: module.AdminSpecialCharges })))
+const AdminAgents = lazy(() => import('../pages/admin/AdminAgents'))
 
 // Manager pages  
 const ManagerDashboard = lazy(() => import('../pages/manager/ManagerDashboard').then(module => ({ default: module.ManagerDashboard })))
@@ -54,6 +55,7 @@ function AppRoutes() {
             <Route path="room-types" element={<AdminRoomTypes />} />
             <Route path="rooms" element={<AdminRooms />} />
             <Route path="special-charges" element={<AdminSpecialCharges />} />
+            <Route path="agents" element={<AdminAgents />} />
           </Route>
           
           {/* Manager routes - protected with ManagerLayout */}

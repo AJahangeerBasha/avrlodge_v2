@@ -66,10 +66,12 @@ export const AdminReservation: React.FC = () => {
     
     // Actions
     setCurrentStep,
+    setPrimaryGuest,
     updatePrimaryGuestField,
     addSecondaryGuest,
     removeSecondaryGuest,
     updateSecondaryGuest,
+    setSecondaryGuests,
     setSelectedState,
     setSelectedDistrict,
     setCheckInDate,
@@ -115,48 +117,9 @@ export const AdminReservation: React.FC = () => {
   const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
   
   // Track original data for edit mode to detect deletions
-  
+
   // Payment method selection
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
-
-  // Load initial data
-  useEffect(() => {
-    loadInitialData();
-  }, [loadInitialData]);
-
-  // Ensure we always start at step 1
-  useEffect(() => {
-    setCurrentStep(1);
-  }, [setCurrentStep]);
-
-  // Scroll to top when step changes
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentStep]);
-
-  // Load existing reservation data in edit mode
-  useEffect(() => {
-    if (isEditMode && editReservationId) {
-      loadReservationForEdit(editReservationId);
-    }
-  }, [isEditMode, editReservationId, loadReservationForEdit]);
-
-  // Focus on guest name input when on step 1
-  useEffect(() => {
-    if (currentStep === 1) {
-      const guestNameInput = document.getElementById('primaryName');
-      if (guestNameInput) {
-        setTimeout(() => guestNameInput.focus(), 100);
-      }
-    }
-  }, [currentStep]);
-
-  // Load available rooms when dates change (without room allocations dependency to avoid circular updates)
-  useEffect(() => {
-    if (checkInDate && checkOutDate) {
-      loadAvailableRooms();
-    }
-  }, [checkInDate, checkOutDate, loadAvailableRooms]);
 
   const loadInitialData = useCallback(async () => {
     try {
@@ -249,7 +212,6 @@ export const AdminReservation: React.FC = () => {
         telegram: g.telegram || ''
       }));
       setSecondaryGuests(mappedSecondaryGuests);
-      setOriginalSecondaryGuests([...mappedSecondaryGuests]);
 
       // Set dates and location data
       setCheckInDate(reservation.checkInDate || '');
@@ -277,6 +239,45 @@ export const AdminReservation: React.FC = () => {
       setIsLoadingReservation(false);
     }
   }, [navigate, setError]);
+
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
+
+  // Focus on guest name input when on step 1
+  useEffect(() => {
+    if (currentStep === 1) {
+      const guestNameInput = document.getElementById('primaryName');
+      if (guestNameInput) {
+        setTimeout(() => guestNameInput.focus(), 100);
+      }
+    }
+  }, [currentStep]);
+
+  // Load available rooms when dates change (without room allocations dependency to avoid circular updates)
+  useEffect(() => {
+    if (checkInDate && checkOutDate) {
+      loadAvailableRooms();
+    }
+  }, [checkInDate, checkOutDate, loadAvailableRooms]);
+
+  // Load initial data - moved after function definition
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
+
+  // Ensure we always start at step 1 - moved after function definition
+  useEffect(() => {
+    setCurrentStep(1);
+  }, [setCurrentStep]);
+
+  // Load existing reservation data in edit mode - moved after function definition
+  useEffect(() => {
+    if (isEditMode && editReservationId) {
+      loadReservationForEdit(editReservationId);
+    }
+  }, [isEditMode, editReservationId, loadReservationForEdit]);
 
   const handleNext = () => {
     if (currentStep === 3) {
