@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBookings } from '@/contexts/BookingsContext'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, User, Hash, Calendar, Users, Home, DollarSign, X, AlertTriangle, History, FileText, Eye, ChevronDown, ChevronUp, RefreshCw, Receipt, Edit } from 'lucide-react'
+import { Phone, User, Hash, Calendar, Users, Home, DollarSign, X, AlertTriangle, History, FileText, Eye, ChevronDown, ChevronUp, RefreshCw, Receipt, Edit, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,6 +15,7 @@ import { getPaymentsByReservationId } from '@/lib/payments'
 import { getRoomCheckinDocumentsByReservationId } from '@/lib/roomCheckinDocuments'
 import { getReservationSpecialChargesByReservationId, ReservationSpecialCharge } from '@/lib/reservationSpecialCharges'
 import { supabase } from '@/lib/supabase'
+import { AdditionalOptionsModal } from './AdditionalOptionsModal'
 
 interface Booking {
   id: string
@@ -74,6 +75,7 @@ export default function FirebaseBookingCard({
   const [cancellationConfirmation, setCancellationConfirmation] = useState('')
   const [showDocuments, setShowDocuments] = useState(false)
   const [showPaymentHistory, setShowPaymentHistory] = useState(false)
+  const [showAdditionalOptions, setShowAdditionalOptions] = useState(false)
   const [selectedDocument, setSelectedDocument] = useState<RoomCheckinDocument | null>(null)
   const [payments, setPayments] = useState<Payment[]>([])
   const [documents, setDocuments] = useState<RoomCheckinDocument[]>([])
@@ -879,7 +881,7 @@ export default function FirebaseBookingCard({
               )}
 
               {/* Edit Reservation Button */}
-              <Button
+              {/* <Button
                 onClick={handleEditReservation}
                 variant="outline"
                 className="w-full border-green-200 text-green-600 hover:bg-green-50 hover:border-green-300 transition-colors"
@@ -887,7 +889,20 @@ export default function FirebaseBookingCard({
               >
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Reservation
-              </Button>
+              </Button> */}
+
+              {/* Additional Options Button - Only show when there's remaining balance */}
+              {calculatePaymentTotals().remainingBalance > 0 && getCalculatedStatus() !== 'cancelled' && (
+                <Button
+                  onClick={() => setShowAdditionalOptions(true)}
+                  variant="outline"
+                  className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 hover:border-purple-300 transition-colors"
+                  size="sm"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Additional Discounts
+                </Button>
+              )}
 
               {/* Cancel Reservation Button */}
               {getCalculatedStatus() !== 'cancelled' && (
@@ -1281,6 +1296,19 @@ export default function FirebaseBookingCard({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Additional Options Modal */}
+      <AdditionalOptionsModal
+        booking={booking}
+        isOpen={showAdditionalOptions}
+        onClose={() => setShowAdditionalOptions(false)}
+        onUpdate={() => {
+          // Reload local data to reflect changes
+          loadPaymentHistory()
+          loadSpecialCharges()
+          loadDocuments()
+        }}
+      />
 
     </motion.div>
   )
