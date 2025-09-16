@@ -1,0 +1,27 @@
+[
+  {
+    "roomTypeid": "274dd93c-e93d-4070-8856-9365e056d025",
+    "commission": 100,
+    "status": "active"
+  },
+  {
+    "roomTypeid": "77b434bb-3693-4e0e-ab12-cd64a28c8269",
+    "commission": 200,
+    "status": "active"
+  },
+  {
+    "roomTypeid": "3091a830-f65b-4385-af93-747122bf8d6c",
+    "commission": 300,
+    "status": "active"
+  },
+  {
+    "roomTypeid": "60230608-4023-4aa4-80df-0b486eacbfe7",
+    "commission": 25,
+    "status": "inactive"
+  },
+  {
+    "roomTypeid": "b48297cf-35d9-4a7c-97dc-1138ae5ebbe7",
+    "commission": 25,
+    "status": "inactive"
+  }
+]

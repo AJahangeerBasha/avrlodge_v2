@@ -1,11 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Calendar, Users, CreditCard, Plus, Trash2, X, MapPin, DollarSign } from 'lucide-react';
+import { CheckCircle, Calendar, Users, Plus, Trash2, X, MapPin, DollarSign } from 'lucide-react';
 import { useReservationStore, type RoomAllocation, type SpecialCharge } from '@/stores/reservationStore';
 import { validatePhoneNumber, formatPhoneNumber, getPhoneValidationError } from '@/utils/phoneValidation';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { StateDistrictDropdown } from '@/components/agents/StateDistrictDropdown';
+import agentFeesData from '@/data/agent-fees.json';
+import { getAgents } from '@/lib/agents';
+import type { Agent } from '@/lib/types/agents';
 import { useAuth } from '@/contexts/AuthContext';
 import { Guest } from '@/lib/types/guests';
 import { Room } from '@/lib/types/rooms';
@@ -85,6 +88,12 @@ export const AdminReservation: React.FC = () => {
     setSpecialCharges,
     setDiscountType,
     setDiscountValue,
+    selectedAgentFee,
+    agentFeeAmount,
+    selectedAgentId,
+    setSelectedAgentFee,
+    setAgentFeeAmount,
+    setSelectedAgentId,
     setIsSubmitting,
     setError,
     resetForm,
@@ -114,11 +123,10 @@ export const AdminReservation: React.FC = () => {
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
   const [specialChargesMaster, setSpecialChargesMaster] = useState<SpecialCharge[]>([]);
   const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
+  const [activeAgents, setActiveAgents] = useState<Agent[]>([]);
   
   // Track original data for edit mode to detect deletions
 
-  // Payment method selection
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
 
   const loadInitialData = useCallback(async () => {
     try {
@@ -131,18 +139,21 @@ export const AdminReservation: React.FC = () => {
       console.log('Special charges count:', specialChargesData?.length || 0);
 
       // Load other data
-      const [roomTypesData, roomsData] = await Promise.all([
+      const [roomTypesData, roomsData, agentsData] = await Promise.all([
         getAllRoomTypes(),
-        getAllRooms()
+        getAllRooms(),
+        getAgents({ status: 'active' })
       ]);
 
       console.log('Loaded room types:', roomTypesData.length);
       console.log('Loaded rooms:', roomsData.length);
+      console.log('Loaded active agents:', agentsData.length);
       console.log('Final special charges to set:', specialChargesData);
 
       setRoomTypes(roomTypesData);
       // Note: roomsData is not stored in state, it's used when loading available rooms for dates
       setSpecialChargesMaster(specialChargesData || []);
+      setActiveAgents(agentsData || []);
 
       console.log('State updated with special charges');
     } catch (error) {
@@ -271,6 +282,23 @@ export const AdminReservation: React.FC = () => {
     setCurrentStep(1);
   }, [setCurrentStep]);
 
+  // Calculate and update agent fee when room allocations or agent selection changes
+  useEffect(() => {
+    const numberOfNights = calculateNumberOfNights();
+    const calculatedAgentFee = selectedAgentFee === 'agent' && roomAllocations.length > 0 && numberOfNights > 0
+      ? roomAllocations.reduce((total, room) => {
+          const roomTypeCommission = agentFeesData.find(fee => fee.roomTypeid === room.roomTypeId);
+          if (roomTypeCommission && roomTypeCommission.status === 'active') {
+            // Commission per night per room
+            return total + (roomTypeCommission.commission * numberOfNights);
+          }
+          return total;
+        }, 0)
+      : 0;
+
+    setAgentFeeAmount(calculatedAgentFee);
+  }, [selectedAgentFee, roomAllocations, setAgentFeeAmount, calculateNumberOfNights]);
+
   // Load existing reservation data in edit mode - moved after function definition
   useEffect(() => {
     if (isEditMode && editReservationId) {
@@ -305,9 +333,16 @@ export const AdminReservation: React.FC = () => {
       return;
     }
 
+    // Validate agent selection if agent referral is chosen
+    if (selectedAgentFee === 'agent' && !selectedAgentId) {
+      setError('Please select an agent for referral commission.');
+      setIsSubmitting(false);
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
-    
+
     try {
       // Generate reference number for new reservations
       const referenceNumber = isEditMode ? '' : await generateReferenceNumber();
@@ -345,7 +380,7 @@ export const AdminReservation: React.FC = () => {
         roomId: roomAllocations.length > 0 ? roomAllocations[0].roomId : 'temp-room-id',
         totalQuote: calculateTotalAmount(),
         roomTariff: roomTariffTotal,
-        
+
         // New system fields
         guestName: primaryGuest.name,
         guestEmail: '', // Not captured in this form
@@ -357,6 +392,8 @@ export const AdminReservation: React.FC = () => {
         totalPrice: calculateTotalAmount(),
         percentageDiscount: discountType === 'percentage' ? discountValue : 0,
         fixedDiscount: discountType === 'amount' ? discountValue : 0,
+        agentId: selectedAgentFee === 'agent' ? selectedAgentId : null,
+        agentCommission: selectedAgentFee === 'agent' ? agentFeeAmount : null,
         status: 'reservation' as const,
         paymentStatus: 'pending' as const
       };
@@ -1030,6 +1067,7 @@ export const AdminReservation: React.FC = () => {
       const newAllocation: RoomAllocation = {
         id: crypto.randomUUID(),
         roomId: availableRoom.id,
+        roomTypeId: availableRoom.roomTypeId,
         roomNumber: availableRoom.roomNumber,
         roomType: roomType.name,
         capacity: roomType.maxGuests,
@@ -1310,7 +1348,9 @@ export const AdminReservation: React.FC = () => {
       discount = discountValue;
     }
     
-    const finalTotal = subtotal - discount;
+
+
+    const finalTotal = subtotal - discount; // Agent fee excluded from customer total
 
     const addCustomCharge = () => {
       const newCharge: SpecialCharge = {
@@ -1606,60 +1646,131 @@ export const AdminReservation: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Payment Method Section */}
+        {/* Agent Fees Section */}
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center space-x-2 text-lg font-semibold text-gray-900">
               <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-                <CreditCard className="h-4 w-4 text-white" />
+                <Users className="h-4 w-4 text-white" />
               </div>
-              <span>Payment Method</span>
+              <span>Agent Referral</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Agent Referral Option */}
+              <div
                 className={`p-4 border rounded-lg transition-colors cursor-pointer ${
-                  selectedPaymentMethod === 'jubair' 
-                    ? 'border-blue-500 bg-blue-50' 
+                  selectedAgentFee === 'agent'
+                    ? 'border-blue-500 bg-blue-50'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
-                onClick={() => setSelectedPaymentMethod('jubair')}
+                onClick={() => setSelectedAgentFee(selectedAgentFee === 'agent' ? '' : 'agent')}
               >
                 <div className="flex items-center space-x-3">
                   <div className="w-6 h-6 border-2 rounded-full flex items-center justify-center">
                     <div className={`w-3 h-3 rounded-full ${
-                      selectedPaymentMethod === 'jubair' ? 'bg-blue-500' : ''
+                      selectedAgentFee === 'agent' ? 'bg-blue-500' : ''
                     }`} />
                   </div>
                   <div>
-                    <div className="font-medium text-gray-900">Jubair QR Code</div>
-                    <div className="text-sm text-gray-600">Scan to pay via Jubair</div>
+                    <div className="font-medium text-gray-900">Agent Referral</div>
+                    <div className="text-sm text-gray-600">Commission per room type</div>
                   </div>
                 </div>
               </div>
-              
-              <div 
+
+              {/* No Agent Fee Option */}
+              <div
                 className={`p-4 border rounded-lg transition-colors cursor-pointer ${
-                  selectedPaymentMethod === 'basha' 
-                    ? 'border-blue-500 bg-blue-50' 
+                  selectedAgentFee === ''
+                    ? 'border-green-500 bg-green-50'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
-                onClick={() => setSelectedPaymentMethod('basha')}
+                onClick={() => setSelectedAgentFee('')}
               >
                 <div className="flex items-center space-x-3">
                   <div className="w-6 h-6 border-2 rounded-full flex items-center justify-center">
                     <div className={`w-3 h-3 rounded-full ${
-                      selectedPaymentMethod === 'basha' ? 'bg-blue-500' : ''
+                      selectedAgentFee === '' ? 'bg-green-500' : ''
                     }`} />
                   </div>
                   <div>
-                    <div className="font-medium text-gray-900">Basha QR Code</div>
-                    <div className="text-sm text-gray-600">Scan to pay via Basha</div>
+                    <div className="font-medium text-gray-900">Direct Booking</div>
+                    <div className="text-sm text-gray-600">No agent commission</div>
                   </div>
                 </div>
               </div>
             </div>
+
+            {selectedAgentFee === 'agent' && (
+              <div className="mt-4 space-y-4">
+                {/* Agent Selection Dropdown */}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Select Agent *
+                  </Label>
+                  <select
+                    value={selectedAgentId}
+                    onChange={(e) => setSelectedAgentId(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors"
+                  >
+                    <option value="">Select an agent...</option>
+                    {activeAgents.map((agent) => (
+                      <option key={agent.id} value={agent.id}>
+                        {agent.name} - {agent.phoneNumber}
+                        {agent.companyName ? ` (${agent.companyName})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedAgentFee === 'agent' && !selectedAgentId && (
+                    <p className="text-sm text-red-600 mt-1">Please select an agent for referral commission</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {selectedAgentFee === 'agent' && roomAllocations.length > 0 && selectedAgentId && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="text-sm text-blue-800 space-y-2">
+                  <div className="font-semibold">Agent Commission Breakdown:</div>
+                  {roomAllocations.map((room, index) => {
+                    const roomTypeCommission = agentFeesData.find(fee => fee.roomTypeid === room.roomTypeId);
+                    const commissionPerNight = roomTypeCommission && roomTypeCommission.status === 'active'
+                      ? roomTypeCommission.commission
+                      : 0;
+                    const numberOfNights = calculateNumberOfNights();
+                    const totalCommission = commissionPerNight * numberOfNights;
+                    return (
+                      <div key={index} className="space-y-1">
+                        <div className="flex justify-between">
+                          <span>{room.roomType} (Room {room.roomNumber}):</span>
+                          <span className="font-medium">₹{totalCommission}</span>
+                        </div>
+                        <div className="flex justify-between text-xs text-blue-600">
+                          <span>₹{commissionPerNight} × {numberOfNights} night{numberOfNights > 1 ? 's' : ''}</span>
+                          <span></span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="border-t border-blue-300 pt-2 mt-2">
+                    <div className="flex justify-between font-semibold">
+                      <span>Total Agent Commission:</span>
+                      <span>₹{agentFeeAmount}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {selectedAgentFee === 'agent' && roomAllocations.length === 0 && (
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="text-sm text-yellow-800">
+                  Please allocate rooms first to calculate agent commission.
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -1693,6 +1804,12 @@ export const AdminReservation: React.FC = () => {
                 <div className="flex justify-between py-2 text-green-600">
                   <span>Discount</span>
                   <span className="font-medium">-₹{discount.toLocaleString()}</span>
+                </div>
+              )}
+              {agentFeeAmount > 0 && (
+                <div className="flex justify-between py-2 text-blue-600 text-sm italic">
+                  <span>Agent Commission (not charged to customer)</span>
+                  <span className="font-medium">₹{agentFeeAmount.toLocaleString()}</span>
                 </div>
               )}
               <div className="flex justify-between py-2 border-t pt-4">

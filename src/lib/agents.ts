@@ -87,21 +87,17 @@ export const getAgent = async (agentId: string): Promise<Agent | null> => {
 
 export const getAgents = async (filters?: AgentFilters): Promise<Agent[]> => {
   try {
-    let q = query(collection(db, COLLECTION_NAME), orderBy('createdAt', 'desc'))
+    // Simple query without orderBy to avoid composite index requirement
+    let q = query(collection(db, COLLECTION_NAME))
 
-    if (filters?.agentType) {
-      q = query(q, where('agentType', '==', filters.agentType))
-    }
-
+    // Only add single where clauses that don't require composite indexes
     if (filters?.status) {
       q = query(q, where('status', '==', filters.status))
-    }
-
-    if (filters?.state) {
+    } else if (filters?.agentType) {
+      q = query(q, where('agentType', '==', filters.agentType))
+    } else if (filters?.state) {
       q = query(q, where('state', '==', filters.state))
-    }
-
-    if (filters?.district) {
+    } else if (filters?.district) {
       q = query(q, where('district', '==', filters.district))
     }
 
@@ -116,18 +112,36 @@ export const getAgents = async (filters?: AgentFilters): Promise<Agent[]> => {
       } as Agent
     })
 
-    // Client-side filtering for search term
-    if (filters?.searchTerm) {
-      const searchTerm = filters.searchTerm.toLowerCase()
-      agents = agents.filter(agent =>
-        agent.name.toLowerCase().includes(searchTerm) ||
-        (agent.email && agent.email.toLowerCase().includes(searchTerm)) ||
-        agent.phoneNumber.includes(searchTerm) ||
-        agent.state.toLowerCase().includes(searchTerm) ||
-        agent.district.toLowerCase().includes(searchTerm) ||
-        (agent.companyName && agent.companyName.toLowerCase().includes(searchTerm))
-      )
+    // Client-side filtering for all other filters
+    if (filters) {
+      if (filters.agentType && !filters.status) {
+        agents = agents.filter(agent => agent.agentType === filters.agentType)
+      }
+      if (filters.state && !filters.status) {
+        agents = agents.filter(agent => agent.state === filters.state)
+      }
+      if (filters.district && !filters.status) {
+        agents = agents.filter(agent => agent.district === filters.district)
+      }
+      if (filters.searchTerm) {
+        const searchTerm = filters.searchTerm.toLowerCase()
+        agents = agents.filter(agent =>
+          agent.name.toLowerCase().includes(searchTerm) ||
+          (agent.email && agent.email.toLowerCase().includes(searchTerm)) ||
+          agent.phoneNumber.includes(searchTerm) ||
+          agent.state.toLowerCase().includes(searchTerm) ||
+          agent.district.toLowerCase().includes(searchTerm) ||
+          (agent.companyName && agent.companyName.toLowerCase().includes(searchTerm))
+        )
+      }
     }
+
+    // Client-side sorting by creation date (newest first)
+    agents.sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime()
+      const dateB = new Date(b.createdAt).getTime()
+      return dateB - dateA
+    })
 
     return agents
   } catch (error) {
@@ -141,21 +155,17 @@ export const subscribeToAgents = (
   filters?: AgentFilters
 ): Unsubscribe => {
   try {
-    let q = query(collection(db, COLLECTION_NAME), orderBy('createdAt', 'desc'))
+    // Simple query without orderBy to avoid composite index requirement
+    let q = query(collection(db, COLLECTION_NAME))
 
-    if (filters?.agentType) {
-      q = query(q, where('agentType', '==', filters.agentType))
-    }
-
+    // Only add single where clauses that don't require composite indexes
     if (filters?.status) {
       q = query(q, where('status', '==', filters.status))
-    }
-
-    if (filters?.state) {
+    } else if (filters?.agentType) {
+      q = query(q, where('agentType', '==', filters.agentType))
+    } else if (filters?.state) {
       q = query(q, where('state', '==', filters.state))
-    }
-
-    if (filters?.district) {
+    } else if (filters?.district) {
       q = query(q, where('district', '==', filters.district))
     }
 
@@ -170,18 +180,36 @@ export const subscribeToAgents = (
         } as Agent
       })
 
-      // Client-side filtering for search term
-      if (filters?.searchTerm) {
-        const searchTerm = filters.searchTerm.toLowerCase()
-        agents = agents.filter(agent =>
-          agent.name.toLowerCase().includes(searchTerm) ||
-          (agent.email && agent.email.toLowerCase().includes(searchTerm)) ||
-          agent.phoneNumber.includes(searchTerm) ||
-          agent.state.toLowerCase().includes(searchTerm) ||
-          agent.district.toLowerCase().includes(searchTerm) ||
-          (agent.companyName && agent.companyName.toLowerCase().includes(searchTerm))
-        )
+      // Client-side filtering for all other filters
+      if (filters) {
+        if (filters.agentType && !filters.status) {
+          agents = agents.filter(agent => agent.agentType === filters.agentType)
+        }
+        if (filters.state && !filters.status) {
+          agents = agents.filter(agent => agent.state === filters.state)
+        }
+        if (filters.district && !filters.status) {
+          agents = agents.filter(agent => agent.district === filters.district)
+        }
+        if (filters.searchTerm) {
+          const searchTerm = filters.searchTerm.toLowerCase()
+          agents = agents.filter(agent =>
+            agent.name.toLowerCase().includes(searchTerm) ||
+            (agent.email && agent.email.toLowerCase().includes(searchTerm)) ||
+            agent.phoneNumber.includes(searchTerm) ||
+            agent.state.toLowerCase().includes(searchTerm) ||
+            agent.district.toLowerCase().includes(searchTerm) ||
+            (agent.companyName && agent.companyName.toLowerCase().includes(searchTerm))
+          )
+        }
       }
+
+      // Client-side sorting by creation date (newest first)
+      agents.sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime()
+        const dateB = new Date(b.createdAt).getTime()
+        return dateB - dateA
+      })
 
       callback(agents)
     })

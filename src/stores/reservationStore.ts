@@ -14,6 +14,7 @@ export interface Guest {
 export interface RoomAllocation {
   id: string;
   roomId: string;
+  roomTypeId: string;
   roomNumber: string;
   roomType: string;
   capacity: number;
@@ -33,11 +34,11 @@ export interface SpecialCharge {
 export interface ReservationState {
   // Current step
   currentStep: number;
-  
+
   // Guest Details (Step 1)
   primaryGuest: Guest;
   secondaryGuests: Guest[];
-  
+
   // Location & Dates (Step 2)
   selectedState: string;
   selectedDistrict: string;
@@ -45,15 +46,20 @@ export interface ReservationState {
   checkOutDate: string;
   guestCount: number;
   guestType: 'Individual' | 'Couple' | 'Family' | 'Friends' | '';
-  
+
   // Room Allocation (Step 3)
   roomAllocations: RoomAllocation[];
-  
+
   // Special Charges & Payment (Step 4)
   specialCharges: SpecialCharge[];
   discountType: 'percentage' | 'amount' | 'none';
   discountValue: number;
-  
+
+  // Agent Fees
+  selectedAgentFee: string;
+  agentFeeAmount: number;
+  selectedAgentId: string;
+
   // UI State
   isSubmitting: boolean;
   error: string;
@@ -91,7 +97,12 @@ export interface ReservationState {
   setSpecialCharges: (charges: SpecialCharge[]) => void;
   setDiscountType: (type: 'percentage' | 'amount' | 'none') => void;
   setDiscountValue: (value: number) => void;
-  
+
+  // Agent Fee Actions
+  setSelectedAgentFee: (value: string) => void;
+  setAgentFeeAmount: (amount: number) => void;
+  setSelectedAgentId: (agentId: string) => void;
+
   // UI Actions
   setIsSubmitting: (isSubmitting: boolean) => void;
   setError: (error: string) => void;
@@ -132,7 +143,12 @@ const initialState = {
   specialCharges: [],
   discountType: 'none' as const,
   discountValue: 0,
-  
+
+  // Agent Fees
+  selectedAgentFee: '',
+  agentFeeAmount: 0,
+  selectedAgentId: '',
+
   // UI State
   isSubmitting: false,
   error: '',
@@ -232,7 +248,12 @@ export const useReservationStore = create<ReservationState>()(
       setSpecialCharges: (charges) => set({ specialCharges: charges }),
       setDiscountType: (type) => set({ discountType: type }),
       setDiscountValue: (value) => set({ discountValue: value }),
-      
+
+      // Agent Fee Actions
+      setSelectedAgentFee: (value) => set({ selectedAgentFee: value }),
+      setAgentFeeAmount: (amount) => set({ agentFeeAmount: amount }),
+      setSelectedAgentId: (agentId) => set({ selectedAgentId: agentId }),
+
       // UI Actions
       setIsSubmitting: (isSubmitting) => set({ isSubmitting }),
       setError: (error) => set({ error }),
@@ -242,29 +263,30 @@ export const useReservationStore = create<ReservationState>()(
       
       calculateTotalAmount: () => {
         const state = get();
-        
+
         // Calculate number of days
         const checkIn = new Date(state.checkInDate);
         const checkOut = new Date(state.checkOutDate);
         const numberOfDays = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-        
+
         const roomTariff = state.roomAllocations.reduce((total, room) => {
           return total + (room.tariff * numberOfDays);
         }, 0);
-        
+
         const specialChargesTotal = state.specialCharges.reduce((total, charge) => {
           return total + (charge.amount * (charge.quantity || 1));
         }, 0);
-        
+
         const subtotal = roomTariff + specialChargesTotal;
-        
+
         let discount = 0;
         if (state.discountType === 'percentage') {
           discount = (subtotal * state.discountValue) / 100;
         } else if (state.discountType === 'amount') {
           discount = state.discountValue;
         }
-        
+
+        // Agent fee is NOT included in customer total - it's tracked separately for commission
         return subtotal - discount;
       },
       

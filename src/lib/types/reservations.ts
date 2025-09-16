@@ -20,6 +20,8 @@ export interface Reservation {
   advancePayment: number
   balancePayment: number
   totalPrice: number
+  agentId?: string | null // Reference to agent document ID
+  agentCommission?: number | null // Commission amount in currency
   status: ReservationStatus
   paymentStatus: PaymentStatus
   createdAt: string
@@ -54,6 +56,8 @@ export interface CreateReservationData {
   advancePayment?: number
   balancePayment?: number
   totalPrice: number
+  agentId?: string
+  agentCommission?: number
   status?: ReservationStatus
   paymentStatus?: PaymentStatus
 }
