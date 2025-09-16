@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react'
+import * as React from 'react'
+const { createContext, useContext, useReducer } = React
 import { Room } from '@/lib/types/rooms'
 
 // Booking interface

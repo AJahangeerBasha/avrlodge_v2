@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import * as React from 'react';
+const { createContext, useContext, useEffect, useState } = React;
 import { User } from 'firebase/auth';
 import { onAuthStateChange, signOutUser, signInUser, createUser, signInWithGoogle, resetPassword, createUserDocument, updateUserProfile } from '@/lib/auth';
 import { UserRole, UserClaims, ROLES } from '@/lib/types/auth';

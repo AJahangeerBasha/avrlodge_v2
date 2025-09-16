@@ -26,16 +26,14 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
     target: 'es2022',
     rollupOptions: {
+      external: [],
       output: {
         manualChunks: (id) => {
           // Vendor chunks
           if (id.includes('node_modules')) {
-            // Core React chunks
-            if (id.includes('react') && !id.includes('react-router')) {
+            // Keep React ecosystem together to prevent context loading issues
+            if (id.includes('react')) {
               return 'react-vendor'
-            }
-            if (id.includes('react-router')) {
-              return 'router-vendor'
             }
             if (id.includes('@tanstack/react-query')) {
               return 'query-vendor'
@@ -111,5 +109,6 @@ export default defineConfig({
       '@tanstack/react-query',
       '@supabase/supabase-js'
     ],
+    force: true
   },
 })
