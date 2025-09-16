@@ -80,6 +80,7 @@ export default function FirebaseBookingCard({
   const [specialCharges, setSpecialCharges] = useState<ReservationSpecialCharge[]>([])
   const [loadingPayments, setLoadingPayments] = useState(true)
   const [loadingDocuments, setLoadingDocuments] = useState(false)
+  const [documentsCount, setDocumentsCount] = useState(0)
   const [loadingSpecialCharges, setLoadingSpecialCharges] = useState(true)
   const [showSpecialCharges, setShowSpecialCharges] = useState(false)
   const [processing, setProcessing] = useState(false)
@@ -251,6 +252,7 @@ export default function FirebaseBookingCard({
       setLoadingDocuments(true)
       const docs = await getRoomCheckinDocumentsByReservationId(booking.id)
       setDocuments(docs)
+      setDocumentsCount(docs.length)
     } catch (error) {
       console.error('FirebaseBookingCard: Error loading documents:', error)
       toast({
@@ -322,10 +324,11 @@ export default function FirebaseBookingCard({
     return { totalPaid, remainingBalance }
   }
 
-  // Load payment history on component mount and when booking ID changes
+  // Load initial data on component mount
   useEffect(() => {
     loadPaymentHistory()
     loadSpecialCharges()
+    loadDocuments() // Load documents to get count for conditional display
   }, [loadPaymentHistory, loadSpecialCharges])
 
   // Refresh data when onPaymentUpdate function is called (indicates parent update)
@@ -862,16 +865,18 @@ export default function FirebaseBookingCard({
         {showActions && (
           <div className={`${calculatePaymentTotals().remainingBalance > 0 && getCalculatedStatus() !== 'cancelled' ? '' : 'pt-4 border-t border-gray-100'}`}>
             <div className="space-y-2">
-              {/* View Documents Button */}
-              <Button
-                onClick={handleShowDocuments}
-                variant="outline"
-                className="w-full border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-colors"
-                size="sm"
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                View Uploaded Documents
-              </Button>
+              {/* View Documents Button - Only show if documents exist */}
+              {documentsCount > 0 && (
+                <Button
+                  onClick={handleShowDocuments}
+                  variant="outline"
+                  className="w-full border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                  size="sm"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  View Uploaded Documents ({documentsCount})
+                </Button>
+              )}
 
               {/* Edit Reservation Button */}
               <Button

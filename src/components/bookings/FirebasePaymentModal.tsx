@@ -50,6 +50,19 @@ export function FirebasePaymentModal({
   const { toast } = useToast()
   const { currentUser } = useAuth()
 
+  // Load payment history function - defined first to avoid hoisting issues
+  const loadPaymentHistory = useCallback(async () => {
+    try {
+      setLoadingPayments(true)
+      const paymentHistory = await getPaymentsByReservationId(booking.id)
+      setPayments(paymentHistory)
+    } catch (error) {
+      console.error('Error loading payment history:', error)
+    } finally {
+      setLoadingPayments(false)
+    }
+  }, [booking.id])
+
   // Calculate payment totals from actual payment history
   const calculatePaymentTotals = useCallback(() => {
     const totalPaid = payments
@@ -74,18 +87,6 @@ export function FirebasePaymentModal({
       setAmount(remainingBalance.toString())
     }
   }, [payments, loadingPayments, calculatePaymentTotals])
-
-  const loadPaymentHistory = useCallback(async () => {
-    try {
-      setLoadingPayments(true)
-      const paymentHistory = await getPaymentsByReservationId(booking.id)
-      setPayments(paymentHistory)
-    } catch (error) {
-      console.error('Error loading payment history:', error)
-    } finally {
-      setLoadingPayments(false)
-    }
-  }, [booking.id])
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {

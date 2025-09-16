@@ -10,7 +10,7 @@ export function BookingModalManager() {
   return (
     <>
       {/* Payment Modal */}
-      {paymentModal.booking && (
+      {paymentModal.booking && paymentModal.isOpen && (
         <FirebasePaymentModal
           booking={paymentModal.booking}
           isOpen={paymentModal.isOpen}
@@ -23,7 +23,7 @@ export function BookingModalManager() {
       )}
 
       {/* Room Check-In Modal */}
-      {checkInModal.booking && checkInModal.room && (
+      {checkInModal.booking && checkInModal.room && checkInModal.isOpen && (
         <RoomCheckInModal
           booking={checkInModal.booking}
           room={checkInModal.room}
@@ -37,7 +37,7 @@ export function BookingModalManager() {
       )}
 
       {/* Room Check-Out Modal */}
-      {checkOutModal.booking && checkOutModal.room && (
+      {checkOutModal.booking && checkOutModal.room && checkOutModal.isOpen && (
         <RoomCheckOutModal
           booking={checkOutModal.booking}
           room={checkOutModal.room}
@@ -51,7 +51,7 @@ export function BookingModalManager() {
       )}
 
       {/* Room Change Modal */}
-      {roomChangeModal.booking && roomChangeModal.room && (
+      {roomChangeModal.booking && roomChangeModal.room && roomChangeModal.isOpen && (
         <RoomChangeModal
           booking={roomChangeModal.booking}
           room={roomChangeModal.room}
