@@ -4,8 +4,9 @@ import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, startOfMonth, endOf
 import { FileText, Search, Filter, RefreshCw } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import FirebaseBookingCard from '@/components/bookings/FirebaseBookingCard'
-import ModernPageLayout from '@/components/common/ModernPageLayout'
-import ModernCard from '@/components/common/ModernCard'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 // Firebase imports
@@ -437,7 +438,7 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
       
       // Get related data for each reservation
       const bookingsWithDetails = await Promise.all(
-        reservations.map(async (reservation: FirebaseReservation) => {
+        reservations.map(async (reservation: any) => {
           try {
             // Get rooms for this reservation
             const rooms = await getAllReservationRooms({ reservationId: reservation.id })
@@ -531,7 +532,7 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
       const reservations = await getAllReservations()
       
       const allBookingsWithDetails = await Promise.all(
-        reservations.map(async (reservation: FirebaseReservation) => {
+        reservations.map(async (reservation: any) => {
           try {
             const rooms = await getAllReservationRooms({ reservationId: reservation.id })
             const guests = await getGuestsByReservationId(reservation.id)
@@ -688,75 +689,98 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
   }
 
   return (
-    <ModernPageLayout
-      title="Booking Management"
-      subtitle="Search and manage all bookings"
-      icon={FileText}
-      headerContent={
+    <motion.div
+      className="space-y-8 p-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Header */}
+      <motion.div
+        className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+      >
         <div className="flex items-center gap-3">
-          <div className="relative flex-1 max-w-lg">
+          <FileText className="h-8 w-8 text-gray-900" />
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Booking Management</h1>
+            <p className="text-gray-600 mt-2">Search and manage all bookings</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 w-full lg:w-auto">
+          <div className="relative flex-1 lg:flex-initial lg:w-96">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <input
+            <Input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={handleSearchKeyPress}
               placeholder="Search by guest name, booking ID, room number, or status..."
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:border-black focus:ring-black bg-white w-full"
+              className="pl-10 bg-white/95 backdrop-blur-sm border-black/20"
               disabled={loading || searching}
             />
           </div>
 
-          {/* Search Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleSearchClick}
-            disabled={searching || loading}
-            className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-              searching || loading
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
-          >
-            <Search className={`h-4 w-4 ${searching ? 'animate-pulse' : ''}`} />
-            <span>Search</span>
-          </motion.button>
+          <div className="flex items-center gap-3">
+            {/* Search Button */}
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={handleSearchClick}
+                disabled={searching || loading}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Search className={`mr-2 h-4 w-4 ${searching ? 'animate-pulse' : ''}`} />
+                Search
+              </Button>
+            </motion.div>
 
-          {/* Clear Search Button */}
-          {isSearchMode && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleClearSearch}
-              className="px-3 py-2 rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
-              title="Clear search"
-            >
-              ✕
-            </motion.button>
-          )}
+            {/* Clear Search Button */}
+            {isSearchMode && (
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  onClick={handleClearSearch}
+                  variant="outline"
+                  className="bg-white/95 backdrop-blur-sm border-black/20"
+                  title="Clear search"
+                >
+                  ✕
+                </Button>
+              </motion.div>
+            )}
 
-          {/* Refresh Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleRefresh}
-            disabled={refreshing || loading || searching}
-            className={`p-2 rounded-lg transition-colors ${
-              refreshing || loading || searching
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
-            }`}
-            title="Refresh bookings"
-          >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-          </motion.button>
+            {/* Refresh Button */}
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={handleRefresh}
+                disabled={refreshing || loading || searching}
+                variant="outline"
+                className="bg-white/95 backdrop-blur-sm border-black/20"
+                title="Refresh bookings"
+              >
+                <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              </Button>
+            </motion.div>
+          </div>
         </div>
-      }
-    >
+      </motion.div>
 
       {/* Filters Card */}
-      <ModernCard title="Filters" icon={Filter}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+              <Filter className="h-5 w-5" />
+              Filters
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
         {/* Date Filter Buttons */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter by Date Range</h3>
@@ -875,63 +899,101 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
             </p>
           )}
         </div>
-      </ModernCard>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Results */}
       {bookings.length > 0 && (
-        <ModernCard 
-          title={isSearchMode 
-            ? `Search Results (${bookings.length})` 
-            : `${getDateRangeText(selectedFilter)} • ${getStatusFilterText(selectedStatusFilter)} (${bookings.length})`
-          }
-          subtitle={`${bookings.length} booking${bookings.length !== 1 ? 's' : ''} sorted by today's check-ins first`}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {bookings.map((booking) => (
-              <FirebaseBookingCard
-                key={booking.id}
-                booking={booking}
-                showActions={true}
-                showRoomStatus={true}
-                onPaymentUpdate={loadBookings}
-              />
-            ))}
-          </div>
-        </ModernCard>
+          <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-900">
+                {isSearchMode
+                  ? `Search Results (${bookings.length})`
+                  : `${getDateRangeText(selectedFilter)} • ${getStatusFilterText(selectedStatusFilter)} (${bookings.length})`
+                }
+              </CardTitle>
+              <p className="text-sm text-gray-600">
+                {`${bookings.length} booking${bookings.length !== 1 ? 's' : ''} sorted by today's check-ins first`}
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {bookings.map((booking) => (
+                  <FirebaseBookingCard
+                    key={booking.id}
+                    booking={booking}
+                    showActions={true}
+                    showRoomStatus={true}
+                    onPaymentUpdate={loadBookings}
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
 
       {/* Empty State */}
       {!loading && bookings.length === 0 && (
-        <ModernCard>
-          <div className="text-center py-12">
-            <div className="max-w-md mx-auto">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
+            <CardContent className="p-12">
+              <div className="text-center">
+                <div className="max-w-md mx-auto">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    {isSearchMode ? 'No Search Results' : 'No Bookings Found'}
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {isSearchMode
+                      ? 'No bookings found with the provided search criteria.'
+                      : `No bookings found for ${getDateRangeText(selectedFilter).toLowerCase()} with status "${getStatusFilterText(selectedStatusFilter).toLowerCase()}".`
+                    }
+                  </p>
+                  {isSearchMode && (
+                    <Button
+                      onClick={handleClearSearch}
+                      className="bg-black hover:bg-gray-800 text-white"
+                    >
+                      Clear Search
+                    </Button>
+                  )}
+                </div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {isSearchMode ? 'No Search Results' : 'No Bookings Found'}
-              </h3>
-              <p className="text-gray-600 mb-4">
-                {isSearchMode 
-                  ? 'No bookings found with the provided search criteria.'
-                  : `No bookings found for ${getDateRangeText(selectedFilter).toLowerCase()} with status "${getStatusFilterText(selectedStatusFilter).toLowerCase()}".`
-                }
-              </p>
-              {isSearchMode && (
-                <button
-                  onClick={handleClearSearch}
-                  className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-                >
-                  Clear Search
-                </button>
-              )}
-            </div>
-          </div>
-        </ModernCard>
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
 
-    </ModernPageLayout>
+      {/* Loading State */}
+      {loading && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading bookings...</p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </motion.div>
   )
 }

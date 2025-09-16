@@ -5,6 +5,8 @@ import { Calendar, Download, Filter, RefreshCw } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/hooks/use-toast'
 import { useCalendarStore } from '@/stores/calendarStore'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 // Import existing calendar components
 import CalendarHeader from '@/components/calendar/CalendarHeader'
@@ -12,8 +14,6 @@ import CalendarGrid from '@/components/calendar/CalendarGrid'
 import CalendarViewModeSelector from '@/components/calendar/CalendarViewModeSelector'
 import CalendarFilters from '@/components/calendar/CalendarFilters'
 import CalendarLegend from '@/components/calendar/CalendarLegend'
-import ModernPageLayout from '@/components/common/ModernPageLayout'
-import ModernCard from '@/components/common/ModernCard'
 
 // Import Firebase functions
 import { getAllReservations } from '@/lib/reservations'
@@ -403,16 +403,19 @@ export const AdminCalendar: React.FC = () => {
 
   if (isLoading) {
     return (
-      <ModernPageLayout
-        title="Admin Calendar"
-        subtitle="Loading calendar data..."
-        icon={Calendar}
+      <motion.div
+        className="space-y-8 p-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-          <span className="ml-3 text-gray-600">Loading calendar...</span>
+        <div className="flex items-center justify-center min-h-screen bg-white">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading calendar...</p>
+          </div>
         </div>
-      </ModernPageLayout>
+      </motion.div>
     )
   }
 
@@ -420,86 +423,134 @@ export const AdminCalendar: React.FC = () => {
   const totalTariff = filteredRooms.reduce((sum, room) => sum + room.tariff, 0)
 
   return (
-    <ModernPageLayout
-      title="Admin Calendar"
-      subtitle="Manage room availability and view all bookings"
-      icon={Calendar}
-      actions={
+    <motion.div
+      className="space-y-8 p-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Header */}
+      <motion.div
+        className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+      >
+        <div className="flex items-center gap-3">
+          <Calendar className="h-8 w-8 text-gray-900" />
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Admin Calendar</h1>
+            <p className="text-gray-600 mt-2">Manage room availability and view all bookings</p>
+          </div>
+        </div>
+
         <div className="flex items-center gap-3">
           <CalendarViewModeSelector viewMode={viewMode} onViewModeChange={setViewMode} />
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            title={lastRefreshTime ? `Last refreshed: ${new Date(lastRefreshTime).toLocaleTimeString()}` : 'Refresh calendar data'}
-          >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            <Filter className="w-4 h-4" />
-            Filters
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleExportData}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            Export
-          </motion.button>
+
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              title={lastRefreshTime ? `Last refreshed: ${new Date(lastRefreshTime).toLocaleTimeString()}` : 'Refresh calendar data'}
+            >
+              <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            </Button>
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              onClick={() => setShowFilters(!showFilters)}
+              variant="outline"
+              className="bg-white/95 backdrop-blur-sm border-black/20"
+            >
+              <Filter className="mr-2 h-4 w-4" />
+              Filters
+            </Button>
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              onClick={handleExportData}
+              className="bg-black hover:bg-gray-800 text-white"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+          </motion.div>
         </div>
-      }
-    >
+      </motion.div>
+
       {/* Filters Panel */}
-      <CalendarFilters
-        showFilters={showFilters}
-        setShowFilters={setShowFilters}
-        selectedRoomType={filters.selectedRoomType}
-        setSelectedRoomType={setSelectedRoomType}
-        selectedStatus={filters.selectedStatus}
-        setSelectedStatus={setSelectedStatus}
-        roomTypes={roomTypes}
-        statusTypes={statusTypes}
-        filteredRoomsCount={filteredRooms.length}
-        totalRoomsCount={rooms.length}
-        filteredReservationsCount={filteredReservations.length}
-        totalReservationsCount={reservations.length}
-      />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        <CalendarFilters
+          showFilters={showFilters}
+          setShowFilters={setShowFilters}
+          selectedRoomType={filters.selectedRoomType}
+          setSelectedRoomType={setSelectedRoomType}
+          selectedStatus={filters.selectedStatus}
+          setSelectedStatus={setSelectedStatus}
+          roomTypes={roomTypes}
+          statusTypes={statusTypes}
+          filteredRoomsCount={filteredRooms.length}
+          totalRoomsCount={rooms.length}
+          filteredReservationsCount={filteredReservations.length}
+          totalReservationsCount={reservations.length}
+        />
+      </motion.div>
 
       {/* Calendar Statistics */}
-      <CalendarHeader
-        selectedDate={safeSelectedDate}
-        onPreviousMonth={handlePrevious}
-        onNextMonth={handleNext}
-        totalRooms={filteredRooms.length}
-        totalCapacity={totalCapacity}
-        totalTariff={totalTariff}
-        activeReservations={filteredReservations.length}
-        viewMode={viewMode}
-      />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+      >
+        <CalendarHeader
+          selectedDate={safeSelectedDate}
+          onPreviousMonth={handlePrevious}
+          onNextMonth={handleNext}
+          totalRooms={filteredRooms.length}
+          totalCapacity={totalCapacity}
+          totalTariff={totalTariff}
+          activeReservations={filteredReservations.length}
+          viewMode={viewMode}
+        />
+      </motion.div>
 
       {/* Calendar Grid */}
-      <ModernCard title="Room Availability Calendar">
-        <CalendarGrid
-          rooms={filteredRooms}
-          reservations={filteredReservations}
-          dates={dates}
-          onCellClick={handleCellClick}
-        />
-      </ModernCard>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+      >
+        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-gray-900">Room Availability Calendar</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CalendarGrid
+              rooms={filteredRooms}
+              reservations={filteredReservations}
+              dates={dates}
+              onCellClick={handleCellClick}
+            />
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Calendar Legend */}
-      <CalendarLegend />
-
-    </ModernPageLayout>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+      >
+        <CalendarLegend />
+      </motion.div>
+    </motion.div>
   )
 }
