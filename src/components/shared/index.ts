@@ -1,11 +1,10 @@
 // Layout Components
 export { DashboardHeader } from './layout/DashboardHeader'
-export { DashboardSidebar } from './layout/DashboardSidebar'
 
 // Navigation Components
 export { NavigationLink } from './navigation/NavigationLink'
 export { HeaderNavigation } from './navigation/HeaderNavigation'
-export { SidebarNavigation } from './navigation/SidebarNavigation'
+export { NavigationDropdown } from './navigation/NavigationDropdown'
 export { MobileNavigation } from './navigation/MobileNavigation'
 export { NAVIGATION_ITEMS, getNavigationItemsForRole, getPrimaryNavigationItems } from './navigation/NavigationConfig'
 

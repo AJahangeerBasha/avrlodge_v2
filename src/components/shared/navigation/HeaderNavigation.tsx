@@ -1,4 +1,5 @@
 import { NavigationLink } from './NavigationLink'
+import { NavigationDropdown } from './NavigationDropdown'
 import { getPrimaryNavigationItems } from './NavigationConfig'
 
 interface HeaderNavigationProps {
@@ -12,13 +13,23 @@ export function HeaderNavigation({ role, basePath }: HeaderNavigationProps) {
   return (
     <nav className="hidden md:flex items-center space-x-1">
       {navigationItems.map((item) => (
-        <NavigationLink
-          key={item.id}
-          to={item.to}
-          icon={item.icon}
-          label={item.label}
-          variant="header"
-        />
+        item.submenu ? (
+          <NavigationDropdown
+            key={item.id}
+            icon={item.icon}
+            label={item.label}
+            submenu={item.submenu}
+            variant="header"
+          />
+        ) : (
+          <NavigationLink
+            key={item.id}
+            to={item.to}
+            icon={item.icon}
+            label={item.label}
+            variant="header"
+          />
+        )
       ))}
     </nav>
   )

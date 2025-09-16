@@ -7,6 +7,7 @@ export interface NavigationItem {
   icon: LucideIcon
   label: string
   roles: ('admin' | 'manager')[]
+  submenu?: NavigationItem[]
 }
 
 export const NAVIGATION_ITEMS: NavigationItem[] = [
@@ -39,39 +40,41 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     roles: ['admin', 'manager']
   },
   {
-    id: 'room-types',
-    to: '/room-types',
-    icon: Home,
-    label: 'Room Types',
-    roles: ['admin'] // Admin only
-  },
-  {
-    id: 'rooms',
-    to: '/rooms',
-    icon: Bed,
-    label: 'Rooms',
-    roles: ['admin'] // Admin only
-  },
-  {
-    id: 'special-charges',
-    to: '/special-charges',
-    icon: DollarSign,
-    label: 'Special Charges',
-    roles: ['admin'] // Admin only
-  },
-  {
-    id: 'agents',
-    to: '/agents',
-    icon: UserCheck,
-    label: 'Agents',
-    roles: ['admin'] // Admin only
-  },
-  {
     id: 'settings',
     to: '/settings',
     icon: Settings,
     label: 'Settings',
-    roles: ['admin'] // Admin only
+    roles: ['admin'], // Admin only
+    submenu: [
+      {
+        id: 'room-types',
+        to: '/room-types',
+        icon: Home,
+        label: 'Room Types',
+        roles: ['admin']
+      },
+      {
+        id: 'rooms',
+        to: '/rooms',
+        icon: Bed,
+        label: 'Rooms',
+        roles: ['admin']
+      },
+      {
+        id: 'agents',
+        to: '/agents',
+        icon: UserCheck,
+        label: 'Agents',
+        roles: ['admin']
+      },
+      {
+        id: 'special-charges',
+        to: '/special-charges',
+        icon: DollarSign,
+        label: 'Special Charges',
+        roles: ['admin']
+      }
+    ]
   }
 ]
 
@@ -81,12 +84,18 @@ export const getNavigationItemsForRole = (role: 'admin' | 'manager', basePath: s
     .filter(item => item.roles.includes(role))
     .map(item => ({
       ...item,
-      to: `${basePath}${item.to}`
+      to: `${basePath}${item.to}`,
+      submenu: item.submenu?.map(subItem => ({
+        ...subItem,
+        to: `${basePath}${subItem.to}`
+      }))
     }))
 }
 
 // Get primary navigation items (for header)
 export const getPrimaryNavigationItems = (role: 'admin' | 'manager', basePath: string = ''): NavigationItem[] => {
-  const primaryIds = ['calendar', 'reservation', 'bookings']
+  const primaryIds = role === 'admin'
+    ? ['calendar', 'reservation', 'bookings', 'settings']
+    : ['calendar', 'reservation', 'bookings']
   return getNavigationItemsForRole(role, basePath).filter(item => primaryIds.includes(item.id))
 }

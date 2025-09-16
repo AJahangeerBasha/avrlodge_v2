@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X } from 'lucide-react'
+import { X, ChevronDown, ChevronRight } from 'lucide-react'
 import { NavigationLink } from './NavigationLink'
 import { getNavigationItemsForRole } from './NavigationConfig'
 
@@ -23,6 +24,15 @@ export function MobileNavigation({
   onAdminPanelClick
 }: MobileNavigationProps) {
   const navigationItems = getNavigationItemsForRole(role, basePath)
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
+
+  const toggleSubmenu = (itemId: string) => {
+    setExpandedItems(prev =>
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    )
+  }
 
   return (
     <AnimatePresence>
@@ -63,13 +73,61 @@ export function MobileNavigation({
               <div className="flex-1 overflow-y-auto p-4">
                 <nav className="space-y-2">
                   {navigationItems.map((item) => (
-                    <NavigationLink
-                      key={item.id}
-                      to={item.to}
-                      icon={item.icon}
-                      label={item.label}
-                      variant="mobile"
-                    />
+                    <div key={item.id}>
+                      {item.submenu ? (
+                        <div>
+                          {/* Parent item with submenu */}
+                          <button
+                            onClick={() => toggleSubmenu(item.id)}
+                            className="w-full flex items-center justify-between space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors text-left"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <item.icon className="h-4 w-4" />
+                              <span>{item.label}</span>
+                            </div>
+                            {expandedItems.includes(item.id) ? (
+                              <ChevronDown className="h-4 w-4" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4" />
+                            )}
+                          </button>
+
+                          {/* Submenu items */}
+                          <AnimatePresence>
+                            {expandedItems.includes(item.id) && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="ml-6 mt-2 space-y-1">
+                                  {item.submenu.map((subItem) => (
+                                    <NavigationLink
+                                      key={subItem.id}
+                                      to={subItem.to}
+                                      icon={subItem.icon}
+                                      label={subItem.label}
+                                      variant="mobile"
+                                      className="text-sm"
+                                    />
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      ) : (
+                        <NavigationLink
+                          key={item.id}
+                          to={item.to}
+                          icon={item.icon}
+                          label={item.label}
+                          variant="mobile"
+                        />
+                      )}
+                    </div>
                   ))}
                 </nav>
               </div>
