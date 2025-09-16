@@ -32,7 +32,7 @@ export default defineConfig({
           // Vendor chunks
           if (id.includes('node_modules')) {
             // Keep React ecosystem together to prevent context loading issues
-            if (id.includes('react')) {
+            if (id.includes('react') || id.includes('framer-motion')) {
               return 'react-vendor'
             }
             if (id.includes('@tanstack/react-query')) {
@@ -60,9 +60,6 @@ export default defineConfig({
             }
             if (id.includes('react-hook-form') || id.includes('@hookform') || id.includes('zod')) {
               return 'form-vendor'
-            }
-            if (id.includes('framer-motion')) {
-              return 'motion-vendor'
             }
             if (id.includes('lucide-react')) {
               return 'icon-vendor'
@@ -97,6 +94,7 @@ export default defineConfig({
   },
   define: {
     'process.env': process.env,
+    global: 'globalThis',
   },
   esbuild: {
     target: 'es2022',
@@ -106,6 +104,7 @@ export default defineConfig({
       'react',
       'react-dom',
       'react-router-dom',
+      'framer-motion',
       '@tanstack/react-query',
       '@supabase/supabase-js'
     ],
