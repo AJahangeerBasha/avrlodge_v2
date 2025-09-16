@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useBookings } from '@/contexts/BookingsContext'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, User, Hash, Calendar, Users, Home, DollarSign, X, AlertTriangle, History, FileText, Eye, ChevronDown, ChevronUp, RefreshCw, Receipt } from 'lucide-react'
+import { Phone, User, Hash, Calendar, Users, Home, DollarSign, X, AlertTriangle, History, FileText, Eye, ChevronDown, ChevronUp, RefreshCw, Receipt, Edit } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -85,6 +86,7 @@ export default function FirebaseBookingCard({
   const { actions } = useBookings()
   const { toast } = useToast()
   const { currentUser } = useAuth()
+  const navigate = useNavigate()
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -338,6 +340,11 @@ export default function FirebaseBookingCard({
   const handleShowDocuments = () => {
     setShowDocuments(true)
     loadDocuments()
+  }
+
+  // Handle edit reservation
+  const handleEditReservation = () => {
+    navigate(`/admin/reservation?edit=${booking.id}`)
   };
 
   const getRoomStatusColor = (status?: string) => {
@@ -864,6 +871,17 @@ export default function FirebaseBookingCard({
               >
                 <FileText className="w-4 h-4 mr-2" />
                 View Uploaded Documents
+              </Button>
+
+              {/* Edit Reservation Button */}
+              <Button
+                onClick={handleEditReservation}
+                variant="outline"
+                className="w-full border-green-200 text-green-600 hover:bg-green-50 hover:border-green-300 transition-colors"
+                size="sm"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Reservation
               </Button>
 
               {/* Cancel Reservation Button */}

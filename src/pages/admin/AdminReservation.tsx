@@ -27,6 +27,14 @@ import {
   createGuest,
   getGuestsByReservationId
 } from '@/lib/guests';
+import {
+  getAllReservationRooms,
+  createReservationRoom
+} from '@/lib/reservationRooms';
+import {
+  getReservationSpecialChargesByReservationId,
+  createReservationSpecialCharge
+} from '@/lib/reservationSpecialCharges';
 import WhatsAppModal from '@/components/messaging/WhatsAppModal';
 import {
   getAllRooms,
@@ -247,8 +255,70 @@ export const AdminReservation: React.FC = () => {
       // Set guest type
       setGuestType(reservation.guestType || '');
 
-      // Load room allocations, special charges, etc.
-      console.log('Reservation loaded successfully for editing');
+      // Set agent information
+      if (reservation.agentId && reservation.agentCommission) {
+        setSelectedAgentFee('agent');
+        setSelectedAgentId(reservation.agentId);
+        setAgentFeeAmount(reservation.agentCommission);
+      } else {
+        setSelectedAgentFee('');
+        setSelectedAgentId('');
+        setAgentFeeAmount(0);
+      }
+
+      // Set discount information
+      if (reservation.percentageDiscount && reservation.percentageDiscount > 0) {
+        setDiscountType('percentage');
+        setDiscountValue(reservation.percentageDiscount);
+      } else if (reservation.fixedDiscount && reservation.fixedDiscount > 0) {
+        setDiscountType('amount');
+        setDiscountValue(reservation.fixedDiscount);
+      } else {
+        setDiscountType('none');
+        setDiscountValue(0);
+      }
+
+      // Load room allocations
+      try {
+        const reservationRooms = await getAllReservationRooms({ reservationId });
+        const mappedRoomAllocations = reservationRooms.map(room => ({
+          id: room.id || crypto.randomUUID(),
+          roomId: room.roomId || '',
+          roomTypeId: room.roomTypeId || '',
+          roomNumber: room.roomNumber || '',
+          roomType: room.roomType || '',
+          capacity: room.capacity || 1,
+          tariff: room.tariff || 0,
+          guestCount: room.guestCount || 1
+        }));
+        setRoomAllocations(mappedRoomAllocations);
+      } catch (error) {
+        console.error('Error loading room allocations:', error);
+      }
+
+      // Load special charges
+      try {
+        const reservationSpecialCharges = await getReservationSpecialChargesByReservationId(reservationId);
+        const mappedSpecialCharges = reservationSpecialCharges.map(charge => ({
+          id: charge.id,
+          masterId: charge.specialChargeId || '',
+          name: charge.customDescription || 'Special Charge',
+          amount: charge.customRate || 0,
+          quantity: charge.quantity || 1,
+          description: charge.customDescription || ''
+        }));
+        setSpecialCharges(mappedSpecialCharges);
+      } catch (error) {
+        console.error('Error loading special charges:', error);
+      }
+
+      console.log('Reservation loaded successfully for editing', {
+        id: reservation.id,
+        referenceNumber: reservation.referenceNumber,
+        guestName: reservation.guestName,
+        agentId: reservation.agentId,
+        agentCommission: reservation.agentCommission
+      });
       
     } catch (error) {
       console.error('Error loading reservation for edit:', error);
