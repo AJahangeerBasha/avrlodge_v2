@@ -1762,58 +1762,52 @@ export const AdminReservation: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      {/* Enhanced Header */}
-      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <motion.div 
-            className="flex items-center justify-between"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div>
-              <motion.h1 
-                className="text-3xl sm:text-4xl font-serif font-bold text-black tracking-tight"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-              >
-                {isEditMode ? 'Edit Reservation' : 'Create Reservation'}
-              </motion.h1>
-              <motion.p 
-                className="text-gray-600 mt-2 text-lg"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-              >
-                {isEditMode ? 'Update the reservation details below' : 'Complete the form to create a new guest reservation'}
-              </motion.p>
-            </div>
-            
-            {/* Quick Stats */}
-            <motion.div 
-              className="hidden lg:flex items-center space-x-6"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-            >
-              <div className="text-center">
-                <div className="text-2xl font-bold text-black">{currentStep}</div>
-                <div className="text-sm text-gray-500">Current Step</div>
-              </div>
-              <div className="h-12 w-px bg-gray-200"></div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">₹{calculateTotalAmount().toLocaleString()}</div>
-                <div className="text-sm text-gray-500">Total Amount</div>
-              </div>
-            </motion.div>
-          </motion.div>
+    <motion.div
+      className="space-y-8 p-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Header */}
+      <motion.div
+        className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+      >
+        <div className="flex items-center gap-3">
+          <Calendar className="h-8 w-8 text-gray-900" />
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {isEditMode ? 'Edit Reservation' : 'Create Reservation'}
+            </h1>
+            <p className="text-gray-600 mt-2">
+              {isEditMode ? 'Update the reservation details below' : 'Complete the form to create a new guest reservation'}
+            </p>
+          </div>
         </div>
-      </div>
+
+        {/* Quick Stats */}
+        <div className="flex items-center gap-6 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-4">
+          <div className="text-center">
+            <div className="text-xl font-bold text-gray-900">{currentStep}</div>
+            <div className="text-sm text-gray-500">Current Step</div>
+          </div>
+          <div className="h-8 w-px bg-gray-200"></div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-green-600">₹{calculateTotalAmount().toLocaleString()}</div>
+            <div className="text-sm text-gray-500">Total Amount</div>
+          </div>
+        </div>
+      </motion.div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <motion.div
+        className="space-y-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
 
         {/* Enhanced Progress Steps */}
         <motion.div
@@ -1902,24 +1896,20 @@ export const AdminReservation: React.FC = () => {
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -30, scale: 0.95 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 300, 
+            transition={{
+              type: "spring",
+              stiffness: 300,
               damping: 30,
-              duration: 0.4 
+              duration: 0.4
             }}
-            className="relative"
+            className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-8 hover:shadow-lg transition-all duration-300"
           >
-            {/* Content Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-gray-50/30 rounded-2xl blur-3xl transform scale-105" />
-            
-            <div className="relative z-10 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-100 shadow-xl p-8">
-              {/* Step Content Wrapper */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-              >
+            {/* Step Content Wrapper */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
           {isLoadingReservation ? (
             <Card>
               <CardContent className="p-12 text-center">
@@ -1930,8 +1920,7 @@ export const AdminReservation: React.FC = () => {
           ) : (
             renderCurrentStep()
           )}
-              </motion.div>
-            </div>
+            </motion.div>
           </motion.div>
         </AnimatePresence>
 
@@ -2004,7 +1993,7 @@ export const AdminReservation: React.FC = () => {
         )}
         </AnimatePresence>
 
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
