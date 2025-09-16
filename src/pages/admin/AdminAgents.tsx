@@ -671,4 +671,5 @@ const AdminAgents = () => {
   )
 }
 
+export { AdminAgents }
 export default AdminAgents

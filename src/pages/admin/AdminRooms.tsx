@@ -553,4 +553,5 @@ const AdminRooms = () => {
   )
 }
 
+export { AdminRooms }
 export default AdminRooms

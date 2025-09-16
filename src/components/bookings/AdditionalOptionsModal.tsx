@@ -112,7 +112,7 @@ export function AdditionalOptionsModal({
       setProcessing(true)
 
       // Prepare update data following the reservation types
-      const updateData = {
+      const updateData: any = {
         guestCount: guestCount,
         totalPrice: finalTotal,
         totalQuote: finalTotal, // Update both totalPrice and totalQuote

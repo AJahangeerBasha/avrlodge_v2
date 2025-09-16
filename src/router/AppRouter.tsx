@@ -2,8 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import { RootLayout } from '../layouts/RootLayout'
 import { HomeLayout } from '../layouts/HomeLayout'
-import { AdminLayout } from '../layouts/AdminLayout'
-import { ManagerLayout } from '../layouts/ManagerLayout'
+import { UnifiedDashboardLayout } from '../layouts/UnifiedDashboardLayout'
 import { RouteLoader } from '../components/ui/page-loader'
 import { AuthProvider } from '../contexts/AuthContext'
 
@@ -46,8 +45,8 @@ function AppRoutes() {
           <Route path="auth/signup" element={<SignupPage />} />
           <Route path="auth/forgot-password" element={<ForgotPasswordPage />} />
 
-          {/* Admin routes - protected with AdminLayout */}
-          <Route path="admin" element={<AdminLayout />}>
+          {/* Admin routes - protected with UnifiedDashboardLayout */}
+          <Route path="admin" element={<UnifiedDashboardLayout role="admin" />}>
             <Route index element={<AdminDashboard />} />
             <Route path="calendar" element={<AdminCalendar />} />
             <Route path="reservation" element={<AdminReservation />} />
@@ -58,8 +57,8 @@ function AppRoutes() {
             <Route path="agents" element={<AdminAgents />} />
           </Route>
 
-          {/* Manager routes - protected with ManagerLayout */}
-          <Route path="manager" element={<ManagerLayout />}>
+          {/* Manager routes - protected with UnifiedDashboardLayout */}
+          <Route path="manager" element={<UnifiedDashboardLayout role="manager" />}>
             <Route index element={<ManagerDashboard />} />
             <Route path="calendar" element={<ManagerCalendar />} />
             <Route path="reservation" element={<ManagerReservation />} />

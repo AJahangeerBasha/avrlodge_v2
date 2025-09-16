@@ -1,5 +1,5 @@
 import { useBookings } from '@/contexts/BookingsContext'
-import { FirebasePaymentModal } from './FirebasePaymentModal'
+import { PaymentModal } from './PaymentModal'
 import RoomCheckInModal from './RoomCheckInModal'
 import RoomCheckOutModal from './RoomCheckOutModal'
 import RoomChangeModal from './RoomChangeModal'
@@ -11,7 +11,7 @@ export function BookingModalManager() {
     <>
       {/* Payment Modal */}
       {paymentModal.booking && paymentModal.isOpen && (
-        <FirebasePaymentModal
+        <PaymentModal
           booking={paymentModal.booking}
           isOpen={paymentModal.isOpen}
           onClose={actions.closePaymentModal}

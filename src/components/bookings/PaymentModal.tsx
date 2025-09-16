@@ -28,19 +28,19 @@ interface Booking {
   status: 'reservation' | 'booking' | 'checked_in' | 'checked_out' | 'cancelled'
 }
 
-interface FirebasePaymentModalProps {
+interface PaymentModalProps {
   booking: Booking
   isOpen: boolean
   onClose: () => void
   onPaymentComplete: () => void
 }
 
-export function FirebasePaymentModal({
+export function PaymentModal({
   booking,
   isOpen,
   onClose,
   onPaymentComplete
-}: FirebasePaymentModalProps) {
+}: PaymentModalProps) {
   const [paymentMethod, setPaymentMethod] = useState<'jubair_qr' | 'basha_qr' | 'cash'>('cash')
   const [amount, setAmount] = useState('')
   const [transactionId, setTransactionId] = useState('')

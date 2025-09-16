@@ -400,7 +400,7 @@ export const useAgentsStore = create<AgentState & AgentActions>()(
     }),
     {
       name: 'agents-store',
-      partialize: (state) => ({
+      partialize: (state: any) => ({
         // Only persist filters and form data
         filters: state.filters,
         formData: state.formData
