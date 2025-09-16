@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useBookings } from '@/contexts/BookingsContext'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, User, Hash, Calendar, Users, Home, DollarSign, X, AlertTriangle, History, FileText, Eye, ChevronDown, ChevronUp, RefreshCw, Receipt, Edit, Settings } from 'lucide-react'
+import { Phone, User, Hash, Calendar, Users, Home, DollarSign, X, AlertTriangle, History, FileText, Eye, ChevronDown, ChevronUp, RefreshCw, Receipt, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -89,7 +88,6 @@ export default function FirebaseBookingCard({
   const { actions } = useBookings()
   const { toast } = useToast()
   const { currentUser } = useAuth()
-  const navigate = useNavigate()
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -249,7 +247,7 @@ export default function FirebaseBookingCard({
   }, [booking.id, toast]);
 
   // Load documents
-  const loadDocuments = async () => {
+  const loadDocuments = useCallback(async () => {
     try {
       setLoadingDocuments(true)
       const docs = await getRoomCheckinDocumentsByReservationId(booking.id)
@@ -265,7 +263,7 @@ export default function FirebaseBookingCard({
     } finally {
       setLoadingDocuments(false)
     }
-  };
+  }, [booking.id, toast]);
 
   // Load special charges
   const loadSpecialCharges = useCallback(async () => {
@@ -331,7 +329,7 @@ export default function FirebaseBookingCard({
     loadPaymentHistory()
     loadSpecialCharges()
     loadDocuments() // Load documents to get count for conditional display
-  }, [loadPaymentHistory, loadSpecialCharges])
+  }, [loadPaymentHistory, loadSpecialCharges, loadDocuments])
 
   // Refresh data when onPaymentUpdate function is called (indicates parent update)
   useEffect(() => {
@@ -347,10 +345,6 @@ export default function FirebaseBookingCard({
     loadDocuments()
   }
 
-  // Handle edit reservation
-  const handleEditReservation = () => {
-    navigate(`/admin/reservation?edit=${booking.id}`)
-  };
 
   const getRoomStatusColor = (status?: string) => {
     switch (status) {

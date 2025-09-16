@@ -263,7 +263,7 @@ export function AdditionalOptionsModal({
                   </Label>
                   <select
                     value={discountType}
-                    onChange={(e) => setDiscountType(e.target.value as any)}
+                    onChange={(e) => setDiscountType(e.target.value as 'none' | 'percentage' | 'amount')}
                     className="w-full px-4 py-3 border border-gray-300 rounded-md bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
                   >
                     <option value="none">No Discount</option>
