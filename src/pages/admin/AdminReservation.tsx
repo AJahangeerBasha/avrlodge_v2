@@ -5,8 +5,7 @@ import { CheckCircle, Calendar, Users, CreditCard, Plus, Trash2, X, MapPin, Doll
 import { useReservationStore, type RoomAllocation, type SpecialCharge } from '@/stores/reservationStore';
 import { validatePhoneNumber, formatPhoneNumber, getPhoneValidationError } from '@/utils/phoneValidation';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
-import { SearchableDropdown } from '@/components/ui/searchable-dropdown';
-import statesDistrictsData from '@/data/states-districts.json';
+import { StateDistrictDropdown } from '@/components/agents/StateDistrictDropdown';
 import { useAuth } from '@/contexts/AuthContext';
 import { Guest } from '@/lib/types/guests';
 import { Room } from '@/lib/types/rooms';
@@ -849,9 +848,6 @@ export const AdminReservation: React.FC = () => {
   };
 
   const renderLocationDatesForm = () => {
-    // Get districts for selected state
-    const selectedStateData = statesDistrictsData.find(s => s.state === selectedState);
-    const districts = selectedStateData ? selectedStateData.district : [];
     const numberOfNights = calculateNumberOfNights();
 
     return (
@@ -915,31 +911,14 @@ export const AdminReservation: React.FC = () => {
               <span>Guest Location</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">State *</Label>
-                <SearchableDropdown
-                  options={statesDistrictsData.map(s => s.state)}
-                  value={selectedState}
-                  onChange={setSelectedState}
-                  placeholder="Select state"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
-                />
-              </div>
-              
-              <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">District *</Label>
-                <SearchableDropdown
-                  options={districts}
-                  value={selectedDistrict}
-                  onChange={setSelectedDistrict}
-                  placeholder={selectedState ? "Select district" : "Select state first"}
-                  disabled={!selectedState || districts.length === 0}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-              </div>
-            </div>
+          <CardContent>
+            <StateDistrictDropdown
+              selectedState={selectedState}
+              selectedDistrict={selectedDistrict}
+              onStateChange={setSelectedState}
+              onDistrictChange={setSelectedDistrict}
+              className="w-full"
+            />
           </CardContent>
         </Card>
 
@@ -1304,17 +1283,6 @@ export const AdminReservation: React.FC = () => {
     }
   }, [currentStep, guestCount, roomAllocations, specialChargesMaster, specialCharges, addSpecialCharge, setSpecialCharges]);
 
-  // Reset district when state changes
-  useEffect(() => {
-    if (selectedState) {
-      const stateData = statesDistrictsData.find(s => s.state === selectedState);
-      if (stateData && !stateData.district.includes(selectedDistrict)) {
-        setSelectedDistrict('');
-      }
-    } else {
-      setSelectedDistrict('');
-    }
-  }, [selectedState, selectedDistrict, setSelectedDistrict]);
 
   const renderPaymentConfirmationForm = () => {
     const numberOfNights = calculateNumberOfNights();
