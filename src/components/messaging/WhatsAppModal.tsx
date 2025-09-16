@@ -12,12 +12,12 @@ interface Guest {
 
 interface RoomAllocation {
   id: string
-  room_id?: string
-  room_number: string
-  room_type: string
+  roomId?: string
+  roomNumber: string
+  roomType: string
   capacity?: number
   tariff?: number
-  guest_count: number
+  guestCount: number
 }
 
 interface SpecialCharge {
@@ -39,6 +39,11 @@ interface WhatsAppData {
   discountPercentage?: number
   discountAmount?: number
   discountType?: 'percentage' | 'fixed'
+  agentReferral?: {
+    agentName?: string
+    agentCommission?: number
+    agentPhone?: string
+  }
 }
 
 interface WhatsAppModalProps {

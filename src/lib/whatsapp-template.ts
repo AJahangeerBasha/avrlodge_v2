@@ -10,12 +10,12 @@ interface Guest {
 
 interface RoomAllocation {
   id: string
-  room_id?: string
-  room_number: string
-  room_type: string
+  roomId?: string
+  roomNumber: string
+  roomType: string
   capacity?: number
   tariff?: number
-  guest_count: number
+  guestCount: number
 }
 
 interface SpecialCharge {
@@ -37,6 +37,11 @@ interface WhatsAppTemplateData {
   discountPercentage?: number
   discountAmount?: number
   discountType?: 'percentage' | 'fixed'
+  agentReferral?: {
+    agentName?: string
+    agentCommission?: number
+    agentPhone?: string
+  }
 }
 
 export function generateWhatsAppBookingMessage(
@@ -44,7 +49,7 @@ export function generateWhatsAppBookingMessage(
   guest: Guest
 ): string {
   const roomDetails = data.roomAllocations
-    .map(room => `Room ${room.room_number} (${room.room_type})`)
+    .map(room => `Room ${room.roomNumber} (${room.roomType})`)
     .join(', ')
 
   // Safe date formatting with fallback
@@ -108,13 +113,34 @@ export function generateWhatsAppBookingMessage(
 
   bookingDetails += `\n• Total Amount: ₹${data.totalAmount.toLocaleString()}`
 
+  // Add agent referral details if available
+  let agentReferralSection = ''
+  console.log('🔍 WhatsApp Template - Agent Referral Data:', data.agentReferral)
+
+  if (data.agentReferral?.agentName) {
+    agentReferralSection = `\n\n👥 *Agent Referral:*
+• Agent: ${data.agentReferral.agentName}`
+
+    if (data.agentReferral.agentPhone) {
+      agentReferralSection += `\n• Agent Phone: ${data.agentReferral.agentPhone}`
+    }
+
+    if (data.agentReferral.agentCommission) {
+      agentReferralSection += `\n• Commission: ₹${data.agentReferral.agentCommission.toLocaleString()}`
+    }
+
+    console.log('✅ Agent referral section created:', agentReferralSection)
+  } else {
+    console.log('❌ No agent referral data found or missing agentName')
+  }
+
   return `🏨 *AVR Lodge Reservation Confirmed*
 
 Dear ${guest.name || 'Guest'},
 
 Thank you for choosing AVR Lodge! Your reservation has been successfully confirmed.
 
-${bookingDetails}
+${bookingDetails}${agentReferralSection}
 
 📍 *Location:* AVR Lodge, Kolli Hills. https://maps.app.goo.gl/Bv2G2d5PPhXEzESs7
 

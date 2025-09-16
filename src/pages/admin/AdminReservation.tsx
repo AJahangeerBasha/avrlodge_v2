@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Calendar, Users, Plus, Trash2, X, MapPin, DollarSign } from 'lucide-react';
+import { CheckCircle, Calendar, Users, Plus, Trash2, X, MapPin, DollarSign, MessageCircle } from 'lucide-react';
 import { useReservationStore, type RoomAllocation, type SpecialCharge } from '@/stores/reservationStore';
 import { validatePhoneNumber, formatPhoneNumber, getPhoneValidationError } from '@/utils/phoneValidation';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
@@ -27,6 +27,7 @@ import {
   createGuest,
   getGuestsByReservationId
 } from '@/lib/guests';
+import WhatsAppModal from '@/components/messaging/WhatsAppModal';
 import {
   getAllRooms,
 } from '@/lib/rooms';
@@ -117,7 +118,15 @@ export const AdminReservation: React.FC = () => {
     checkOutDate: string;
     roomAllocations: RoomAllocation[];
     guestCount: number;
+    agentReferral?: {
+      agentName?: string;
+      agentCommission?: number;
+      agentPhone?: string;
+    };
   } | null>(null);
+
+  // WhatsApp modal state
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
 
   // Available data
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
@@ -493,6 +502,21 @@ export const AdminReservation: React.FC = () => {
           }
         }
         
+        // Capture agent data before form reset
+        const agentReferralData = selectedAgentFee === 'agent' && selectedAgentId ? {
+          agentName: activeAgents.find(agent => agent.id === selectedAgentId)?.name,
+          agentCommission: agentFeeAmount,
+          agentPhone: activeAgents.find(agent => agent.id === selectedAgentId)?.phone
+        } : undefined;
+
+        console.log('🔍 AdminReservation - Capturing agent data before form reset:', {
+          selectedAgentFee,
+          selectedAgentId,
+          agentFeeAmount,
+          activeAgentsCount: activeAgents.length,
+          agentReferralData
+        });
+
         // Show success modal
         setSuccessData({
           referenceNumber: savedReservation.referenceNumber || referenceNumber,
@@ -502,10 +526,11 @@ export const AdminReservation: React.FC = () => {
           checkInDate,
           checkOutDate,
           roomAllocations: [...roomAllocations],
-          guestCount
+          guestCount,
+          agentReferral: agentReferralData
         });
         setShowSuccessModal(true);
-        
+
         // Reset form
         resetForm();
       }
@@ -2055,28 +2080,70 @@ export const AdminReservation: React.FC = () => {
                   You can view this reservation in the bookings section.
                 </p>
                 
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowSuccessModal(false)}
-                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Close
-                  </button>
+                <div className="flex flex-col gap-3">
+                  {/* WhatsApp Button */}
                   <button
                     onClick={() => {
                       setShowSuccessModal(false);
-                      navigate('/admin/bookings');
+                      setShowWhatsAppModal(true);
                     }}
-                    className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                    className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 font-medium"
                   >
-                    Go to Bookings
+                    <MessageCircle className="h-4 w-4" />
+                    Send WhatsApp Messages
                   </button>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setShowSuccessModal(false)}
+                      className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Close
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowSuccessModal(false);
+                        navigate('/admin/bookings');
+                      }}
+                      className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                    >
+                      Go to Bookings
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
           </motion.div>
         )}
         </AnimatePresence>
+
+        {/* WhatsApp Modal */}
+        {showWhatsAppModal && successData && (
+          <WhatsAppModal
+            isOpen={showWhatsAppModal}
+            onClose={() => setShowWhatsAppModal(false)}
+            data={{
+              referenceNumber: successData.referenceNumber,
+              totalAmount: successData.totalAmount,
+              primaryGuest: successData.primaryGuest,
+              secondaryGuests: successData.secondaryGuests,
+              checkInDate: successData.checkInDate,
+              checkOutDate: successData.checkOutDate,
+              roomAllocations: successData.roomAllocations,
+              guestCount: successData.guestCount,
+              specialCharges: specialCharges.map(charge => ({
+                name: charge.name,
+                amount: charge.amount,
+                quantity: charge.quantity
+              })),
+              discountPercentage: discountType === 'percentage' ? discountValue : undefined,
+              discountAmount: discountType === 'amount' ? discountValue :
+                             discountType === 'percentage' ? (calculateTotalAmount() * discountValue) / 100 : undefined,
+              discountType: discountType as 'percentage' | 'fixed',
+              agentReferral: successData.agentReferral
+            }}
+          />
+        )}
 
       </motion.div>
     </motion.div>
