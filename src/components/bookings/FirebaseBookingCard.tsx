@@ -29,6 +29,9 @@ interface Booking {
   status: 'reservation' | 'booking' | 'checked_in' | 'checked_out' | 'cancelled'
   guest_count: number
   room_numbers?: string
+  agent_id?: string | null
+  agent_commission?: number | null
+  agent_name?: string | null
   reservation_rooms?: Array<{
     id?: string
     room_number: string
@@ -453,6 +456,19 @@ export default function FirebaseBookingCard({
                 +91 {formatPhone(booking.guest_phone)}
               </a>
             </div>
+            {(booking.agent_name || booking.agent_id) && (
+              <div className="flex items-center gap-1.5 text-xs text-gray-600 mt-1">
+                <Users className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+                <span className="text-green-700 font-medium truncate">
+                  Agent: {booking.agent_name || `ID: ${booking.agent_id}`}
+                </span>
+                {booking.agent_commission && (
+                  <span className="text-xs text-green-600 bg-green-50 px-1.5 py-0.5 rounded border border-green-200 ml-1 flex-shrink-0">
+                    ₹{booking.agent_commission}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           
           {/* Right Column: Status Badge */}

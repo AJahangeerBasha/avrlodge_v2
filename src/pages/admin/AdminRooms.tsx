@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { Plus, Search, Filter, Users, Bed, CheckCircle, AlertCircle, Clock, MapPin, Edit, Trash2, Eye, XCircle, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRooms, useRoomsUI, useRoomsCRUD } from '@/hooks/useRooms'
 import { getStatusConfig } from '@/lib/utils/roomStatus'
-import type { Room, RoomStatus } from '@/lib/types/rooms'
+import type { RoomStatus } from '@/lib/types/rooms'
 
 // Helper function to get status icon
 const getStatusIcon = (status: RoomStatus) => {
@@ -44,7 +44,6 @@ const AdminRooms = () => {
     openEditModal,
     closeEditModal,
     updateFormData,
-    resetFormData,
     updateFilters
   } = useRoomsUI()
   const {

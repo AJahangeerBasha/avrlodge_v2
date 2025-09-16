@@ -13,6 +13,9 @@ export interface Reservation {
   approxCheckInTime?: string | null // HH:MM format
   approxCheckOutTime?: string | null // HH:MM format
   guestType?: GuestType | null
+  guestName?: string // Guest name stored in reservation
+  guestEmail?: string // Guest email stored in reservation
+  guestPhone?: string // Guest phone stored in reservation
   percentageDiscount: number // 0-100
   fixedDiscount: number
   totalQuote: number

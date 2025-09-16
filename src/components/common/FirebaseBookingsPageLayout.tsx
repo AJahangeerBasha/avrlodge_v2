@@ -15,6 +15,7 @@ import { getAllReservationRooms } from '../../lib/reservationRooms'
 import { getGuestsByReservationId } from '../../lib/guests'
 import { getAllReservationSpecialCharges } from '../../lib/reservationSpecialCharges'
 import { getPaymentsByReservationId } from '../../lib/payments'
+import { getAgent } from '../../lib/agents'
 import { useAuth } from '../../contexts/AuthContext'
 import { useBookings } from '../../contexts/BookingsContext'
 
@@ -28,6 +29,8 @@ interface FirebaseReservation {
   checkOutDate: string
   guestCount: number
   totalPrice: number
+  agentId?: string | null
+  agentCommission?: number | null
   status: 'reservation' | 'booking' | 'checked_in' | 'checked_out' | 'cancelled'
   paymentStatus: 'pending' | 'partial' | 'paid' | 'refunded'
   createdAt: string
@@ -48,6 +51,9 @@ interface Booking {
   status: 'reservation' | 'booking' | 'checked_in' | 'checked_out' | 'cancelled'
   guest_count: number
   room_numbers?: string
+  agent_id?: string | null
+  agent_commission?: number | null
+  agent_name?: string | null
   reservation_rooms?: Array<{
     id?: string
     room_number: string
@@ -132,15 +138,15 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
   const { toast } = useToast()
 
   // Helper function to transform Firebase data to Booking format
-  const transformFirebaseToBooking = (firebaseReservation: FirebaseReservation, rooms: any[], guests: any[], specialCharges: any[]): Booking => {
+  const transformFirebaseToBooking = (firebaseReservation: FirebaseReservation, rooms: any[], guests: any[], specialCharges: any[], agentName?: string | null): Booking => {
     // Calculate payment info (placeholder - you may need to implement proper payment tracking)
     const totalPaid = 0 // TODO: Calculate from payments collection
     const remainingBalance = firebaseReservation.totalPrice - totalPaid
 
     // Find primary guest for name and phone
     const primaryGuest = guests.find(guest => guest.isPrimaryGuest)
-    
-    return {
+
+    const booking = {
       id: firebaseReservation.id,
       reference_number: firebaseReservation.referenceNumber,
       guest_name: primaryGuest?.name || firebaseReservation.guestName || 'Unknown Guest',
@@ -153,6 +159,9 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
       remaining_balance: remainingBalance,
       status: firebaseReservation.status,
       guest_count: firebaseReservation.guestCount,
+      agent_id: firebaseReservation.agentId,
+      agent_commission: firebaseReservation.agentCommission,
+      agent_name: agentName,
       room_numbers: rooms.map(r => r.roomNumber).join(', '),
       reservation_rooms: rooms.map(room => ({
         id: room.id,
@@ -178,6 +187,9 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
       created_at: firebaseReservation.createdAt,
       updated_at: firebaseReservation.updatedAt
     }
+
+
+    return booking
   }
 
   // Helper function to get date range based on filter
@@ -448,9 +460,33 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
             
             // Get special charges for this reservation
             const specialCharges = await getAllReservationSpecialCharges({ reservationId: reservation.id })
-            
+
+            // Get agent information if agent ID exists
+            let agentName = null
+            if (reservation.agentId) {
+              try {
+                const agent = await getAgent(reservation.agentId)
+                agentName = agent?.name || null
+              } catch (error) {
+                console.error(`Error loading agent ${reservation.agentId}:`, error)
+              }
+            }
+
             // Debug logging
             const primaryGuest = guests?.find(g => g.isPrimaryGuest)
+
+            // Special debug for the specific reservation
+            if (reservation.id === '5tnn6iuqJfRWvY9YiWnz') {
+              console.log('🔍 DEBUGGING SPECIFIC RESERVATION:', {
+                reservationId: reservation.id,
+                referenceNumber: reservation.referenceNumber,
+                agentId: reservation.agentId,
+                agentCommission: reservation.agentCommission,
+                agentName: agentName,
+                rawReservation: reservation
+              })
+            }
+
             console.log(`Reservation ${reservation.referenceNumber}:`, {
               reservationId: reservation.id,
               guestsCount: guests?.length || 0,
@@ -461,13 +497,15 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
                 isPrimaryGuest: primaryGuest.isPrimaryGuest
               } : null,
               roomsCount: rooms?.length || 0,
+              agentId: reservation.agentId,
+              agentName: agentName,
               allGuests: guests?.map(g => ({ name: g.name, isPrimary: g.isPrimaryGuest }))
             })
-            
-            return transformFirebaseToBooking(reservation, rooms || [], guests || [], specialCharges || [])
+
+            return transformFirebaseToBooking(reservation, rooms || [], guests || [], specialCharges || [], agentName)
           } catch (error) {
             console.error(`Error loading details for reservation ${reservation.id}:`, error)
-            return transformFirebaseToBooking(reservation, [], [], [])
+            return transformFirebaseToBooking(reservation, [], [], [], null)
           }
         })
       )
@@ -537,7 +575,18 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
             const rooms = await getAllReservationRooms({ reservationId: reservation.id })
             const guests = await getGuestsByReservationId(reservation.id)
             const specialCharges = await getAllReservationSpecialCharges({ reservationId: reservation.id })
-            
+
+            // Get agent information if agent ID exists
+            let agentName = null
+            if (reservation.agentId) {
+              try {
+                const agent = await getAgent(reservation.agentId)
+                agentName = agent?.name || null
+              } catch (error) {
+                console.error(`Error loading agent ${reservation.agentId}:`, error)
+              }
+            }
+
             // Debug logging for search
             const primaryGuestSearch = guests?.find(g => g.isPrimaryGuest)
             console.log(`Search - Reservation ${reservation.referenceNumber}:`, {
@@ -547,13 +596,15 @@ export default function FirebaseBookingsPageLayout({ role }: FirebaseBookingsPag
                 name: primaryGuestSearch.name,
                 phone: primaryGuestSearch.phone,
                 isPrimary: primaryGuestSearch.isPrimaryGuest
-              } : null
+              } : null,
+              agentId: reservation.agentId,
+              agentName: agentName
             })
-            
-            return transformFirebaseToBooking(reservation, rooms || [], guests || [], specialCharges || [])
+
+            return transformFirebaseToBooking(reservation, rooms || [], guests || [], specialCharges || [], agentName)
           } catch (error) {
             console.error(`Error loading details for reservation ${reservation.id}:`, error)
-            return transformFirebaseToBooking(reservation, [], [], [])
+            return transformFirebaseToBooking(reservation, [], [], [], null)
           }
         })
       )

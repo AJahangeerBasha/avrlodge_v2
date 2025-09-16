@@ -1,17 +1,16 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Search, Filter, Users, Building2, UserCheck, UserX, AlertTriangle, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Search, Users, Building2, UserCheck, UserX, AlertTriangle, Edit, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/contexts/AuthContext'
 import { useAgents, useAgentsUI, useAgentsCRUD } from '@/hooks/useAgents'
 import { StateDistrictDropdown } from '@/components/agents/StateDistrictDropdown'
-import type { Agent } from '@/lib/types/agents'
 
 const AdminAgents = () => {
   const { currentUser } = useAuth()

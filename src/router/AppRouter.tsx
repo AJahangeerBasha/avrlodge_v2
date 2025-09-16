@@ -20,9 +20,9 @@ const AdminCalendar = lazy(() => import('../pages/admin/AdminCalendar').then(mod
 const AdminReservation = lazy(() => import('../pages/admin/AdminReservation').then(module => ({ default: module.AdminReservation })))
 const AdminBookings = lazy(() => import('../pages/admin/AdminBookings').then(module => ({ default: module.AdminBookings })))
 const AdminRoomTypes = lazy(() => import('../pages/admin/AdminRoomTypes').then(module => ({ default: module.AdminRoomTypes })))
-const AdminRooms = lazy(() => import('../pages/admin/AdminRooms'))
+const AdminRooms = lazy(() => import('../pages/admin/AdminRooms').then(module => ({ default: module.AdminRooms })))
 const AdminSpecialCharges = lazy(() => import('../pages/admin/AdminSpecialCharges').then(module => ({ default: module.AdminSpecialCharges })))
-const AdminAgents = lazy(() => import('../pages/admin/AdminAgents'))
+const AdminAgents = lazy(() => import('../pages/admin/AdminAgents').then(module => ({ default: module.AdminAgents })))
 
 // Manager pages  
 const ManagerDashboard = lazy(() => import('../pages/manager/ManagerDashboard').then(module => ({ default: module.ManagerDashboard })))
@@ -39,13 +39,13 @@ function AppRoutes() {
           <Route path="/" element={<HomeLayout />}>
             <Route index element={<HomePage />} />
           </Route>
-          
+
           {/* Auth routes - no layout */}
           <Route path="auth" element={<Navigate to="/auth/login" replace />} />
           <Route path="auth/login" element={<LoginPage />} />
           <Route path="auth/signup" element={<SignupPage />} />
           <Route path="auth/forgot-password" element={<ForgotPasswordPage />} />
-          
+
           {/* Admin routes - protected with AdminLayout */}
           <Route path="admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
@@ -57,7 +57,7 @@ function AppRoutes() {
             <Route path="special-charges" element={<AdminSpecialCharges />} />
             <Route path="agents" element={<AdminAgents />} />
           </Route>
-          
+
           {/* Manager routes - protected with ManagerLayout */}
           <Route path="manager" element={<ManagerLayout />}>
             <Route index element={<ManagerDashboard />} />
@@ -65,7 +65,7 @@ function AppRoutes() {
             <Route path="reservation" element={<ManagerReservation />} />
             <Route path="bookings" element={<ManagerBookings />} />
           </Route>
-          
+
           {/* Error pages */}
           <Route path="unauthorized" element={<UnauthorizedPage />} />
         </Route>
@@ -76,7 +76,11 @@ function AppRoutes() {
 
 export function AppRouter() {
   return (
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true
+      }}
+    >
       <AuthProvider>
         <AppRoutes />
       </AuthProvider>

@@ -373,7 +373,7 @@ export const subscribeToRooms = (
     }
 
     return onSnapshot(q, async (querySnapshot) => {
-      let rooms = querySnapshot.docs.map(convertFirestoreToRoom)
+      const rooms = querySnapshot.docs.map(convertFirestoreToRoom)
 
       // Populate room types
       const roomsWithType = await Promise.all(
