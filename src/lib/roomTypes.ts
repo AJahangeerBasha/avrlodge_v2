@@ -1,16 +1,18 @@
-import { 
-  collection, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  getDocs, 
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
   getDoc,
-  query, 
-  where, 
+  query,
+  where,
   orderBy,
   serverTimestamp,
-  Timestamp 
+  Timestamp,
+  onSnapshot,
+  Unsubscribe
 } from 'firebase/firestore'
 import { db } from './firebase'
 import { RoomType, CreateRoomTypeData, UpdateRoomTypeData } from './types/roomTypes'
@@ -171,10 +173,32 @@ export const getAvailableRoomTypes = async (): Promise<RoomType[]> => {
       orderBy('pricePerNight')
     )
     const querySnapshot = await getDocs(q)
-    
+
     return querySnapshot.docs.map(convertFirestoreToRoomType)
   } catch (error) {
     console.error('Error getting available room types:', error)
     throw error
+  }
+}
+
+// Subscribe to real-time room types updates
+export const subscribeToRoomTypes = (
+  callback: (roomTypes: RoomType[]) => void,
+  filters?: { isActive?: boolean }
+): Unsubscribe => {
+  try {
+    let q = query(collection(db, ROOM_TYPES_COLLECTION), orderBy('createdAt', 'desc'))
+
+    if (filters?.isActive !== undefined) {
+      q = query(q, where('isActive', '==', filters.isActive))
+    }
+
+    return onSnapshot(q, (querySnapshot) => {
+      const roomTypes = querySnapshot.docs.map(convertFirestoreToRoomType)
+      callback(roomTypes)
+    })
+  } catch (error) {
+    console.error('Error subscribing to room types:', error)
+    throw new Error('Failed to subscribe to room types')
   }
 }
