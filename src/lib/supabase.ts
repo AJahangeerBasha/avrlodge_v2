@@ -8,13 +8,36 @@ const supabaseAnonKey = (
     : process.env.VITE_SUPABASE_ANON_KEY
 ) || 'YOUR_SUPABASE_ANON_KEY_HERE'
 
-// Create Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-})
+// Validate configuration before creating client
+if (supabaseAnonKey === 'YOUR_SUPABASE_ANON_KEY_HERE') {
+  console.warn('⚠️ Supabase client initialized with placeholder key. Some features may not work properly.')
+}
+
+// Create Supabase client with error handling
+let supabase: any
+try {
+  supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  })
+} catch (error) {
+  console.error('Failed to initialize Supabase client:', error)
+  // Create a minimal mock client to prevent app crashes
+  supabase = {
+    auth: { getSession: () => Promise.resolve({ data: { session: null }, error: null }) },
+    storage: {
+      from: () => ({
+        upload: () => Promise.resolve({ error: new Error('Supabase not configured') }),
+        getPublicUrl: () => ({ data: { publicUrl: '' } }),
+        createSignedUrl: () => Promise.resolve({ error: new Error('Supabase not configured') })
+      })
+    }
+  }
+}
+
+export { supabase }
 
 // Enhanced debugging information
 const isDev = (
