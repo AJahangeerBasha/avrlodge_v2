@@ -28,66 +28,13 @@ export default defineConfig({
     rollupOptions: {
       external: [],
       output: {
-        manualChunks: (id) => {
-          // Vendor chunks
-          if (id.includes('node_modules')) {
-            // Keep React ecosystem together to prevent context loading issues
-            if (id.includes('react') || id.includes('framer-motion')) {
-              return 'react-vendor'
-            }
-            if (id.includes('@tanstack/react-query')) {
-              return 'query-vendor'
-            }
-            if (id.includes('@supabase/supabase-js')) {
-              return 'supabase-vendor'
-            }
-            
-            // UI library chunks
-            if (id.includes('@radix-ui') && (id.includes('dialog') || id.includes('dropdown') || id.includes('select') || id.includes('tabs') || id.includes('popover'))) {
-              return 'ui-vendor'
-            }
-            if (id.includes('@radix-ui') && (id.includes('checkbox') || id.includes('radio') || id.includes('switch') || id.includes('slider'))) {
-              return 'radix-forms'
-            }
-            if (id.includes('recharts')) {
-              return 'chart-vendor'
-            }
-            if (id.includes('@fullcalendar')) {
-              return 'calendar-vendor'
-            }
-            if (id.includes('date-fns')) {
-              return 'date-utils'
-            }
-            if (id.includes('react-hook-form') || id.includes('@hookform') || id.includes('zod')) {
-              return 'form-vendor'
-            }
-            if (id.includes('lucide-react')) {
-              return 'icon-vendor'
-            }
-            
-            // Default vendor chunk for other node_modules
-            return 'vendor'
-          }
-          
-          // App chunks based on route structure
-          if (id.includes('src/pages/admin/')) {
-            return 'admin-pages'
-          }
-          if (id.includes('src/pages/manager/')) {
-            return 'manager-pages'
-          }
-          if (id.includes('src/pages/auth/') || id.includes('src/pages/Auth') || id.includes('src/pages/AuthCallback')) {
-            return 'auth-pages'
-          }
-          if (id.includes('src/layouts/')) {
-            return 'layouts'
-          }
-          if (id.includes('src/components/sections/')) {
-            return 'sections'
-          }
-          if (id.includes('src/components/')) {
-            return 'components'
-          }
+        format: 'es',
+        manualChunks: {
+          // Group problematic dependencies together
+          'vendor-core': ['@supabase/supabase-js'],
+          'react-vendor': ['react', 'react-dom', 'framer-motion'],
+          'query-vendor': ['@tanstack/react-query'],
+          'ui-vendor': ['lucide-react'],
         }
       }
     }
@@ -105,9 +52,9 @@ export default defineConfig({
       'react-dom',
       'react-router-dom',
       'framer-motion',
-      '@tanstack/react-query',
-      '@supabase/supabase-js'
+      '@tanstack/react-query'
     ],
+    exclude: ['@supabase/supabase-js'],
     force: true
   },
 })
