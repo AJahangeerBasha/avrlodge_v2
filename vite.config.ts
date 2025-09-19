@@ -30,8 +30,6 @@ export default defineConfig({
       output: {
         format: 'es',
         manualChunks: {
-          // Group problematic dependencies together
-          'vendor-core': ['@supabase/supabase-js'],
           'react-vendor': ['react', 'react-dom', 'framer-motion'],
           'query-vendor': ['@tanstack/react-query'],
           'ui-vendor': ['lucide-react'],
@@ -52,9 +50,9 @@ export default defineConfig({
       'react-dom',
       'react-router-dom',
       'framer-motion',
-      '@tanstack/react-query'
+      '@tanstack/react-query',
+      '@supabase/supabase-js'
     ],
-    exclude: ['@supabase/supabase-js'],
     force: true
   },
 })
