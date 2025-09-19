@@ -35,7 +35,9 @@ const COLLECTIONS = {
   reservationRooms: 'reservationRooms',
   reservationSpecialCharges: 'reservationSpecialCharges',
   roomCheckinDocuments: 'roomCheckinDocuments',
-  payments: 'payments'
+  roomCheckinDocumentAudits: 'roomCheckinDocumentAudits',
+  payments: 'payments',
+  paymentAudits: 'paymentAudits'
 } as const
 
 interface DeletionStats {
