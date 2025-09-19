@@ -34,6 +34,7 @@ import {
 } from './utils/reservationRoomValidation'
 import { getReservationById } from './reservations'
 import { getRoomById } from './rooms'
+import { updateRoomStatusAndReservation } from './utils/statusManagement'
 
 const RESERVATION_ROOMS_COLLECTION = 'reservationRooms'
 
@@ -399,15 +400,17 @@ export const checkInReservationRoom = async (
       throw new Error(transitionError.message)
     }
     
-    const docRef = doc(db, RESERVATION_ROOMS_COLLECTION, id)
-    await updateDoc(docRef, {
-      roomStatus: newStatus,
-      checkInDatetime: checkInData.checkInDatetime,
-      checkedInBy: checkInData.checkedInBy,
-      checkInNotes: checkInData.checkInNotes || null,
-      updatedAt: serverTimestamp(),
-      updatedBy: checkInData.checkedInBy
-    })
+    // Use the new status management function that also updates reservation status
+    await updateRoomStatusAndReservation(
+      id,
+      newStatus,
+      checkInData.checkedInBy,
+      {
+        checkInDatetime: checkInData.checkInDatetime,
+        checkedInBy: checkInData.checkedInBy,
+        checkInNotes: checkInData.checkInNotes
+      }
+    )
   } catch (error) {
     console.error('Error checking in reservation room:', error)
     throw error
@@ -438,15 +441,17 @@ export const checkOutReservationRoom = async (
       throw new Error(transitionError.message)
     }
     
-    const docRef = doc(db, RESERVATION_ROOMS_COLLECTION, id)
-    await updateDoc(docRef, {
-      roomStatus: newStatus,
-      checkOutDatetime: checkOutData.checkOutDatetime,
-      checkedOutBy: checkOutData.checkedOutBy,
-      checkOutNotes: checkOutData.checkOutNotes || null,
-      updatedAt: serverTimestamp(),
-      updatedBy: checkOutData.checkedOutBy
-    })
+    // Use the new status management function that also updates reservation status
+    await updateRoomStatusAndReservation(
+      id,
+      newStatus,
+      checkOutData.checkedOutBy,
+      {
+        checkOutDatetime: checkOutData.checkOutDatetime,
+        checkedOutBy: checkOutData.checkedOutBy,
+        checkOutNotes: checkOutData.checkOutNotes
+      }
+    )
   } catch (error) {
     console.error('Error checking out reservation room:', error)
     throw error

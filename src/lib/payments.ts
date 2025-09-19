@@ -40,6 +40,7 @@ import {
 } from './types/payments'
 import { generateUniqueReceiptNumber } from './utils/receiptNumber'
 import { COLLECTIONS } from './constants/collections'
+import { updateReservationStatusOnFirstPayment } from './utils/statusManagement'
 
 const COLLECTION_NAME = COLLECTIONS.PAYMENTS
 const AUDIT_COLLECTION_NAME = 'paymentAudits'
@@ -141,7 +142,7 @@ export const createPayment = async (
     }
 
     const docRef = await addDoc(collection(db, COLLECTION_NAME), paymentData)
-    
+
     // Create audit log
     await createAuditLog(docRef.id, 'created', userId, {
       amount: data.amount,
@@ -150,6 +151,16 @@ export const createPayment = async (
       receiptNumber,
       reservationId: data.reservationId
     })
+
+    // Auto-update reservation status on first payment (if this payment is for a reservation)
+    if (data.reservationId && data.amount > 0) {
+      try {
+        await updateReservationStatusOnFirstPayment(data.reservationId, userId)
+      } catch (statusError) {
+        // Log the error but don't fail the payment creation
+        console.warn('⚠️ Payment created successfully but failed to update reservation status:', statusError)
+      }
+    }
 
     return docRef.id
   } catch (error) {

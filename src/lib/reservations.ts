@@ -26,6 +26,7 @@ import {
 import { generateReferenceNumber } from './utils/referenceNumber'
 import { validateReservation } from './utils/reservationValidation'
 import { getRoomById } from './rooms'
+import { cancelReservationAndRooms } from './utils/statusManagement'
 
 const RESERVATIONS_COLLECTION = 'reservations'
 
@@ -356,6 +357,21 @@ export const deleteReservation = async (id: string, userId: string): Promise<voi
     })
   } catch (error) {
     console.error('Error deleting reservation:', error)
+    throw error
+  }
+}
+
+// Cancel reservation and all associated rooms
+export const cancelReservation = async (
+  id: string,
+  userId: string,
+  cancellationReason?: string
+): Promise<void> => {
+  try {
+    // Use the new status management function that handles both reservation and rooms
+    await cancelReservationAndRooms(id, userId, cancellationReason)
+  } catch (error) {
+    console.error('Error cancelling reservation:', error)
     throw error
   }
 }

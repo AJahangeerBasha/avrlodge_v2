@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { Payment } from '@/lib/types/payments'
 import { RoomCheckinDocument } from '@/lib/types/roomCheckinDocuments'
-import { updateReservationStatus } from '@/lib/reservations'
+import { cancelReservation } from '@/lib/reservations'
 import { getPaymentsByReservationId } from '@/lib/payments'
 import { getRoomCheckinDocumentsByReservationId } from '@/lib/roomCheckinDocuments'
 import { getReservationSpecialChargesByReservationId } from '@/lib/reservationSpecialCharges'
@@ -203,7 +203,7 @@ export default function BookingCard({
     try {
       setProcessing(true)
 
-      await updateReservationStatus(booking.id, 'cancelled', currentUser.uid)
+      await cancelReservation(booking.id, currentUser.uid, 'Cancelled via booking management interface')
 
       toast({
         title: "Reservation Cancelled",
