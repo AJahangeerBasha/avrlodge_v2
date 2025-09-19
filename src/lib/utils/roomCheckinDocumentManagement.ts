@@ -490,12 +490,11 @@ export const prepareDocumentUpload = (
       errors.push('Invalid file URL format')
     }
     
-    // Check if file URL looks like supported storage provider URL
-    const isFirebaseStorage = fileUrl.includes('firebase') || fileUrl.includes('googleapis.com')
+    // Check if file URL looks like Supabase storage provider URL
     const isSupabaseStorage = fileUrl.includes('supabase.co') || fileUrl.includes('supabase.com')
 
-    if (!isFirebaseStorage && !isSupabaseStorage) {
-      errors.push('File URL should be from Firebase Storage or Supabase Storage')
+    if (!isSupabaseStorage) {
+      errors.push('File URL should be from Supabase Storage')
     }
     
     const sanitizedData: CreateRoomCheckinDocumentData = {
