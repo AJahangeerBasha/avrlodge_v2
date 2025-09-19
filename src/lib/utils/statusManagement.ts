@@ -5,12 +5,94 @@
 import { runTransaction, doc, collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
 import { COLLECTIONS } from '../constants/collections'
-import { ReservationStatus } from '../types/reservations'
+import { ReservationStatus, PaymentStatus } from '../types/reservations'
 import { RoomStatus } from '../types/reservationRooms'
 
 /**
- * Updates reservation status to 'bookings' when first payment is made
- * Business Rule: First payment success → Reservation Status = 'bookings'
+ * Updates reservation payment status based on actual payment amounts
+ * Business Rule: Calculate payment status from completed payments vs total amount
+ */
+export const updateReservationPaymentStatus = async (
+  reservationId: string,
+  currentUserId: string
+): Promise<void> => {
+  try {
+    // Get reservation and payments data (outside transaction)
+    const reservationRef = doc(db, COLLECTIONS.RESERVATIONS, reservationId)
+    const reservationDoc = await getDocs(query(collection(db, COLLECTIONS.RESERVATIONS), where('__name__', '==', reservationId)))
+
+    if (reservationDoc.empty) {
+      throw new Error('Reservation not found')
+    }
+
+    const reservation = reservationDoc.docs[0].data()
+    const totalAmount = reservation.totalQuote || reservation.totalPrice || 0
+
+    console.log(`💰 Calculating payment status for reservation ${reservationId}:`)
+    console.log(`💰 Total amount: ₹${totalAmount}`)
+    console.log(`💰 Current payment status: '${reservation.paymentStatus}'`)
+
+    // Get completed payments for this reservation
+    const paymentsQuery = query(
+      collection(db, COLLECTIONS.PAYMENTS),
+      where('reservationId', '==', reservationId),
+      where('paymentStatus', '==', 'completed')
+    )
+
+    const paymentsSnapshot = await getDocs(paymentsQuery)
+    const totalPaid = paymentsSnapshot.docs
+      .filter(doc => !doc.data().deletedAt) // Client-side filter for non-deleted payments
+      .reduce((sum, doc) => {
+        const payment = doc.data()
+        return sum + (payment.amount || 0)
+      }, 0)
+
+    console.log(`💰 Total paid: ₹${totalPaid}`)
+
+    // Determine payment status
+    let newPaymentStatus: PaymentStatus
+    if (totalPaid === 0) {
+      newPaymentStatus = 'pending'
+    } else if (totalPaid >= totalAmount) {
+      newPaymentStatus = 'paid'
+    } else {
+      newPaymentStatus = 'partial'
+    }
+
+    console.log(`💰 Calculated new payment status: '${newPaymentStatus}'`)
+
+    // Update reservation payment status
+    await runTransaction(db, async (transaction) => {
+      const currentReservationDoc = await transaction.get(reservationRef)
+
+      if (!currentReservationDoc.exists()) {
+        throw new Error('Reservation not found')
+      }
+
+      const currentData = currentReservationDoc.data()
+
+      // Only update if payment status has changed
+      if (currentData.paymentStatus !== newPaymentStatus) {
+        transaction.update(reservationRef, {
+          paymentStatus: newPaymentStatus,
+          updatedAt: new Date().toISOString(),
+          updatedBy: currentUserId
+        })
+
+        console.log(`✅ Reservation ${reservationId} payment status updated to '${newPaymentStatus}' (paid: ₹${totalPaid}/${totalAmount})`)
+      } else {
+        console.log(`⏭️ Skipping payment status update: already at '${currentData.paymentStatus}'`)
+      }
+    })
+  } catch (error) {
+    console.error('❌ Error updating reservation payment status:', error)
+    throw error
+  }
+}
+
+/**
+ * Updates reservation status to 'booking' when first payment is made
+ * Business Rule: First payment success → Reservation Status = 'booking'
  */
 export const updateReservationStatusOnFirstPayment = async (
   reservationId: string,
@@ -39,6 +121,9 @@ export const updateReservationStatusOnFirstPayment = async (
         console.log(`✅ Reservation ${reservationId} status updated to 'booking' after first payment`)
       }
     })
+
+    // Also update payment status
+    await updateReservationPaymentStatus(reservationId, currentUserId)
   } catch (error) {
     console.error('❌ Error updating reservation status on first payment:', error)
     throw error
@@ -78,19 +163,27 @@ export const updateReservationStatusBasedOnRooms = async (
     // Analyze room statuses
     const roomStatuses = rooms.map(room => room.roomStatus as RoomStatus)
 
+    console.log(`🔍 Analyzing reservation ${reservationId} room statuses:`, roomStatuses)
+
     let newReservationStatus: ReservationStatus | null = null
 
     // Check for cancellation - if any room is cancelled
     if (roomStatuses.includes('cancelled')) {
       newReservationStatus = 'cancelled'
+      console.log(`📋 Setting reservation status to 'cancelled' (found cancelled room)`)
     }
     // Check if all rooms are checked out
     else if (roomStatuses.every(status => status === 'checked_out')) {
       newReservationStatus = 'checked_out'
+      console.log(`📋 Setting reservation status to 'checked_out' (all rooms checked out)`)
     }
     // Check if all rooms are checked in
     else if (roomStatuses.every(status => status === 'checked_in')) {
       newReservationStatus = 'checked_in'
+      console.log(`📋 Setting reservation status to 'checked_in' (all rooms checked in)`)
+    }
+    else {
+      console.log(`📋 No status change needed. Room statuses: ${roomStatuses.join(', ')}`)
     }
 
     // Only update if there's a new status to set
@@ -106,8 +199,11 @@ export const updateReservationStatusBasedOnRooms = async (
 
         const currentStatus = reservationDoc.data().status
 
+        console.log(`🏷️ Current reservation status: '${currentStatus}' → Target: '${newReservationStatus}'`)
+
         // Don't change from cancelled or if already at target status
         if (currentStatus === 'cancelled' || currentStatus === newReservationStatus) {
+          console.log(`⏭️ Skipping status update: ${currentStatus === 'cancelled' ? 'reservation is cancelled' : 'already at target status'}`)
           return
         }
 
@@ -120,6 +216,9 @@ export const updateReservationStatusBasedOnRooms = async (
 
         console.log(`✅ Reservation ${reservationId} status updated from '${currentStatus}' to '${newReservationStatus}' based on room statuses`)
       })
+
+      // Also update payment status to keep it in sync
+      await updateReservationPaymentStatus(reservationId, currentUserId)
     }
   } catch (error) {
     console.error('❌ Error updating reservation status based on rooms:', error)

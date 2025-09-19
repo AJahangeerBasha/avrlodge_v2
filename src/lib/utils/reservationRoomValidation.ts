@@ -162,22 +162,37 @@ export const validateCheckInOutTimes = (
 ): ValidationError[] => {
   const errors: ValidationError[] = []
   
-  if (checkInDatetime && checkOutDatetime) {
+  console.log(`🕐 Validating check-in/out times:`, { checkInDatetime, checkOutDatetime })
+
+  if (checkInDatetime && checkInDatetime.trim() && checkOutDatetime && checkOutDatetime.trim()) {
     const checkIn = new Date(checkInDatetime)
     const checkOut = new Date(checkOutDatetime)
-    
+
+    console.log(`🕐 Parsed dates:`, { checkIn: checkIn.toISOString(), checkOut: checkOut.toISOString() })
+
     if (checkOut <= checkIn) {
-      errors.push({
-        field: 'checkOutDatetime',
-        message: 'Check-out datetime must be after check-in datetime',
-        code: 'INVALID_CHECKOUT_TIME'
-      })
+      console.log(`❌ Check-out time validation failed: ${checkOut.toISOString()} <= ${checkIn.toISOString()}`)
+
+      // Check if check-in is in the future (data correction scenario)
+      const now = new Date()
+      if (checkIn > now) {
+        console.log(`⚠️ Check-in is in the future - allowing check-out for data correction`)
+        console.log(`⚠️ Current time: ${now.toISOString()}, Check-in: ${checkIn.toISOString()}`)
+      } else {
+        errors.push({
+          field: 'checkOutDatetime',
+          message: 'Check-out datetime must be after check-in datetime',
+          code: 'INVALID_CHECKOUT_TIME'
+        })
+      }
+    } else {
+      console.log(`✅ Check-out time validation passed`)
     }
-    
+
     // Check if the stay is reasonable (not more than 30 days)
     const diffMs = checkOut.getTime() - checkIn.getTime()
     const diffDays = diffMs / (1000 * 60 * 60 * 24)
-    
+
     if (diffDays > 30) {
       errors.push({
         field: 'checkOutDatetime',
@@ -185,6 +200,8 @@ export const validateCheckInOutTimes = (
         code: 'STAY_TOO_LONG'
       })
     }
+  } else {
+    console.log(`⏭️ Skipping check-in/out time validation - missing data`)
   }
   
   return errors
@@ -318,6 +335,8 @@ export const validateCheckIn = (data: CheckInData): ValidationResult => {
 // Validate check-out data
 export const validateCheckOut = (data: CheckOutData, checkInDatetime?: string): ValidationResult => {
   const errors: ValidationError[] = []
+
+  console.log(`🚪 Validating check-out data:`, { checkOutDatetime: data.checkOutDatetime, checkInDatetime })
   
   // Check-out datetime is required
   const datetimeError = validateDatetime(data.checkOutDatetime, 'checkOutDatetime', true)
@@ -339,7 +358,7 @@ export const validateCheckOut = (data: CheckOutData, checkInDatetime?: string): 
   }
   
   // Check-out should be after check-in
-  if (data.checkOutDatetime && checkInDatetime) {
+  if (data.checkOutDatetime && checkInDatetime && checkInDatetime.trim()) {
     errors.push(...validateCheckInOutTimes(checkInDatetime, data.checkOutDatetime))
   }
   

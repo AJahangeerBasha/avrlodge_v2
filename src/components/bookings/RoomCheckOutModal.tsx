@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
-import { updateReservationRoom } from '@/lib/reservationRooms'
+import { checkOutReservationRoom } from '@/lib/reservationRooms'
 
 interface Booking {
   id: string
@@ -86,12 +86,10 @@ export function RoomCheckOutModal({
       const today = new Date().toISOString().split('T')[0]
       const checkOutDateTime = new Date(`${today}T${checkOutTime}:00`).toISOString()
 
-      await updateReservationRoom(room.id, {
+      await checkOutReservationRoom(room.id, {
         roomStatus: 'checked_out',
-        checkOutTime: checkOutDateTime,
-        checkedOutBy: currentUser.uid,
-        updatedBy: currentUser.uid,
-        updatedAt: new Date().toISOString()
+        checkOutDatetime: checkOutDateTime,
+        checkedOutBy: currentUser.uid
       })
 
       toast({

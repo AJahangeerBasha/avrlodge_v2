@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
-import { Payment } from '@/lib/types/payments'
+import { Payment, PaymentType } from '@/lib/types/payments'
 import { createPayment, getPaymentsByReservationId } from '@/lib/payments'
 
 interface Booking {
@@ -131,9 +131,22 @@ export function PaymentModal({
           actualPaymentMethod = 'Cash'
       }
 
+      // Determine payment type based on remaining balance after this payment
+      const { totalPaid } = calculatePaymentTotals()
+      const willBeFullyPaid = (totalPaid + paymentAmount) >= booking.total_quote
+      const isFirstPayment = totalPaid === 0
+
+      let paymentType: PaymentType
+      if (isFirstPayment) {
+        paymentType = willBeFullyPaid ? 'full_payment' : 'booking_advance'
+      } else {
+        paymentType = willBeFullyPaid ? 'full_payment' : 'partial_payment'
+      }
+
       const paymentData = {
         reservationId: booking.id,
         amount: paymentAmount,
+        paymentType,
         paymentMethod: actualPaymentMethod,
         transactionId: transactionId.trim() || undefined,
         paymentDate: new Date().toISOString()

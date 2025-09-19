@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, startOfMonth, endOfMonth, addMonths, subMonths, startOfDay, endOfDay, addDays, subDays } from 'date-fns'
 import { FileText, Search, Filter, RefreshCw } from 'lucide-react'
@@ -49,6 +49,7 @@ interface Booking {
   total_paid: number
   remaining_balance: number
   status: 'reservation' | 'booking' | 'checked_in' | 'checked_out' | 'cancelled'
+  paymentStatus: 'pending' | 'partial' | 'paid'
   guest_count: number
   room_numbers?: string
   agent_id?: string | null
@@ -77,12 +78,6 @@ interface Booking {
   }>
   created_at: string
   updated_at?: string
-  // Virtual fields for status filtering
-  virtualStatus?: string
-  virtualPaymentTotals?: {
-    totalPaid: number
-    remainingBalance: number
-  }
 }
 
 type DateFilterType = 'today' | 'yesterday' | 'tomorrow' | 'this_weekend' | 'current_week' | 'last_week' | 'next_week' | 'current_month' | 'previous_month' | 'next_month' | 'all' | string
@@ -118,27 +113,25 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
     return 'all_status'
   })
 
-  // Generate upcoming months for dropdown (6 months ahead)
-  const generateUpcomingMonths = () => {
+  // Generate upcoming months for dropdown (6 months ahead) - memoized
+  const upcomingMonths = useMemo(() => {
     const months = []
     const now = new Date()
-    
+
     for (let i = 2; i <= 7; i++) { // Start from month 2 (current month + 2) up to 7 (6 months ahead)
       const monthDate = addMonths(now, i)
       const key = `month_${monthDate.getFullYear()}_${monthDate.getMonth() + 1}`
       const label = format(monthDate, 'MMMM yyyy')
       months.push({ key, label, date: monthDate })
     }
-    
+
     return months
-  }
-  
-  const upcomingMonths = generateUpcomingMonths()
+  }, [])
   const [isSearchMode, setIsSearchMode] = useState(false)
   const { toast } = useToast()
 
-  // Helper function to transform Firebase data to Booking format
-  const transformReservationToBooking = (reservationData: ReservationData, rooms: any[], guests: any[], specialCharges: any[], agentName?: string | null): Booking => {
+  // Helper function to transform Firebase data to Booking format - memoized
+  const transformReservationToBooking = useCallback((reservationData: ReservationData, rooms: any[], guests: any[], specialCharges: any[], agentName?: string | null): Booking => {
     // Calculate payment info (placeholder - you may need to implement proper payment tracking)
     const totalPaid = 0 // TODO: Calculate from payments collection
     const remainingBalance = reservationData.totalPrice - totalPaid
@@ -158,6 +151,7 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
       total_paid: totalPaid,
       remaining_balance: remainingBalance,
       status: reservationData.status,
+      paymentStatus: reservationData.paymentStatus,
       guest_count: reservationData.guestCount,
       agent_id: reservationData.agentId,
       agent_commission: reservationData.agentCommission,
@@ -190,10 +184,10 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
 
 
     return booking
-  }
+  }, [])
 
-  // Helper function to get date range based on filter
-  const getDateRange = (filter: DateFilterType) => {
+  // Helper function to get date range based on filter - memoized
+  const getDateRange = useCallback((filter: DateFilterType) => {
     const now = new Date()
     
     switch (filter) {
@@ -279,7 +273,7 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
           end: endOfWeek(now, { weekStartsOn: 1 })
         }
     }
-  }
+  }, [])
 
   // Helper function to get display text for date range
   const getDateRangeText = (filter: DateFilterType) => {
@@ -315,103 +309,27 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
     }
   }
 
-  // Virtual status calculation logic (same as BookingCard)
-  const calculatePaymentTotalsForBooking = (booking: Booking, payments: any[]) => {
-    if (payments.length === 0) {
-      return {
-        totalPaid: booking.total_paid || 0,
-        remainingBalance: booking.remaining_balance || 0
-      }
-    }
+  // Simple status filtering without virtual calculations
+  const filterBookingsByStatus = useCallback((bookings: Booking[], statusFilter: StatusFilterType) => {
+    console.log('🔍 Filtering bookings by status:', statusFilter)
+    console.log('📊 Available bookings with statuses:', bookings.map(b => ({ id: b.id, status: b.status, ref: b.reference_number })))
 
-    const totalPaid = payments
-      .filter(payment => payment.paymentStatus === 'completed')
-      .reduce((sum, payment) => sum + (payment.amount || 0), 0)
-
-    const remainingBalance = Math.max(0, (booking.total_quote || 0) - totalPaid)
-
-    return { totalPaid, remainingBalance }
-  }
-
-  const getCalculatedStatusForBooking = (booking: Booking, payments: any[]): string => {
-    // If already cancelled, keep cancelled
-    if (booking.status === 'cancelled') {
-      return 'cancelled'
-    }
-
-    // Check room states if we have reservation_rooms
-    if (booking.reservation_rooms && booking.reservation_rooms.length > 0) {
-      const roomStates = booking.reservation_rooms.map(room => room.room_status || 'pending')
-
-      // If all rooms are checked out
-      if (roomStates.every(status => status === 'checked_out')) {
-        return 'checked_out'
-      }
-
-      // If all rooms are checked in
-      if (roomStates.every(status => status === 'checked_in')) {
-        return 'checked_in'
-      }
-
-      // If some rooms are checked in (partial check-in)
-      if (roomStates.some(status => status === 'checked_in')) {
-        return 'checked_in' // Still show as checked_in for partial
-      }
-    }
-
-    // Check payment status for booking vs reservation - use calculated total paid
-    const { totalPaid } = calculatePaymentTotalsForBooking(booking, payments)
-    if (totalPaid > 0) {
-      return 'booking' // Payment made = booking status
-    }
-
-    // Default to reservation for new bookings with no payment
-    return 'reservation'
-  }
-
-  // Helper function to filter bookings by virtual status
-  const filterBookingsByStatus = useCallback(async (bookings: Booking[], statusFilter: StatusFilterType) => {
     if (statusFilter === 'all_status') {
       return bookings
     }
 
-    // For each booking, we need to calculate the virtual status
-    const bookingsWithVirtualStatus = await Promise.all(
-      bookings.map(async (booking) => {
-        try {
-          // Load payment data for virtual status calculation
-          const payments = await getPaymentsByReservationId(booking.id)
-          const virtualStatus = getCalculatedStatusForBooking(booking, payments)
-          const paymentTotals = calculatePaymentTotalsForBooking(booking, payments)
-
-          return {
-            ...booking,
-            virtualStatus,
-            virtualPaymentTotals: paymentTotals
-          }
-        } catch (error) {
-          console.error(`Error loading payments for booking ${booking.id}:`, error)
-          // Fallback to original booking data
-          return {
-            ...booking,
-            virtualStatus: booking.status,
-            virtualPaymentTotals: {
-              totalPaid: booking.total_paid || 0,
-              remainingBalance: booking.remaining_balance || 0
-            }
-          }
-        }
-      })
-    )
-
-    // Filter based on virtual status
     if (statusFilter === 'pending_payments') {
-      return bookingsWithVirtualStatus.filter(booking =>
-        (booking.virtualPaymentTotals?.remainingBalance || 0) > 0 && booking.virtualStatus !== 'cancelled'
-      )
+      // Use paymentStatus from reservation instead of calculated remaining_balance
+      const filtered = bookings.filter(booking => {
+        return booking.paymentStatus === 'pending' && booking.status !== 'cancelled'
+      })
+      console.log('💰 Pending payments filtered:', filtered.length, 'bookings')
+      return filtered
     }
 
-    return bookingsWithVirtualStatus.filter(booking => booking.virtualStatus === statusFilter)
+    const filtered = bookings.filter(booking => booking.status === statusFilter)
+    console.log(`📋 Status '${statusFilter}' filtered:`, filtered.length, 'bookings')
+    return filtered
   }, [])
 
   // Helper function to get status filter display text
@@ -447,6 +365,7 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
       // Get all reservations
       const reservations = await getAllReservations()
       console.log('Loaded reservations:', reservations.length)
+      console.log('Reservation statuses:', reservations.map(r => ({ id: r.id, ref: r.referenceNumber, status: r.status })))
       
       // Get related data for each reservation
       const bookingsWithDetails = await Promise.all(
@@ -521,13 +440,13 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
           return (checkInDate <= end && checkOutDate >= start)
         })
         
-        // Apply status filtering (async)
-        const statusFilteredResults = await filterBookingsByStatus(dateFilteredResults, selectedStatusFilter)
+        // Apply status filtering
+        const statusFilteredResults = filterBookingsByStatus(dateFilteredResults, selectedStatusFilter)
 
         setBookings(statusFilteredResults)
       } else {
-        // Apply status filtering to all bookings (async)
-        const statusFilteredResults = await filterBookingsByStatus(bookingsWithDetails, selectedStatusFilter)
+        // Apply status filtering to all bookings
+        const statusFilteredResults = filterBookingsByStatus(bookingsWithDetails, selectedStatusFilter)
         setBookings(statusFilteredResults)
       }
       
@@ -541,7 +460,7 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
     } finally {
       setLoading(false)
     }
-  }, [currentUser, selectedFilter, selectedStatusFilter, filterBookingsByStatus, toast])
+  }, [currentUser, selectedFilter, selectedStatusFilter, toast])
 
   // Set refresh callback for BookingsContext
   useEffect(() => {
@@ -609,37 +528,8 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
         })
       )
       
-      // Calculate virtual status for each booking and then filter based on search term
-      const bookingsWithVirtualStatus = await Promise.all(
-        allBookingsWithDetails.map(async (booking) => {
-          try {
-            // Load payment data for virtual status calculation
-            const payments = await getPaymentsByReservationId(booking.id)
-            const virtualStatus = getCalculatedStatusForBooking(booking, payments)
-            const paymentTotals = calculatePaymentTotalsForBooking(booking, payments)
-
-            return {
-              ...booking,
-              virtualStatus,
-              virtualPaymentTotals: paymentTotals
-            }
-          } catch (error) {
-            console.error(`Error loading payments for search booking ${booking.id}:`, error)
-            // Fallback to original booking data
-            return {
-              ...booking,
-              virtualStatus: booking.status,
-              virtualPaymentTotals: {
-                totalPaid: booking.total_paid || 0,
-                remainingBalance: booking.remaining_balance || 0
-              }
-            }
-          }
-        })
-      )
-
-      // Filter bookings based on search term (including virtual status)
-      const searchResults = bookingsWithVirtualStatus.filter((booking: Booking) => {
+      // Filter bookings based on search term
+      const searchResults = allBookingsWithDetails.filter((booking: Booking) => {
         const searchLower = term.toLowerCase()
         return (
           booking.reference_number?.toLowerCase().includes(searchLower) ||
@@ -647,8 +537,7 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
           booking.guest_phone?.toLowerCase().includes(searchLower) ||
           booking.guest_email?.toLowerCase().includes(searchLower) ||
           booking.room_numbers?.toLowerCase().includes(searchLower) ||
-          booking.status?.toLowerCase().includes(searchLower) ||
-          booking.virtualStatus?.toLowerCase().includes(searchLower)
+          booking.status?.toLowerCase().includes(searchLower)
         )
       })
 
@@ -738,6 +627,20 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
       setRefreshing(false)
     }
   }
+
+  // Memoized bookings list to prevent unnecessary re-renders
+  const memoizedBookingsList = useMemo(
+    () => bookings.map((booking) => (
+      <BookingCard
+        key={booking.id}
+        booking={booking}
+        showActions={true}
+        showRoomStatus={true}
+        onPaymentUpdate={loadBookings}
+      />
+    )),
+    [bookings, loadBookings]
+  )
 
   return (
     <motion.div
@@ -975,15 +878,7 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {bookings.map((booking) => (
-                  <BookingCard
-                    key={booking.id}
-                    booking={booking}
-                    showActions={true}
-                    showRoomStatus={true}
-                    onPaymentUpdate={loadBookings}
-                  />
-                ))}
+                {memoizedBookingsList}
               </div>
             </CardContent>
           </Card>

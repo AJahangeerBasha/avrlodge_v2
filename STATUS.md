@@ -10,7 +10,7 @@ This document outlines the business logic for managing reservation and room stat
 
 * When a new reservation is created:
 
-  * **Reservation Status** = `reservations` (default).
+  * **Reservation Status** = `reservation` (default).
 
 ---
 
@@ -18,7 +18,7 @@ This document outlines the business logic for managing reservation and room stat
 
 * When the first payment for a reservation is successfully completed:
 
-  * **Reservation Status** = `bookings`.
+  * **Reservation Status** = `booking`.
 
 ---
 

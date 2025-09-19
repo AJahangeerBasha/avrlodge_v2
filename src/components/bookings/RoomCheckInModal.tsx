@@ -6,7 +6,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { TimePicker } from '@/components/ui/time-picker'
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
-import { updateReservationRoom } from '@/lib/reservationRooms'
+import { checkInReservationRoom } from '@/lib/reservationRooms'
 import { DocumentType, DOCUMENT_TYPE_INFO } from '@/lib/types/roomCheckinDocuments'
 import {
   validateDocumentFile,
@@ -316,12 +316,10 @@ export function RoomCheckInModal({
       // Create check-in datetime using selected date and time
       const checkInDateTime = new Date(`${checkInDate}T${checkInTime}:00`).toISOString()
 
-      await updateReservationRoom(room.id, {
+      await checkInReservationRoom(room.id, {
         roomStatus: 'checked_in',
-        checkInTime: checkInDateTime,
-        checkedInBy: currentUser.uid,
-        updatedBy: currentUser.uid,
-        updatedAt: new Date().toISOString()
+        checkInDatetime: checkInDateTime,
+        checkedInBy: currentUser.uid
       })
 
       toast({
