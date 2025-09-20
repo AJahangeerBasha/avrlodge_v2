@@ -89,14 +89,26 @@ interface BookingsPageLayoutProps {
 }
 
 export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
+  console.log(`🏨 BookingsPageLayout rendering with role: ${role}`)
+  const startTime = performance.now()
+
   const [searchTerm, setSearchTerm] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [searching, setSearching] = useState(false)
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
   const { currentUser } = useAuth()
   const { actions } = useBookings()
+
+  console.log(`🏨 BookingsPageLayout state:`, {
+    bookingsCount: bookings.length,
+    loading,
+    refreshing,
+    searching,
+    currentUser: currentUser?.uid || 'none'
+  })
   
   // Persistent filter states with localStorage
   const [selectedFilter, setSelectedFilter] = useState<DateFilterType>(() => {
@@ -106,12 +118,7 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
     return 'today'
   })
   
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState<StatusFilterType>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('bookings-status-filter') as StatusFilterType) || 'all_status'
-    }
-    return 'all_status'
-  })
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<StatusFilterType>('all_status')
 
   // Generate upcoming months for dropdown (6 months ahead) - memoized
   const upcomingMonths = useMemo(() => {
@@ -312,7 +319,20 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
   // Simple status filtering without virtual calculations
   const filterBookingsByStatus = useCallback((bookings: Booking[], statusFilter: StatusFilterType) => {
     console.log('🔍 Filtering bookings by status:', statusFilter)
-    console.log('📊 Available bookings with statuses:', bookings.map(b => ({ id: b.id, status: b.status, ref: b.reference_number })))
+    console.log('📊 Input bookings count:', bookings.length)
+    const bookingDetails = bookings.map(b => ({
+      id: b.id,
+      status: b.status,
+      paymentStatus: b.paymentStatus,
+      ref: b.reference_number
+    }))
+    console.log('📊 Available bookings with statuses:', bookingDetails)
+
+    // Log each booking individually for easier reading
+    bookingDetails.forEach((booking, index) => {
+      console.log(`📊 Booking ${index + 1}:`, booking)
+    })
+    console.log('📊 Current status filter:', statusFilter)
 
     if (statusFilter === 'all_status') {
       return bookings
@@ -355,8 +375,19 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
   }
 
   // Load bookings data from Firebase
-  const loadBookings = useCallback(async () => {
-    if (!currentUser) return
+  const loadBookings = async (overrideStatusFilter?: StatusFilterType, overrideDateFilter?: DateFilterType) => {
+    const callTime = performance.now()
+    console.log(`📥 loadBookings called at ${callTime.toFixed(2)}ms`)
+
+    if (!currentUser) {
+      console.log('📥 loadBookings aborted - no currentUser')
+      return
+    }
+
+    console.log(`📥 loadBookings starting with user: ${currentUser.uid}`)
+
+    // Set refresh callback for BookingsContext when loading starts
+    actions.setRefreshCallback(loadBookings)
 
     setLoading(true)
     try {
@@ -429,26 +460,45 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
         })
       )
       
+      console.log('📊 Processing filtering step...')
+
+      // Use override filters if provided, otherwise use current state
+      const currentDateFilter = overrideDateFilter || selectedFilter
+      const currentStatusFilter = overrideStatusFilter || selectedStatusFilter
+
+      console.log('📊 Using filters:', { dateFilter: currentDateFilter, statusFilter: currentStatusFilter })
+
       // Apply date filtering
-      if (selectedFilter !== 'all') {
-        const { start, end } = getDateRange(selectedFilter)
+      if (currentDateFilter !== 'all') {
+        console.log('📅 Applying date filter:', currentDateFilter)
+        const { start, end } = getDateRange(currentDateFilter)
         const dateFilteredResults = bookingsWithDetails.filter((booking: Booking) => {
           const checkInDate = new Date(booking.check_in_date)
           const checkOutDate = new Date(booking.check_out_date)
-          
+
           // Include bookings that overlap with the date range
           return (checkInDate <= end && checkOutDate >= start)
         })
-        
+
+        console.log('📅 Date filtered results:', dateFilteredResults.length)
+
         // Apply status filtering
-        const statusFilteredResults = filterBookingsByStatus(dateFilteredResults, selectedStatusFilter)
+        const statusFilteredResults = filterBookingsByStatus(dateFilteredResults, currentStatusFilter)
+        console.log('📊 Final filtered results:', statusFilteredResults.length)
 
         setBookings(statusFilteredResults)
+        console.log('✅ Bookings state updated with filtered results')
       } else {
+        console.log('📋 Applying status filter only (no date filter)')
         // Apply status filtering to all bookings
-        const statusFilteredResults = filterBookingsByStatus(bookingsWithDetails, selectedStatusFilter)
+        const statusFilteredResults = filterBookingsByStatus(bookingsWithDetails, currentStatusFilter)
+        console.log('📊 Final status filtered results:', statusFilteredResults.length)
+
         setBookings(statusFilteredResults)
+        console.log('✅ Bookings state updated with status filtered results')
       }
+
+      console.log('🎉 loadBookings completed successfully')
       
     } catch (error) {
       console.error('Error loading bookings:', error)
@@ -460,17 +510,11 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
     } finally {
       setLoading(false)
     }
-  }, [currentUser, selectedFilter, selectedStatusFilter, toast])
+  }
 
-  // Set refresh callback for BookingsContext
-  useEffect(() => {
-    actions.setRefreshCallback(loadBookings)
-  }, [actions, loadBookings])
-
-  // Auto-fetch bookings on component mount and filter changes
-  useEffect(() => {
-    loadBookings()
-  }, [loadBookings])
+  // Note: Removed all automatic loading useEffects to prevent infinite loops
+  // Bookings are now loaded manually via "Load Bookings" button
+  // Refresh callback is set when needed during operations
 
   // Handle search button click
   const handleSearchClick = async () => {
@@ -566,7 +610,10 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
     setSearchQuery('')
     setSearchTerm('')
     setIsSearchMode(false)
-    loadBookings()
+    // Only reload if we have bookings, otherwise just clear search mode
+    if (bookings.length > 0) {
+      loadBookings()
+    }
   }
 
   // Handle Enter key in search input
@@ -577,26 +624,50 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
   }
 
   // Handle date filter change
-  const handleFilterChange = (filter: DateFilterType) => {
-    setSelectedFilter(filter)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bookings-date-filter', filter)
+  const handleFilterChange = useCallback((filter: DateFilterType) => {
+    console.log('🗂️ Navigation event: handleFilterChange triggered with filter:', filter)
+
+    try {
+      setSelectedFilter(filter)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('bookings-date-filter', filter)
+      }
+      if (!isSearchMode) {
+        console.log('🗂️ Not in search mode, reloading with new date filter:', filter)
+        loadBookings(undefined, filter)
+      }
+      console.log('🗂️ Filter change completed successfully')
+    } catch (error) {
+      console.error('🗂️ Error in handleFilterChange:', error)
     }
-    if (!isSearchMode) {
-      // Will trigger loadBookings via useEffect
-    }
-  }
+  }, [isSearchMode])
 
   // Handle status filter change
-  const handleStatusFilterChange = (statusFilter: StatusFilterType) => {
-    setSelectedStatusFilter(statusFilter)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bookings-status-filter', statusFilter)
+  const handleStatusFilterChange = useCallback((statusFilter: StatusFilterType) => {
+    console.log('📊 Navigation event: handleStatusFilterChange triggered with filter:', statusFilter)
+
+    try {
+      setSelectedStatusFilter(statusFilter)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('bookings-status-filter', statusFilter)
+      }
+      console.log('📊 Status filter change conditions:', {
+        isSearchMode,
+        bookingsLength: bookings.length,
+        shouldReload: !isSearchMode && bookings.length > 0
+      })
+
+      if (!isSearchMode) {
+        console.log('📊 Not in search mode, reloading with new status filter:', statusFilter)
+        loadBookings(statusFilter)
+      } else {
+        console.log('📊 Skipping reload - in search mode')
+      }
+      console.log('📊 Status filter change completed successfully')
+    } catch (error) {
+      console.error('📊 Error in handleStatusFilterChange:', error)
     }
-    if (!isSearchMode) {
-      // Will trigger loadBookings via useEffect
-    }
-  }
+  }, [isSearchMode])
 
   // Handle manual refresh
   const handleRefresh = async () => {
@@ -665,76 +736,99 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
         </div>
 
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 w-full lg:w-auto">
-          <div className="relative flex-1 lg:flex-initial lg:w-96">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={handleSearchKeyPress}
-              placeholder="Search by guest name, booking ID, room number, or status..."
-              className="pl-10 bg-white/95 backdrop-blur-sm border-black/20"
-              disabled={loading || searching}
-            />
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Search Button */}
+          {/* Load Bookings Button - Primary Action - Only show when nothing has been loaded yet */}
+          {!hasLoadedOnce && bookings.length === 0 && !loading && !searching && (
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
-                onClick={handleSearchClick}
-                disabled={searching || loading}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => {
+                  setHasLoadedOnce(true)
+                  loadBookings()
+                }}
+                disabled={loading || searching}
+                className="bg-green-600 hover:bg-green-700 text-white"
               >
-                <Search className={`mr-2 h-4 w-4 ${searching ? 'animate-pulse' : ''}`} />
-                Search
+                <FileText className={`mr-2 h-4 w-4 ${loading ? 'animate-pulse' : ''}`} />
+                Load Bookings
               </Button>
             </motion.div>
+          )}
 
-            {/* Clear Search Button */}
-            {isSearchMode && (
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  onClick={handleClearSearch}
-                  variant="outline"
-                  className="bg-white/95 backdrop-blur-sm border-black/20"
-                  title="Clear search"
-                >
-                  ✕
-                </Button>
-              </motion.div>
-            )}
+          {/* Search Section - Show after first load attempt */}
+          {(hasLoadedOnce || bookings.length > 0 || isSearchMode) && (
+            <>
+              <div className="relative flex-1 lg:flex-initial lg:w-96">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
+                  placeholder="Search by guest name, booking ID, room number, or status..."
+                  className="pl-10 bg-white/95 backdrop-blur-sm border-black/20"
+                  disabled={loading || searching}
+                />
+              </div>
 
-            {/* Refresh Button */}
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                onClick={handleRefresh}
-                disabled={refreshing || loading || searching}
-                variant="outline"
-                className="bg-white/95 backdrop-blur-sm border-black/20"
-                title="Refresh bookings"
-              >
-                <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-              </Button>
-            </motion.div>
-          </div>
+              <div className="flex items-center gap-3">
+                {/* Search Button */}
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    onClick={handleSearchClick}
+                    disabled={searching || loading}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Search className={`mr-2 h-4 w-4 ${searching ? 'animate-pulse' : ''}`} />
+                    Search
+                  </Button>
+                </motion.div>
+
+                {/* Clear Search Button */}
+                {isSearchMode && (
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      onClick={handleClearSearch}
+                      variant="outline"
+                      className="bg-white/95 backdrop-blur-sm border-black/20"
+                      title="Clear search"
+                    >
+                      ✕
+                    </Button>
+                  </motion.div>
+                )}
+
+                {/* Refresh Button */}
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    onClick={handleRefresh}
+                    disabled={refreshing || loading || searching}
+                    variant="outline"
+                    className="bg-white/95 backdrop-blur-sm border-black/20"
+                    title="Refresh bookings"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                  </Button>
+                </motion.div>
+              </div>
+            </>
+          )}
         </div>
       </motion.div>
 
-      {/* Filters Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-      >
-        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
-              <Filter className="h-5 w-5" />
-              Filters
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+      {/* Filters Card - Show after first load attempt */}
+      {(hasLoadedOnce || bookings.length > 0 || isSearchMode) && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                <Filter className="h-5 w-5" />
+                Filters
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
         {/* Date Filter Buttons */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter by Date Range</h3>
@@ -853,9 +947,10 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
             </p>
           )}
         </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Results */}
       {bookings.length > 0 && (
@@ -885,7 +980,7 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
         </motion.div>
       )}
 
-      {/* Empty State */}
+      {/* Empty State or Welcome State */}
       {!loading && bookings.length === 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -902,12 +997,19 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
                     </svg>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {isSearchMode ? 'No Search Results' : 'No Bookings Found'}
+                    {isSearchMode
+                      ? 'No Search Results'
+                      : hasLoadedOnce
+                        ? 'No Bookings Found'
+                        : 'Ready to Load Bookings'
+                    }
                   </h3>
                   <p className="text-gray-600 mb-4">
                     {isSearchMode
                       ? 'No bookings found with the provided search criteria.'
-                      : `No bookings found for ${getDateRangeText(selectedFilter).toLowerCase()} with status "${getStatusFilterText(selectedStatusFilter).toLowerCase()}".`
+                      : hasLoadedOnce
+                        ? 'No bookings match the current filters. Try adjusting your date range or status filters.'
+                        : 'Click the "Load Bookings" button above to view all bookings. Use filters and search after loading.'
                     }
                   </p>
                   {isSearchMode && (
@@ -942,4 +1044,8 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
       )}
     </motion.div>
   )
+
+  // Performance logging at the end of render
+  const endTime = performance.now()
+  console.log(`🏨 BookingsPageLayout render completed in ${(endTime - startTime).toFixed(2)}ms`)
 }
