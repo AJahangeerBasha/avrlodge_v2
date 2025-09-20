@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useBookingsModals, type Booking } from '@/stores/bookingsStore'
+import { useBookingsModals, useBookingsActions, type Booking } from '@/stores/bookingsStore'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Phone, User, Hash, Calendar, Users, Home, DollarSign, X, AlertTriangle, History, FileText, Eye, ChevronDown, ChevronUp, RefreshCw, Receipt, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -47,6 +47,7 @@ export default function BookingCard({
   const [showSpecialCharges, setShowSpecialCharges] = useState(false)
   const [processing, setProcessing] = useState(false)
   const { openPaymentModal, openCheckInModal, openCheckOutModal, openRoomChangeModal } = useBookingsModals()
+  const { refreshBookings } = useBookingsActions()
   const { toast } = useToast()
   const { currentUser } = useAuth()
 
@@ -173,7 +174,10 @@ export default function BookingCard({
       setShowCancellationModal(false)
       setCancellationConfirmation('')
 
-      // Refresh the bookings list
+      // Refresh the bookings list from store
+      await refreshBookings()
+
+      // Also call the parent callback if provided
       if (onPaymentUpdate) {
         onPaymentUpdate()
       }
