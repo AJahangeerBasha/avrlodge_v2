@@ -1,65 +1,66 @@
-import { useBookings } from '@/contexts/BookingsContext'
+import { useBookingsModals, useBookingsActions } from '@/stores/bookingsStore'
 import { PaymentModal } from './PaymentModal'
 import RoomCheckInModal from './RoomCheckInModal'
 import RoomCheckOutModal from './RoomCheckOutModal'
 import RoomChangeModal from './RoomChangeModal'
 
 export function BookingModalManager() {
-  const { paymentModal, checkInModal, checkOutModal, roomChangeModal, actions } = useBookings()
+  const { modals, openPaymentModal, closePaymentModal, openCheckInModal, closeCheckInModal, openCheckOutModal, closeCheckOutModal, openRoomChangeModal, closeRoomChangeModal } = useBookingsModals()
+  const { refreshBookings } = useBookingsActions()
 
   return (
     <>
       {/* Payment Modal */}
-      {paymentModal.booking && paymentModal.isOpen && (
+      {modals.payment.booking && modals.payment.isOpen && (
         <PaymentModal
-          booking={paymentModal.booking}
-          isOpen={paymentModal.isOpen}
-          onClose={actions.closePaymentModal}
+          booking={modals.payment.booking}
+          isOpen={modals.payment.isOpen}
+          onClose={closePaymentModal}
           onPaymentComplete={() => {
-            actions.closePaymentModal()
-            actions.refreshBookings()
+            closePaymentModal()
+            refreshBookings()
           }}
         />
       )}
 
       {/* Room Check-In Modal */}
-      {checkInModal.booking && checkInModal.room && checkInModal.isOpen && (
+      {modals.checkIn.booking && modals.checkIn.room && modals.checkIn.isOpen && (
         <RoomCheckInModal
-          booking={checkInModal.booking}
-          room={checkInModal.room}
-          isOpen={checkInModal.isOpen}
-          onClose={actions.closeCheckInModal}
+          booking={modals.checkIn.booking}
+          room={modals.checkIn.room}
+          isOpen={modals.checkIn.isOpen}
+          onClose={closeCheckInModal}
           onCheckInComplete={() => {
-            actions.closeCheckInModal()
-            actions.refreshBookings()
+            closeCheckInModal()
+            refreshBookings()
           }}
         />
       )}
 
       {/* Room Check-Out Modal */}
-      {checkOutModal.booking && checkOutModal.room && checkOutModal.isOpen && (
+      {modals.checkOut.booking && modals.checkOut.room && modals.checkOut.isOpen && (
         <RoomCheckOutModal
-          booking={checkOutModal.booking}
-          room={checkOutModal.room}
-          isOpen={checkOutModal.isOpen}
-          onClose={actions.closeCheckOutModal}
+          booking={modals.checkOut.booking}
+          room={modals.checkOut.room}
+          isOpen={modals.checkOut.isOpen}
+          onClose={closeCheckOutModal}
           onCheckOutComplete={() => {
-            actions.closeCheckOutModal()
-            actions.refreshBookings()
+            closeCheckOutModal()
+            refreshBookings()
           }}
         />
       )}
 
       {/* Room Change Modal */}
-      {roomChangeModal.booking && roomChangeModal.room && roomChangeModal.isOpen && (
+      {modals.roomChange.booking && modals.roomChange.room && modals.roomChange.isOpen && (
         <RoomChangeModal
-          booking={roomChangeModal.booking}
-          room={roomChangeModal.room}
-          isOpen={roomChangeModal.isOpen}
-          onClose={actions.closeRoomChangeModal}
+          booking={modals.roomChange.booking}
+          room={modals.roomChange.room}
+          isOpen={modals.roomChange.isOpen}
+          onClose={closeRoomChangeModal}
           onSuccess={() => {
-            actions.closeRoomChangeModal()
-            actions.refreshBookings()
+            closeRoomChangeModal()
+            refreshBookings()
           }}
         />
       )}

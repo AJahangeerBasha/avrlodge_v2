@@ -17,7 +17,7 @@ import { getAllReservationSpecialCharges } from '../../lib/reservationSpecialCha
 import { getPaymentsByReservationId } from '../../lib/payments'
 import { getAgent } from '../../lib/agents'
 import { useAuth } from '../../contexts/AuthContext'
-import { useBookings } from '../../contexts/BookingsContext'
+import { useBookingsActions, useBookingsData, useBookingsFilters } from '../../stores/bookingsStore'
 
 interface ReservationData {
   id: string
@@ -99,26 +99,52 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
   const [refreshing, setRefreshing] = useState(false)
   const [searching, setSearching] = useState(false)
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const { currentUser } = useAuth()
-  const { actions } = useBookings()
+  const { loadBookings, refreshBookings } = useBookingsActions()
+  const { bookings: storeBookings, loading: storeLoading } = useBookingsData()
+  const { dateFilter, statusFilter, setDateFilter, setStatusFilter } = useBookingsFilters()
+
+  // Persistent filter states with localStorage - more robust implementation
+  const [selectedFilter, setSelectedFilter] = useState<DateFilterType>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('avr-bookings-date-filter')
+      return (saved as DateFilterType) || 'today'
+    }
+    return 'today'
+  })
+
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<StatusFilterType>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('avr-bookings-status-filter')
+      return (saved as StatusFilterType) || 'all_status'
+    }
+    return 'all_status'
+  })
+
+  // Save filters to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('avr-bookings-date-filter', selectedFilter)
+    }
+  }, [selectedFilter])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('avr-bookings-status-filter', selectedStatusFilter)
+    }
+  }, [selectedStatusFilter])
 
   console.log(`🏨 BookingsPageLayout state:`, {
     bookingsCount: bookings.length,
     loading,
     refreshing,
     searching,
+    selectedStatusFilter,
+    selectedFilter,
+    isRefreshing,
     currentUser: currentUser?.uid || 'none'
   })
-  
-  // Persistent filter states with localStorage
-  const [selectedFilter, setSelectedFilter] = useState<DateFilterType>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('bookings-date-filter') as DateFilterType) || 'today'
-    }
-    return 'today'
-  })
-  
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState<StatusFilterType>('all_status')
 
   // Generate upcoming months for dropdown (6 months ahead) - memoized
   const upcomingMonths = useMemo(() => {
@@ -170,8 +196,8 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
         room_type: room.roomType,
         guest_count: room.guestCount || 0,
         room_status: room.roomStatus as 'pending' | 'checked_in' | 'checked_out',
-        check_in_datetime: room.checkInTime || null,
-        check_out_datetime: room.checkOutTime || null
+        check_in_datetime: room.checkInDatetime || null,
+        check_out_datetime: room.checkOutDatetime || null
       })),
       reservation_special_charges: specialCharges.map(charge => ({
         id: charge.id,
@@ -396,8 +422,7 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
 
     console.log(`📥 loadBookings starting with user: ${currentUser.uid}`)
 
-    // Set refresh callback for BookingsContext when loading starts
-    // actions.setRefreshCallback(loadBookings) // Temporarily disabled to prevent loops
+    // Refresh callback is now set up in useEffect to avoid dependency issues
 
     setLoading(true)
     try {
@@ -649,49 +674,39 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
 
   // Handle date filter change
   const handleFilterChange = useCallback((filter: DateFilterType) => {
-    console.log('🗂️ Navigation event: handleFilterChange triggered with filter:', filter)
+    console.log('🗂️ Date filter changing to:', filter)
 
     try {
       setSelectedFilter(filter)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('bookings-date-filter', filter)
-      }
+      // localStorage is updated automatically via useEffect
+
       if (!isSearchMode) {
-        console.log('🗂️ Not in search mode, reloading with new date filter:', filter)
-        loadBookings(undefined, filter)
+        console.log('🗂️ Reloading with new date filter:', filter)
+        loadBookings(selectedStatusFilter, filter)
       }
-      console.log('🗂️ Filter change completed successfully')
     } catch (error) {
       console.error('🗂️ Error in handleFilterChange:', error)
     }
-  }, [isSearchMode])
+  }, [isSearchMode, selectedStatusFilter, loadBookings])
 
   // Handle status filter change
   const handleStatusFilterChange = useCallback((statusFilter: StatusFilterType) => {
-    console.log('📊 Navigation event: handleStatusFilterChange triggered with filter:', statusFilter)
+    console.log('📊 Status filter changing to:', statusFilter)
 
     try {
       setSelectedStatusFilter(statusFilter)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('bookings-status-filter', statusFilter)
-      }
-      console.log('📊 Status filter change conditions:', {
-        isSearchMode,
-        bookingsLength: bookings.length,
-        shouldReload: !isSearchMode && bookings.length > 0
-      })
+      // localStorage is updated automatically via useEffect
 
       if (!isSearchMode) {
-        console.log('📊 Not in search mode, reloading with new status filter:', statusFilter)
-        loadBookings(statusFilter)
+        console.log('📊 Reloading with new status filter:', statusFilter)
+        loadBookings(statusFilter, selectedFilter)
       } else {
         console.log('📊 Skipping reload - in search mode')
       }
-      console.log('📊 Status filter change completed successfully')
     } catch (error) {
       console.error('📊 Error in handleStatusFilterChange:', error)
     }
-  }, [isSearchMode])
+  }, [isSearchMode, selectedFilter, loadBookings])
 
   // Handle manual refresh
   const handleRefresh = async () => {
@@ -723,18 +738,46 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
     }
   }
 
-  // Memoized bookings list to prevent unnecessary re-renders
+  // Force booking card refresh using timestamp for payment/checkin/checkout operations
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  // Callback to trigger individual booking card refresh
+  const triggerBookingRefresh = useCallback(() => {
+    console.log('💳 Triggering booking card refresh')
+    setRefreshTrigger(prev => prev + 1)
+  }, [])
+
+  // Set up refresh trigger in the refresh callback
+  useEffect(() => {
+    const currentRefreshCallback = () => {
+      console.log('🔄 Main refresh triggered, updating cards')
+      // Trigger card refresh first
+      triggerBookingRefresh()
+
+      // Then reload data
+      const currentDateFilter = (typeof window !== 'undefined' ?
+        localStorage.getItem('avr-bookings-date-filter') as DateFilterType : null) || 'today'
+      const currentStatusFilter = (typeof window !== 'undefined' ?
+        localStorage.getItem('avr-bookings-status-filter') as StatusFilterType : null) || 'all_status'
+
+      loadBookings(currentStatusFilter, currentDateFilter)
+    }
+
+    actions.setRefreshCallback(currentRefreshCallback)
+  }, [actions, loadBookings, triggerBookingRefresh])
+
+  // Memoized bookings list with refresh trigger
   const memoizedBookingsList = useMemo(
     () => bookings.map((booking) => (
       <BookingCard
-        key={booking.id}
+        key={`${booking.id}-${refreshTrigger}`} // Use refresh trigger to force updates
         booking={booking}
         showActions={true}
         showRoomStatus={true}
-        onPaymentUpdate={loadBookings}
+        onPaymentUpdate={() => {}} // Keep empty to prevent duplicate refreshes
       />
     )),
-    [bookings, loadBookings]
+    [bookings, refreshTrigger]
   )
 
   return (

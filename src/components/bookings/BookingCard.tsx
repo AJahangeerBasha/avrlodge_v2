@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useBookings } from '@/contexts/BookingsContext'
+import { useBookingsModals, type Booking } from '@/stores/bookingsStore'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Phone, User, Hash, Calendar, Users, Home, DollarSign, X, AlertTriangle, History, FileText, Eye, ChevronDown, ChevronUp, RefreshCw, Receipt, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -17,46 +17,6 @@ import { ReservationSpecialCharge } from '@/lib/types/reservationSpecialCharges'
 import { supabase } from '@/lib/supabase'
 import { AdditionalOptionsModal } from './AdditionalOptionsModal'
 
-interface Booking {
-  id: string
-  reference_number: string
-  guest_name: string
-  guest_phone: string
-  guest_email: string
-  check_in_date: string
-  check_out_date: string
-  total_quote: number
-  total_paid: number
-  remaining_balance: number
-  status: 'reservation' | 'booking' | 'checked_in' | 'checked_out' | 'cancelled'
-  guest_count: number
-  room_numbers?: string
-  agent_id?: string | null
-  agent_commission?: number | null
-  agent_name?: string | null
-  reservation_rooms?: Array<{
-    id?: string
-    room_number: string
-    room_type: string
-    guest_count: number
-    room_status?: 'pending' | 'checked_in' | 'checked_out'
-    check_in_datetime?: string | null
-    check_out_datetime?: string | null
-  }>
-  reservation_special_charges?: Array<{
-    id: string
-    custom_rate: number
-    custom_description?: string
-    quantity: number
-    total_amount: number
-    special_charges_master?: {
-      charge_name: string
-      default_rate: number
-      rate_type: string
-    }
-  }>
-  created_at: string
-}
 
 interface BookingCardProps {
   booking: Booking
@@ -86,7 +46,7 @@ export default function BookingCard({
   const [loadingSpecialCharges, setLoadingSpecialCharges] = useState(true)
   const [showSpecialCharges, setShowSpecialCharges] = useState(false)
   const [processing, setProcessing] = useState(false)
-  const { actions } = useBookings()
+  const { openPaymentModal, openCheckInModal, openCheckOutModal, openRoomChangeModal } = useBookingsModals()
   const { toast } = useToast()
   const { currentUser } = useAuth()
 
@@ -563,7 +523,7 @@ export default function BookingCard({
                     <div className="flex gap-2 mt-2">
                       {room.room_status === 'pending' && (
                         <button
-                          onClick={() => actions.openCheckInModal(booking, room)}
+                          onClick={() => openCheckInModal(booking, room)}
                           className="px-3 py-1 text-xs bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium"
                         >
                           Check In
@@ -571,7 +531,7 @@ export default function BookingCard({
                       )}
                       {room.room_status === 'checked_in' && (
                         <button
-                          onClick={() => actions.openCheckOutModal(booking, room)}
+                          onClick={() => openCheckOutModal(booking, room)}
                           className="px-3 py-1 text-xs bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors font-medium"
                         >
                           Check Out
@@ -580,7 +540,7 @@ export default function BookingCard({
                       {/* Room Change Button */}
                       {(room.room_status === 'pending' || room.room_status === 'checked_in') && (
                         <button
-                          onClick={() => actions.openRoomChangeModal(booking, room)}
+                          onClick={() => openRoomChangeModal(booking, room)}
                           className="px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium flex items-center gap-1"
                         >
                           <RefreshCw className="w-3 h-3" />
@@ -848,7 +808,7 @@ export default function BookingCard({
         {showActions && calculatePaymentTotals().remainingBalance > 0 && getCalculatedStatus() !== 'cancelled' && (
           <div className="pt-4 border-t border-gray-100">
             <Button
-              onClick={() => actions.openPaymentModal(booking)}
+              onClick={() => openPaymentModal(booking)}
               className="w-full bg-green-600 hover:bg-green-700 text-white transition-colors mb-2"
               size="sm"
             >

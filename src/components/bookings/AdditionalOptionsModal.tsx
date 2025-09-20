@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
-import { useBookings } from '@/contexts/BookingsContext'
+import { useBookingsActions } from '@/stores/bookingsStore'
 import { updateReservation } from '@/lib/reservations'
 
 interface Booking {
@@ -50,7 +50,7 @@ export function AdditionalOptionsModal({
   const [processing, setProcessing] = useState(false)
   const { toast } = useToast()
   const { currentUser } = useAuth()
-  const { actions } = useBookings()
+  const { refreshBookings } = useBookingsActions()
 
   // Load existing values when modal opens
   useEffect(() => {
@@ -139,8 +139,8 @@ export function AdditionalOptionsModal({
         description: `Successfully updated guest count and pricing for ${booking.reference_number}`,
       })
 
-      // Trigger BookingsContext refresh (this calls the parent's loadBookings function)
-      actions.refreshBookings()
+      // Trigger bookings store refresh
+      refreshBookings()
 
       // Trigger local component refresh
       onUpdate()

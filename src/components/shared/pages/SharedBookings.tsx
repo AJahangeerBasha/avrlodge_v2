@@ -1,7 +1,6 @@
 import React from 'react';
-import { BookingsProvider } from '@/contexts/BookingsContext';
 import { BookingModalManager } from '@/components/bookings/BookingModalManager';
-import BookingsPageLayout from '@/components/common/BookingsPageLayout';
+import BookingsPageLayoutV2 from '@/components/common/BookingsPageLayoutV2';
 
 interface SharedBookingsProps {
   role: 'admin' | 'manager'
@@ -9,9 +8,9 @@ interface SharedBookingsProps {
 
 export const SharedBookings: React.FC<SharedBookingsProps> = ({ role }) => {
   return (
-    <BookingsProvider>
-      <BookingsPageLayout role={role} />
+    <>
+      <BookingsPageLayoutV2 role={role} />
       <BookingModalManager />
-    </BookingsProvider>
+    </>
   );
 };
