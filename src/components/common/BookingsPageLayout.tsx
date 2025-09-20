@@ -339,16 +339,26 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
     }
 
     if (statusFilter === 'pending_payments') {
-      // Use paymentStatus from reservation instead of calculated remaining_balance
+      // Show reservations that have pending or partial payment status
       const filtered = bookings.filter(booking => {
-        return booking.paymentStatus === 'pending' && booking.status !== 'cancelled'
+        const hasPendingPayments = booking.paymentStatus === 'pending' || booking.paymentStatus === 'partial'
+        const isNotCancelled = booking.status !== 'cancelled'
+        const matches = hasPendingPayments && isNotCancelled
+        console.log(`🔍 Pending payments check for ${booking.reference_number || booking.ref || 'NO_REF'}: paymentStatus='${booking.paymentStatus}' (hasPending=${hasPendingPayments}) + status='${booking.status}' (notCancelled=${isNotCancelled}) → ${matches ? 'MATCH' : 'NO MATCH'}`)
+        return matches
       })
       console.log('💰 Pending payments filtered:', filtered.length, 'bookings')
+      console.log(`💰 Filtered booking IDs:`, filtered.map(b => b.ref))
       return filtered
     }
 
-    const filtered = bookings.filter(booking => booking.status === statusFilter)
+    const filtered = bookings.filter(booking => {
+      const matches = booking.status === statusFilter
+      console.log(`🔍 Checking booking ${booking.reference_number || booking.ref || 'NO_REF'}: status='${booking.status}' vs filter='${statusFilter}' → ${matches ? 'MATCH' : 'NO MATCH'}`)
+      return matches
+    })
     console.log(`📋 Status '${statusFilter}' filtered:`, filtered.length, 'bookings')
+    console.log(`📋 Filtered booking IDs:`, filtered.map(b => b.ref))
     return filtered
   }, [])
 
@@ -387,7 +397,7 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
     console.log(`📥 loadBookings starting with user: ${currentUser.uid}`)
 
     // Set refresh callback for BookingsContext when loading starts
-    actions.setRefreshCallback(loadBookings)
+    // actions.setRefreshCallback(loadBookings) // Temporarily disabled to prevent loops
 
     setLoading(true)
     try {
@@ -396,7 +406,19 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
       // Get all reservations
       const reservations = await getAllReservations()
       console.log('Loaded reservations:', reservations.length)
-      console.log('Reservation statuses:', reservations.map(r => ({ id: r.id, ref: r.referenceNumber, status: r.status })))
+      console.log('Reservation statuses:', reservations.map(r => ({ id: r.id, ref: r.referenceNumber, status: r.status, paymentStatus: r.paymentStatus })))
+
+      // Debug: Log each reservation in detail
+      reservations.forEach((res, index) => {
+        console.log(`🔍 Reservation ${index + 1} Details:`, {
+          id: res.id,
+          referenceNumber: res.referenceNumber,
+          status: res.status,
+          paymentStatus: res.paymentStatus,
+          guestName: res.guestName,
+          totalPrice: res.totalPrice
+        })
+      })
       
       // Get related data for each reservation
       const bookingsWithDetails = await Promise.all(
@@ -467,6 +489,8 @@ export default function BookingsPageLayout({ role }: BookingsPageLayoutProps) {
       const currentStatusFilter = overrideStatusFilter || selectedStatusFilter
 
       console.log('📊 Using filters:', { dateFilter: currentDateFilter, statusFilter: currentStatusFilter })
+      console.log('📊 Component state selectedStatusFilter:', selectedStatusFilter)
+      console.log('📊 Override status filter:', overrideStatusFilter)
 
       // Apply date filtering
       if (currentDateFilter !== 'all') {

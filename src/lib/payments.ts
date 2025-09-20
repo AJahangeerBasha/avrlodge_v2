@@ -127,10 +127,9 @@ export const createPayment = async (
     const paymentData = {
       reservationId: data.reservationId || null,
       amount: data.amount,
-      paymentType: data.paymentType,
       paymentMethod: data.paymentMethod,
       receiptNumber,
-      paymentStatus: 'completed' as PaymentStatus, // Default to completed
+      paymentStatus: 'completed' as PaymentStatus, // Individual payment transaction is completed
       transactionId: data.transactionId,
       gatewayResponse: data.gatewayResponse,
       notes: data.notes,
