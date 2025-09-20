@@ -30,7 +30,14 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   const formatDisplayDate = (dateStr: string) => {
     if (!dateStr) return '';
-    const date = new Date(dateStr);
+    // Parse date parts to avoid timezone issues
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-based in JS
+    console.log('📅 formatDisplayDate: Input:', dateStr, 'Date object:', date, 'Formatted:', date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }));
     return date.toLocaleDateString('en-GB', {
       day: '2-digit',
       month: 'short',
@@ -57,18 +64,30 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
   };
 
   const handleDateSelect = (date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
-    
+    // Create date string in local timezone to avoid UTC conversion issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+
+    console.log('📅 DateRangePicker: Selected date:', date, 'Local date string:', dateStr);
+
     if (selectingStart || !startDate) {
+      console.log('📅 Setting start date:', dateStr);
       onStartDateChange(dateStr);
       setSelectingStart(false);
     } else {
-      const startDateObj = new Date(startDate);
+      // Parse start date properly to avoid timezone issues
+      const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
+      const startDateObj = new Date(startYear, startMonth - 1, startDay);
+      console.log('📅 Current start date:', startDate, 'Selected date:', dateStr);
       if (date >= startDateObj) {
+        console.log('📅 Setting end date:', dateStr);
         onEndDateChange(dateStr);
         setIsOpen(false);
         setSelectingStart(true);
       } else {
+        console.log('📅 Resetting to new start date:', dateStr);
         onStartDateChange(dateStr);
         onEndDateChange('');
       }
@@ -77,13 +96,20 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   const isDateInRange = (date: Date) => {
     if (!startDate || !endDate) return false;
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    // Parse dates properly to avoid timezone issues
+    const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
+    const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
+    const start = new Date(startYear, startMonth - 1, startDay);
+    const end = new Date(endYear, endMonth - 1, endDay);
     return date >= start && date <= end;
   };
 
   const isDateSelected = (date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
+    // Create date string in local timezone to avoid UTC conversion issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
     return dateStr === startDate || dateStr === endDate;
   };
 
@@ -122,9 +148,9 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
       >
         <CalendarDays className="mr-2 h-4 w-4" />
         <span className="flex-1">
-          {startDate && endDate 
+          {startDate && endDate
             ? `${formatDisplayDate(startDate)} - ${formatDisplayDate(endDate)}`
-            : startDate 
+            : startDate
               ? `${formatDisplayDate(startDate)} - Select check-out`
               : 'Select check-in and check-out dates'
           }
