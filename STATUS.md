@@ -56,3 +56,5 @@ This document outlines the business logic for managing reservation and room stat
     * `db.roomReservations.roomStatus` = `cancelled`.
 
 ---
+
+In db.reservationRooms, dont show roomStatus = 'Cancelled'

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { format, addDays, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns'
 import { Calendar, Download, Filter, RefreshCw } from 'lucide-react'
@@ -14,14 +14,6 @@ import CalendarGrid from '@/components/calendar/CalendarGrid'
 import CalendarViewModeSelector from '@/components/calendar/CalendarViewModeSelector'
 import CalendarFilters from '@/components/calendar/CalendarFilters'
 import CalendarLegend from '@/components/calendar/CalendarLegend'
-
-// Import Firebase functions
-import { getAllReservations } from '@/lib/reservations'
-import { getAllReservationRooms } from '@/lib/reservationRooms'
-import { getAllRooms } from '@/lib/rooms'
-import { getAllRoomTypes } from '@/lib/roomTypes'
-import { getPaymentsByReservationId } from '@/lib/payments'
-import { getPrimaryGuestByReservationId, getGuestsByReservationId } from '@/lib/guests'
 
 // Interfaces to match existing calendar components
 interface Room {
@@ -43,6 +35,7 @@ interface Reservation {
     room_number: string
     room_type: string
     guest_count: number
+    roomStatus?: string
   }>
   reference_number?: string
   guest_name?: string
@@ -61,19 +54,19 @@ export const AdminCalendar: React.FC = () => {
     isLoading,
     lastRefreshTime,
     filters,
-    setRooms,
-    setReservations,
+    isSubscribed,
     setSelectedDate,
     setViewMode,
     setShowFilters,
-    setIsLoading,
-    setLastRefreshTime,
     setSelectedRoomType,
     setSelectedStatus,
     getFilteredRooms,
     getFilteredReservations,
     getRoomTypes,
     getStatusTypes,
+    loadInitialData,
+    startRealtimeListeners,
+    stopRealtimeListeners,
   } = useCalendarStore()
 
   const { currentUser } = useAuth()
@@ -82,227 +75,67 @@ export const AdminCalendar: React.FC = () => {
   // Local state for refresh animation
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  // Virtual status calculation function (same as booking card)
-  const calculateVirtualStatusForReservation = async (reservation: any): Promise<string> => {
-    try {
-      // If already cancelled, keep cancelled
-      if (reservation.status === 'cancelled') {
-        return 'cancelled'
-      }
-
-      // Check room states if we have reservation_rooms
-      if (reservation.reservationRooms && reservation.reservationRooms.length > 0) {
-        const roomStates = reservation.reservationRooms.map((room: any) => room.roomStatus || 'pending')
-
-        // If all rooms are checked out
-        if (roomStates.every((status: string) => status === 'checked_out')) {
-          return 'checked_out'
-        }
-
-        // If all rooms are checked in
-        if (roomStates.every((status: string) => status === 'checked_in')) {
-          return 'checked_in'
-        }
-
-        // If some rooms are checked in (partial check-in)
-        if (roomStates.some((status: string) => status === 'checked_in')) {
-          return 'checked_in' // Still show as checked_in for partial
-        }
-      }
-
-      // Check payment status for booking vs reservation
-      try {
-        const payments = await getPaymentsByReservationId(reservation.id)
-        const totalPaid = payments
-          .filter((payment: any) => payment.paymentStatus === 'completed')
-          .reduce((sum: number, payment: any) => sum + (payment.amount || 0), 0)
-
-        if (totalPaid > 0) {
-          return 'booking' // Payment made = booking status
-        }
-      } catch (error) {
-        // Silently ignore calculation errors for display purposes
-        console.warn('Error calculating booking status:', error)
-      }
-
-      // Default to reservation for new bookings with no payment
-      return 'reservation'
-    } catch (error) {
-      console.error('Error calculating virtual status:', error)
-      return reservation.status || 'reservation'
-    }
-  }
-
-  const loadCalendarData = useCallback(async (isRefresh = false) => {
+  // Initialize calendar data and real-time listeners
+  useEffect(() => {
     if (!currentUser) return
 
-    if (isRefresh) {
-      setIsRefreshing(true)
-    } else {
-      setIsLoading(true)
-    }
-    try {
-      // Ensure selectedDate is a Date object for data loading
-      const dateForLoading = selectedDate instanceof Date ? selectedDate : new Date(selectedDate)
+    const initializeCalendar = async () => {
+      try {
+        // Load initial data
+        await loadInitialData()
 
-      // Determine date range based on viewMode
-      let startDate: string
-      let endDate: string
+        // Start real-time listeners
+        await startRealtimeListeners()
 
-      switch (viewMode) {
-        case 'day':
-          startDate = format(dateForLoading, 'yyyy-MM-dd')
-          endDate = format(dateForLoading, 'yyyy-MM-dd')
-          break
-        case 'week': {
-          const dayOfWeek = dateForLoading.getDay()
-          const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
-          const weekStart = addDays(dateForLoading, -daysFromMonday)
-          const weekEnd = addDays(weekStart, 6)
-          startDate = format(weekStart, 'yyyy-MM-dd')
-          endDate = format(weekEnd, 'yyyy-MM-dd')
-          break
-        }
-        case 'month':
-        default:
-          startDate = format(startOfMonth(dateForLoading), 'yyyy-MM-dd')
-          endDate = format(endOfMonth(dateForLoading), 'yyyy-MM-dd')
-          break
-      }
-
-      // Load all room types first to get pricing info
-      const roomTypes = await getAllRoomTypes()
-      const roomTypeMap = new Map(roomTypes.map(rt => [rt.id, rt]))
-
-      // Load all rooms
-      const allRooms = await getAllRooms()
-
-      // Transform rooms to match interface and add pricing from room types
-      const transformedRooms: Room[] = allRooms.map(room => {
-        const roomType = roomTypeMap.get(room.roomTypeId)
-        return {
-          id: room.id,
-          room_number: room.roomNumber,
-          room_type: roomType?.name || 'Unknown',
-          capacity: roomType?.maxGuests || 1,
-          tariff: roomType?.pricePerNight || 0
-        }
-      })
-
-      setRooms(transformedRooms)
-
-      // Load all reservations
-      const allReservations = await getAllReservations()
-
-      // Filter reservations by date range
-      const dateFilteredReservations = allReservations.filter(reservation => {
-        const reservationStart = reservation.checkInDate
-        const reservationEnd = reservation.checkOutDate
-
-        // Check if reservation overlaps with selected date range
-        return (reservationStart <= endDate && reservationEnd >= startDate)
-      })
-
-      // Load reservation rooms for each reservation and transform data
-      const transformedReservations: Reservation[] = await Promise.all(
-        dateFilteredReservations.map(async (reservation) => {
-          try {
-            // Load reservation rooms
-            const reservationRooms = await getAllReservationRooms({ reservationId: reservation.id })
-
-            // Load primary guest information
-            let primaryGuest = null
-            try {
-              primaryGuest = await getPrimaryGuestByReservationId(reservation.id)
-
-              // If no primary guest found, try to get any guest from the reservation
-              if (!primaryGuest) {
-                const allGuests = await getGuestsByReservationId(reservation.id)
-                primaryGuest = allGuests.length > 0 ? allGuests[0] : null
-              }
-            } catch (guestError) {
-              console.error(`Error fetching guest for reservation ${reservation.id}:`, guestError)
-            }
-
-            // Calculate virtual status
-            const virtualStatus = await calculateVirtualStatusForReservation({
-              ...reservation,
-              reservationRooms
-            })
-
-            return {
-              id: reservation.id,
-              check_in_date: reservation.checkInDate,
-              check_out_date: reservation.checkOutDate,
-              guest_count: reservation.guestCount,
-              status: virtualStatus, // Use virtual status instead of raw status
-              reference_number: reservation.referenceNumber,
-              guest_name: primaryGuest?.name || reservation.guestName || 'Guest Name Not Available',
-              guest_phone: primaryGuest?.phone || reservation.guestPhone || 'Phone Not Available',
-              total_quote: reservation.totalPrice,
-              reservation_rooms: reservationRooms.map(room => ({
-                room_number: room.roomNumber,
-                room_type: room.roomType || 'Unknown',
-                guest_count: room.guestCount || 0
-              })),
-              room_numbers: reservationRooms.map(room => room.roomNumber)
-            }
-          } catch (error) {
-            console.error(`Error loading details for reservation ${reservation.id}:`, error)
-            return {
-              id: reservation.id,
-              check_in_date: reservation.checkInDate,
-              check_out_date: reservation.checkOutDate,
-              guest_count: reservation.guestCount,
-              status: reservation.status,
-              reference_number: reservation.referenceNumber,
-              guest_name: reservation.guestName || 'Guest Name Not Available',
-              guest_phone: reservation.guestPhone || 'Phone Not Available',
-              total_quote: reservation.totalPrice
-            }
-          }
-        })
-      )
-
-      setReservations(transformedReservations.filter(r => r.status !== 'cancelled'))
-
-      // Update refresh timestamp
-      setLastRefreshTime(new Date().toISOString())
-
-      // Show success message for manual refresh
-      if (isRefresh) {
+        console.log('📅 Calendar initialized with real-time updates')
+      } catch (error) {
+        console.error('Error initializing calendar:', error)
         toast({
-          title: "Calendar Refreshed",
-          description: "Latest data has been loaded successfully.",
+          title: "Initialization Error",
+          description: "Failed to initialize calendar. Please refresh the page.",
+          variant: "destructive",
         })
       }
+    }
 
-    } catch (error) {
-      console.error('Error loading calendar data:', error)
+    initializeCalendar()
+
+    // Cleanup listeners on unmount or user change
+    return () => {
+      stopRealtimeListeners()
+    }
+  }, [currentUser, loadInitialData, startRealtimeListeners, stopRealtimeListeners, toast])
+
+  // Refresh handler (triggers re-initialization)
+  const handleRefresh = async () => {
+    if (!currentUser) return
+
+    setIsRefreshing(true)
+    try {
+      // Stop existing listeners
+      stopRealtimeListeners()
+
+      // Reload initial data
+      await loadInitialData()
+
+      // Restart listeners
+      await startRealtimeListeners()
+
       toast({
-        title: isRefresh ? "Refresh Error" : "Loading Error",
-        description: "Failed to load calendar data. Please try again.",
+        title: "Calendar Refreshed",
+        description: "Latest data has been loaded successfully.",
+      })
+    } catch (error) {
+      console.error('Error refreshing calendar:', error)
+      toast({
+        title: "Refresh Error",
+        description: "Failed to refresh calendar data. Please try again.",
         variant: "destructive",
       })
-      if (!isRefresh) {
-        setReservations([])
-        setRooms([])
-      }
     } finally {
-      setIsLoading(false)
       setIsRefreshing(false)
     }
-  }, [currentUser, selectedDate, viewMode, toast, setRooms, setReservations, setIsLoading, setLastRefreshTime])
-
-  // Load data on component mount and when dependencies change
-  useEffect(() => {
-    loadCalendarData()
-  }, [loadCalendarData])
-
-  // Refresh handler
-  const handleRefresh = useCallback(async () => {
-    await loadCalendarData(true)
-  }, [loadCalendarData])
+  }
 
   // Generate date range based on view mode
   const generateDateRange = (date: Date, mode: 'day' | 'week' | 'month') => {
@@ -452,7 +285,7 @@ export const AdminCalendar: React.FC = () => {
               onClick={handleRefresh}
               disabled={isRefreshing}
               className="bg-blue-600 hover:bg-blue-700 text-white"
-              title={lastRefreshTime ? `Last refreshed: ${new Date(lastRefreshTime).toLocaleTimeString()}` : 'Refresh calendar data'}
+              title={`${isSubscribed ? 'Real-time updates active' : 'Click to enable real-time updates'}${lastRefreshTime ? ` • Last updated: ${new Date(lastRefreshTime).toLocaleTimeString()}` : ''}`}
             >
               <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               {isRefreshing ? 'Refreshing...' : 'Refresh'}

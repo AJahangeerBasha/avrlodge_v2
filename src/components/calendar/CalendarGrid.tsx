@@ -31,6 +31,7 @@ interface Reservation {
     room_number: string
     room_type: string
     guest_count: number
+    roomStatus?: string
   }>
 }
 
@@ -139,7 +140,10 @@ export default function CalendarGrid({
 
     // Check if room is occupied on this date and get reservation details
     const dateStr = format(date, 'yyyy-MM-dd')
-    const occupiedReservation = reservations.find(reservation => {
+
+
+    // Find ALL reservations that might affect this room
+    const affectingReservations = reservations.filter(reservation => {
       // Check new structure (reservation_rooms)
       if (reservation.reservation_rooms && reservation.reservation_rooms.length > 0) {
         const roomMatch = reservation.reservation_rooms.some(room => room.room_number === roomNumber)
@@ -155,6 +159,32 @@ export default function CalendarGrid({
       }
 
       return false
+    })
+
+
+    // Find the ACTIVE reservation (not cancelled, not fully checked out)
+    const occupiedReservation = affectingReservations.find(reservation => {
+      // Skip fully cancelled or checked_out reservations at reservation level
+      if (['cancelled', 'checked_out'].includes(reservation.status)) {
+        return false
+      }
+
+      // For reservations with room details, check individual room status
+      if (reservation.reservation_rooms && reservation.reservation_rooms.length > 0) {
+        const specificRoom = reservation.reservation_rooms.find(room => room.room_number === roomNumber)
+
+        // IMPORTANT: According to STATUS.md - "dont show roomStatus = 'cancelled' in Calendar route"
+        // If this specific room is cancelled, checked_out, or doesn't exist, don't show as occupied
+        if (specificRoom && specificRoom.roomStatus) {
+          return !['checked_out', 'cancelled'].includes(specificRoom.roomStatus)
+        }
+
+        // If room not found in reservation_rooms, it means this room was removed/cancelled
+        return false
+      }
+
+      // For general reservations without room details, show as occupied only if reservation is active
+      return true
     })
 
     const isOccupied = !!occupiedReservation
@@ -187,7 +217,6 @@ export default function CalendarGrid({
 
     // Get reservation status for occupied rooms
     const status = capacityData.reservation?.status?.toLowerCase() || 'occupied'
-    console.log('status::', status)
     switch (status) {
       case 'checked_in':
         // CheckedIn → Blue
