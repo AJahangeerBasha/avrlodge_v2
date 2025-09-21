@@ -1,6 +1,6 @@
 export type ReservationStatus = 'reservation' | 'booking' | 'checked_in' | 'checked_out' | 'cancelled'
 export type PaymentStatus = 'pending' | 'partial' | 'paid'
-export type GuestType = 'individual' | 'family' | 'friends' | 'couple'
+export type GuestType = 'individual' | 'family' | 'friends' | 'couple' | 'Individual' | 'Family' | 'Friends' | 'Couple'
 
 export interface Reservation {
   id: string

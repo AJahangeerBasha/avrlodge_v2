@@ -186,9 +186,10 @@ export const validatePaymentStatus = (paymentStatus: string): ValidationError | 
 // Validate guest type
 export const validateGuestType = (guestType: string | undefined): ValidationError | null => {
   if (!guestType) return null
-  
-  const validGuestTypes: GuestType[] = ['individual', 'family', 'friends', 'couple']
-  
+
+
+  const validGuestTypes: GuestType[] = ['individual', 'family', 'friends', 'couple', 'Individual', 'Family', 'Friends', 'Couple']
+
   if (!validGuestTypes.includes(guestType as GuestType)) {
     return {
       field: 'guestType',
@@ -196,7 +197,7 @@ export const validateGuestType = (guestType: string | undefined): ValidationErro
       code: 'INVALID_GUEST_TYPE'
     }
   }
-  
+
   return null
 }
 

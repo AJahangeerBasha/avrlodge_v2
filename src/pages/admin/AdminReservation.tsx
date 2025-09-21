@@ -436,7 +436,7 @@ export const AdminReservation: React.FC = () => {
           case 'family':
             return 'family';
           case 'friends':
-            return 'group';
+            return 'friends';
           default:
             return 'individual';
         }
