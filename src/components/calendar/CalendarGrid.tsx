@@ -423,8 +423,8 @@ ${getStatusColor(reservation.status)}`
             <table className="border-collapse">
               <thead>
                 <tr className="bg-gray-100 border-b-2 border-gray-300 h-16">
-                  <th className="p-3 text-left font-semibold text-gray-900 min-w-[80px] bg-gray-100">
-                    <div className="font-semibold text-sm text-gray-700 h-10 flex items-center">Room #</div>
+                  <th className="p-3 min-w-[40px] bg-gray-100">
+                    <div className="text-sm text-gray-700 h-10 flex items-center"></div>
                   </th>
                 </tr>
               </thead>
@@ -436,7 +436,7 @@ ${getStatusColor(reservation.status)}`
                     className={`border-b border-gray-200 h-16 ${roomIndex % 2 === 0 ? 'bg-blue-50' : 'bg-indigo-50'
                       }`}
                   >
-                    <td className="p-2 font-medium text-gray-900 bg-inherit min-w-[80px]">
+                    <td className="p-2 font-medium text-gray-900 bg-inherit min-w-[40px]">
                       <div className="flex items-center gap-2 h-12">
                         <span className="font-mono text-sm font-bold text-blue-900">{room.room_number}</span>
                       </div>
@@ -486,7 +486,7 @@ ${getStatusColor(reservation.status)}`
                             key={`${room.id}-${date.toISOString()}`}
                             variants={cellVariants}
                             title="Room not available"
-                            className="border-r border-gray-200 p-1.5 text-center text-xs bg-gray-50/20 h-16 relative"
+                            className="border-r border-gray-200 text-center text-xs bg-gray-50/20 h-16 relative"
                           >
                             {/* Unavailable indicator */}
                             <div className="absolute top-1 left-1 opacity-50">
@@ -622,7 +622,7 @@ ${getStatusColor(reservation.status)}`
                           aria-describedby={tooltipData && tooltipData.roomNumber === room.room_number && tooltipData.date === format(date, 'MMM dd, yyyy') ? 'room-tooltip' : undefined}
                           title=""
                           className={`
-                        calendar-cell border-r border-gray-200 p-1.5 text-center text-xs cursor-pointer transition-all duration-300 h-16
+                        calendar-cell border-r border-gray-200 text-center text-xs cursor-pointer transition-all duration-300 h-16
                         focus:outline-none focus:ring-2 focus:ring-opacity-60 focus:z-10 relative
                         ${colors.cellHover} ${colors.cellFocus} ${colors.ringColor}
                       `}
