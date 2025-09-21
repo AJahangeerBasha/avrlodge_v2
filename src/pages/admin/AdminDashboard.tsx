@@ -1,6 +1,11 @@
-import React from 'react';
-import { SharedDashboard } from '@/components/shared';
+import React from 'react'
+import { DashboardLayout } from '@/components/dashboard/DashboardLayout'
 
 export const AdminDashboard: React.FC = () => {
-  return <SharedDashboard role="admin" />;
-};
+  return (
+    <DashboardLayout
+      title="Admin Dashboard"
+      subtitle="Resort management analytics and real-time metrics"
+    />
+  )
+}
