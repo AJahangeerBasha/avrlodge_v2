@@ -21,7 +21,7 @@ import { SpecialCharge, SpecialChargeStats } from '@/lib/types/specialCharges'
 import { getRateTypeConfig, getRateTypeOptions, formatRateDisplay } from '@/lib/utils/rateType'
 import { useAuth } from '@/contexts/AuthContext'
 
-export const AdminSpecialCharges: React.FC = () => {
+const AdminSpecialCharges: React.FC = () => {
   const [charges, setCharges] = useState<SpecialCharge[]>([])
   const [stats, setStats] = useState<SpecialChargeStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -316,3 +316,6 @@ export const AdminSpecialCharges: React.FC = () => {
     </div>
   )
 }
+
+export { AdminSpecialCharges };
+export default AdminSpecialCharges;

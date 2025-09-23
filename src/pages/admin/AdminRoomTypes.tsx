@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Plus, Search, Filter, Users, Bed, Home, DollarSign, Edit, Trash2, Eye, Tag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { NumberInput } from '@/components/ui/number-input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -461,40 +462,43 @@ const AdminRoomTypes = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="pricePerNight" className="text-sm font-medium text-black">Price per Night (₹) *</Label>
-                <Input
+                <NumberInput
                   id="pricePerNight"
-                  type="number"
-                  min="1"
+                  min={1}
                   value={formData.pricePerNight}
-                  onChange={(e) => updateFormData({ pricePerNight: parseInt(e.target.value) || 0 })}
+                  onChange={(value) => updateFormData({ pricePerNight: value || 0 })}
                   placeholder="1500"
                   className="border-2 border-gray-200 focus:border-black"
+                  allowDecimals={false}
+                  allowNegative={false}
                   required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="maxGuests" className="text-sm font-medium text-black">Max Guests *</Label>
-                <Input
+                <NumberInput
                   id="maxGuests"
-                  type="number"
-                  min="1"
+                  min={1}
                   value={formData.maxGuests}
-                  onChange={(e) => updateFormData({ maxGuests: parseInt(e.target.value) || 1 })}
+                  onChange={(value) => updateFormData({ maxGuests: value || 1 })}
                   placeholder="2"
                   className="border-2 border-gray-200 focus:border-black"
+                  allowDecimals={false}
+                  allowNegative={false}
                   required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="numberOfRooms" className="text-sm font-medium text-black">Number of Rooms *</Label>
-                <Input
+                <NumberInput
                   id="numberOfRooms"
-                  type="number"
-                  min="1"
+                  min={1}
                   value={formData.numberOfRooms}
-                  onChange={(e) => updateFormData({ numberOfRooms: parseInt(e.target.value) || 1 })}
+                  onChange={(value) => updateFormData({ numberOfRooms: value || 1 })}
                   placeholder="5"
                   className="border-2 border-gray-200 focus:border-black"
+                  allowDecimals={false}
+                  allowNegative={false}
                   required
                 />
               </div>
@@ -579,40 +583,43 @@ const AdminRoomTypes = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-pricePerNight" className="text-sm font-medium text-black">Price per Night (₹) *</Label>
-                <Input
+                <NumberInput
                   id="edit-pricePerNight"
-                  type="number"
-                  min="1"
+                  min={1}
                   value={formData.pricePerNight}
-                  onChange={(e) => updateFormData({ pricePerNight: parseInt(e.target.value) || 0 })}
+                  onChange={(value) => updateFormData({ pricePerNight: value || 0 })}
                   placeholder="1500"
                   className="border-2 border-gray-200 focus:border-black"
+                  allowDecimals={false}
+                  allowNegative={false}
                   required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-maxGuests" className="text-sm font-medium text-black">Max Guests *</Label>
-                <Input
+                <NumberInput
                   id="edit-maxGuests"
-                  type="number"
-                  min="1"
+                  min={1}
                   value={formData.maxGuests}
-                  onChange={(e) => updateFormData({ maxGuests: parseInt(e.target.value) || 1 })}
+                  onChange={(value) => updateFormData({ maxGuests: value || 1 })}
                   placeholder="2"
                   className="border-2 border-gray-200 focus:border-black"
+                  allowDecimals={false}
+                  allowNegative={false}
                   required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-numberOfRooms" className="text-sm font-medium text-black">Number of Rooms *</Label>
-                <Input
+                <NumberInput
                   id="edit-numberOfRooms"
-                  type="number"
-                  min="1"
+                  min={1}
                   value={formData.numberOfRooms}
-                  onChange={(e) => updateFormData({ numberOfRooms: parseInt(e.target.value) || 1 })}
+                  onChange={(value) => updateFormData({ numberOfRooms: value || 1 })}
                   placeholder="5"
                   className="border-2 border-gray-200 focus:border-black"
+                  allowDecimals={false}
+                  allowNegative={false}
                   required
                 />
               </div>

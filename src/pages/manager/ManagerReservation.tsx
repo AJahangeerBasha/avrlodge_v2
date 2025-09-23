@@ -1,6 +1,9 @@
 import React from 'react';
 import { SharedReservation } from '@/components/shared';
 
-export const ManagerReservation: React.FC = () => {
+const ManagerReservation: React.FC = () => {
   return <SharedReservation role="manager" />;
 };
+
+export { ManagerReservation };
+export default ManagerReservation;

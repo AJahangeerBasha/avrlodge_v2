@@ -43,7 +43,7 @@ interface Reservation {
   total_quote?: number
 }
 
-export const AdminCalendar: React.FC = () => {
+const AdminCalendar: React.FC = () => {
   // Use calendar store for state management
   const {
     rooms,
@@ -387,3 +387,6 @@ export const AdminCalendar: React.FC = () => {
     </motion.div>
   )
 }
+
+export { AdminCalendar };
+export default AdminCalendar;

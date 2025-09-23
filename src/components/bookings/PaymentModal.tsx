@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { NumberInput } from '@/components/ui/number-input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
@@ -42,7 +43,7 @@ export function PaymentModal({
   onPaymentComplete
 }: PaymentModalProps) {
   const [paymentMethod, setPaymentMethod] = useState<'jubair_qr' | 'basha_qr' | 'cash'>('cash')
-  const [amount, setAmount] = useState('')
+  const [amount, setAmount] = useState<number | undefined>()
   const [transactionId, setTransactionId] = useState('')
   const [processing, setProcessing] = useState(false)
   const [payments, setPayments] = useState<Payment[]>([])
@@ -77,6 +78,12 @@ export function PaymentModal({
   useEffect(() => {
     if (isOpen) {
       loadPaymentHistory()
+      // Reset form state
+      setTransactionId('')
+      setPaymentMethod('cash')
+    } else {
+      // Clear amount when modal closes
+      setAmount(undefined)
     }
   }, [isOpen, loadPaymentHistory])
 
@@ -84,7 +91,7 @@ export function PaymentModal({
   useEffect(() => {
     if (!loadingPayments) {
       const { remainingBalance } = calculatePaymentTotals()
-      setAmount(remainingBalance.toString())
+      setAmount(remainingBalance)
     }
   }, [payments, loadingPayments, calculatePaymentTotals])
 
@@ -109,10 +116,13 @@ export function PaymentModal({
     try {
       setProcessing(true)
       
-      const paymentAmount = parseFloat(amount)
+      if (!amount || amount <= 0) {
+        throw new Error('Please enter a valid payment amount')
+      }
+
       const { remainingBalance } = calculatePaymentTotals()
-      if (paymentAmount <= 0 || paymentAmount > remainingBalance) {
-        throw new Error('Invalid payment amount')
+      if (amount > remainingBalance) {
+        throw new Error('Payment amount cannot exceed remaining balance')
       }
 
       // Store the actual payment method name as selected by user
@@ -133,7 +143,7 @@ export function PaymentModal({
 
       // Determine payment type based on remaining balance after this payment
       const { totalPaid } = calculatePaymentTotals()
-      const willBeFullyPaid = (totalPaid + paymentAmount) >= booking.total_quote
+      const willBeFullyPaid = (totalPaid + amount) >= booking.total_quote
       const isFirstPayment = totalPaid === 0
 
       let paymentType: PaymentType
@@ -145,7 +155,7 @@ export function PaymentModal({
 
       const paymentData = {
         reservationId: booking.id,
-        amount: paymentAmount,
+        amount: amount,
         paymentType,
         paymentMethod: actualPaymentMethod,
         transactionId: transactionId.trim() || undefined,
@@ -156,7 +166,7 @@ export function PaymentModal({
       
       toast({
         title: "Payment Successful",
-        description: `Payment of ${formatCurrency(paymentAmount)} recorded successfully`,
+        description: `Payment of ${formatCurrency(amount)} recorded successfully`,
       })
       
       onPaymentComplete()
@@ -173,7 +183,7 @@ export function PaymentModal({
     }
   }
 
-  const isFullPayment = parseFloat(amount || '0') >= calculatePaymentTotals().remainingBalance
+  const isFullPayment = (amount || 0) >= calculatePaymentTotals().remainingBalance
 
 
   return (
@@ -316,15 +326,15 @@ export function PaymentModal({
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                     ₹
                   </span>
-                  <Input
-                    type="number"
+                  <NumberInput
                     value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    onChange={setAmount}
                     className="pl-8 pr-4 py-3 bg-gray-50 border-gray-200"
                     placeholder="Enter amount"
-                    min="0"
+                    min={0}
                     max={calculatePaymentTotals().remainingBalance}
-                    step="0.01"
+                    allowDecimals={true}
+                    allowNegative={false}
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
@@ -388,7 +398,7 @@ export function PaymentModal({
                 <Button
                   onClick={handlePayment}
                   className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                  disabled={processing || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > calculatePaymentTotals().remainingBalance}
+                  disabled={processing || !amount || amount <= 0 || amount > calculatePaymentTotals().remainingBalance}
                 >
                   {processing ? (
                     <div className="flex items-center gap-2">

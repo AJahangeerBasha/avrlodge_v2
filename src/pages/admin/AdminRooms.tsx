@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Plus, Search, Filter, Users, Bed, CheckCircle, AlertCircle, Clock, MapPin, Edit, Trash2, Eye, XCircle, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { NumberInput } from '@/components/ui/number-input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -306,12 +307,14 @@ const AdminRooms = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="floorNumber">Floor Number</Label>
-                  <Input
+                  <NumberInput
                     id="floorNumber"
-                    type="number"
-                    value={formData.floorNumber || ''}
-                    onChange={(e) => updateFormData({ floorNumber: e.target.value ? parseInt(e.target.value) : null })}
+                    value={formData.floorNumber || undefined}
+                    onChange={(value) => updateFormData({ floorNumber: value || null })}
                     className="bg-white/95 backdrop-blur-sm border-black/20"
+                    allowDecimals={false}
+                    allowNegative={false}
+                    placeholder="Floor number"
                   />
                 </div>
                 <div>
@@ -511,12 +514,14 @@ const AdminRooms = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="edit-floorNumber">Floor Number</Label>
-                <Input
+                <NumberInput
                   id="edit-floorNumber"
-                  type="number"
-                  value={formData.floorNumber || ''}
-                  onChange={(e) => updateFormData({ floorNumber: e.target.value ? parseInt(e.target.value) : null })}
+                  value={formData.floorNumber || undefined}
+                  onChange={(value) => updateFormData({ floorNumber: value || null })}
                   className="bg-white/95 backdrop-blur-sm border-black/20"
+                  allowDecimals={false}
+                  allowNegative={false}
+                  placeholder="Floor number"
                 />
               </div>
               <div>

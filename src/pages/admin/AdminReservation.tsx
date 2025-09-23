@@ -52,7 +52,7 @@ import {
   generateReferenceNumber 
 } from '@/lib/utils/referenceNumber';
 
-export const AdminReservation: React.FC = () => {
+const AdminReservation: React.FC = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -2219,3 +2219,6 @@ export const AdminReservation: React.FC = () => {
     </motion.div>
   );
 };
+
+export { AdminReservation };
+export default AdminReservation;

@@ -1,7 +1,7 @@
 import React from 'react'
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout'
 
-export const ManagerDashboard: React.FC = () => {
+const ManagerDashboard: React.FC = () => {
   return (
     <DashboardLayout
       title="Manager Dashboard"
@@ -9,3 +9,6 @@ export const ManagerDashboard: React.FC = () => {
     />
   )
 }
+
+export { ManagerDashboard };
+export default ManagerDashboard;
