@@ -25,7 +25,9 @@
     "import-rooms": "tsx scripts/importRooms.ts",
     "import-special-charges": "tsx scripts/importSpecialCharges.ts",
     "add-rooms": "tsx scripts/addRooms.ts",
-    "delete-reservation": "tsx scripts/deleteReservationData.ts"
+    "delete-reservation": "tsx scripts/deleteReservationData.ts",
+    "generate-schema": "node scripts/generateDatabaseSchema.js",
+    "update-schema": "node scripts/generateDatabaseSchema.js"
   },
   "dependencies": {
     "@dataconnect/generated": "file:src/dataconnect-generated",

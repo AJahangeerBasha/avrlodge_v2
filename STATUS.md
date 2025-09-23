@@ -57,4 +57,4 @@ This document outlines the business logic for managing reservation and room stat
 
 ---
 
-In db.reservationRooms, dont show roomStatus = 'Cancelled'
+In db.reservationRooms, dont show roomStatus = 'Cancelled' in Caledar route.
