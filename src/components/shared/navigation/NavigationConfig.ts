@@ -6,7 +6,7 @@ export interface NavigationItem {
   to: string
   icon: LucideIcon
   label: string
-  roles: ('admin' | 'manager')[]
+  roles: ('admin' | 'manager' | 'agent')[]
   submenu?: NavigationItem[]
 }
 
@@ -16,28 +16,28 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     to: '/dashboard',
     icon: BarChart3,
     label: 'Dashboard',
-    roles: ['admin', 'manager']
+    roles: ['admin', 'manager', 'agent']
   },
   {
     id: 'calendar',
     to: '/calendar',
     icon: Calendar,
     label: 'Calendar',
-    roles: ['admin', 'manager']
+    roles: ['admin', 'manager', 'agent']
   },
   {
     id: 'reservation',
     to: '/reservation',
     icon: BookOpen,
     label: 'Reservations',
-    roles: ['admin', 'manager']
+    roles: ['admin', 'manager', 'agent']
   },
   {
     id: 'bookings',
     to: '/bookings',
     icon: Users,
     label: 'Bookings',
-    roles: ['admin', 'manager']
+    roles: ['admin', 'manager', 'agent']
   },
   {
     id: 'settings',
@@ -79,7 +79,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
 ]
 
 // Get navigation items for specific role
-export const getNavigationItemsForRole = (role: 'admin' | 'manager', basePath: string = ''): NavigationItem[] => {
+export const getNavigationItemsForRole = (role: 'admin' | 'manager' | 'agent', basePath: string = ''): NavigationItem[] => {
   return NAVIGATION_ITEMS
     .filter(item => item.roles.includes(role))
     .map(item => ({
@@ -93,7 +93,7 @@ export const getNavigationItemsForRole = (role: 'admin' | 'manager', basePath: s
 }
 
 // Get primary navigation items (for header)
-export const getPrimaryNavigationItems = (role: 'admin' | 'manager', basePath: string = ''): NavigationItem[] => {
+export const getPrimaryNavigationItems = (role: 'admin' | 'manager' | 'agent', basePath: string = ''): NavigationItem[] => {
   const primaryIds = role === 'admin'
     ? ['calendar', 'reservation', 'bookings', 'settings']
     : ['calendar', 'reservation', 'bookings']

@@ -9,6 +9,7 @@ import { AuthProvider } from '../contexts/AuthContext'
 // Lazy load pages for better code splitting
 const HomePage = lazy(() => import('../pages/Home').then(module => ({ default: module.HomePage })))
 const LoginPage = lazy(() => import('../pages/auth/Login').then(module => ({ default: module.LoginPage })))
+const PhoneLoginPage = lazy(() => import('../pages/auth/PhoneLogin').then(module => ({ default: module.PhoneLoginPage })))
 const SignupPage = lazy(() => import('../pages/auth/Signup').then(module => ({ default: module.SignupPage })))
 const ForgotPasswordPage = lazy(() => import('../pages/auth/ForgotPassword').then(module => ({ default: module.ForgotPasswordPage })))
 const UnauthorizedPage = lazy(() => import('../pages/auth/Unauthorized').then(module => ({ default: module.UnauthorizedPage })))
@@ -29,6 +30,12 @@ const ManagerCalendar = lazy(() => import('../pages/manager/ManagerCalendar'))
 const ManagerReservation = lazy(() => import('../pages/manager/ManagerReservation'))
 const ManagerBookings = lazy(() => import('../pages/manager/ManagerBookings'))
 
+// Agent pages
+const AgentDashboard = lazy(() => import('../pages/agent/AgentDashboard'))
+const AgentCalendar = lazy(() => import('../pages/agent/AgentCalendar'))
+const AgentReservation = lazy(() => import('../pages/agent/AgentReservation'))
+const AgentBookings = lazy(() => import('../pages/agent/AgentBookings'))
+
 function AppRoutes() {
   return (
     <Suspense fallback={<RouteLoader />}>
@@ -42,6 +49,7 @@ function AppRoutes() {
           {/* Auth routes - no layout */}
           <Route path="auth" element={<Navigate to="/auth/login" replace />} />
           <Route path="auth/login" element={<LoginPage />} />
+          <Route path="auth/phone-login" element={<PhoneLoginPage />} />
           <Route path="auth/signup" element={<SignupPage />} />
           <Route path="auth/forgot-password" element={<ForgotPasswordPage />} />
 
@@ -63,6 +71,14 @@ function AppRoutes() {
             <Route path="calendar" element={<ManagerCalendar />} />
             <Route path="reservation" element={<ManagerReservation />} />
             <Route path="bookings" element={<ManagerBookings />} />
+          </Route>
+
+          {/* Agent routes - protected with UnifiedDashboardLayout */}
+          <Route path="agent" element={<UnifiedDashboardLayout role="agent" />}>
+            <Route index element={<AgentDashboard />} />
+            <Route path="calendar" element={<AgentCalendar />} />
+            <Route path="reservation" element={<AgentReservation />} />
+            <Route path="bookings" element={<AgentBookings />} />
           </Route>
 
           {/* Error pages */}

@@ -7,7 +7,7 @@ import { getNavigationItemsForRole } from './NavigationConfig'
 interface MobileNavigationProps {
   isOpen: boolean
   onClose: () => void
-  role: 'admin' | 'manager'
+  role: 'admin' | 'manager' | 'agent'
   basePath: string
   userRole: string
   onLogout: () => void
@@ -59,7 +59,7 @@ export function MobileNavigation({
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-gray-900">
-                  {role === 'admin' ? 'Admin Panel' : 'Manager Panel'}
+                  {role === 'admin' ? 'Admin Panel' : role === 'manager' ? 'Manager Panel' : 'Agent Panel'}
                 </h2>
                 <button
                   onClick={onClose}

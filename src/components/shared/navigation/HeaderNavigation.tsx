@@ -3,7 +3,7 @@ import { NavigationDropdown } from './NavigationDropdown'
 import { getPrimaryNavigationItems } from './NavigationConfig'
 
 interface HeaderNavigationProps {
-  role: 'admin' | 'manager'
+  role: 'admin' | 'manager' | 'agent'
   basePath: string
 }
 

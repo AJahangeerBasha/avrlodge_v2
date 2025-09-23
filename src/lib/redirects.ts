@@ -8,8 +8,8 @@ import { UserRole, ROLES } from './types/auth';
  * @param replace - Whether to replace the current history entry
  */
 export const redirectByRole = (
-  userRole: UserRole, 
-  navigate: NavigateFunction, 
+  userRole: UserRole,
+  navigate: NavigateFunction,
   replace: boolean = true
 ): void => {
   switch (userRole) {
@@ -18,6 +18,9 @@ export const redirectByRole = (
       break;
     case ROLES.MANAGER:
       navigate('/manager', { replace });
+      break;
+    case ROLES.AGENT:
+      navigate('/agent', { replace });
       break;
     case ROLES.GUEST:
     default:
@@ -37,6 +40,8 @@ export const getDashboardRoute = (userRole: UserRole): string => {
       return '/admin';
     case ROLES.MANAGER:
       return '/manager';
+    case ROLES.AGENT:
+      return '/agent';
     case ROLES.GUEST:
     default:
       return '/';

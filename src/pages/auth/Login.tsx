@@ -6,7 +6,7 @@ import { Input } from '../../components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { Label } from '../../components/ui/label';
 import { Alert, AlertDescription } from '../../components/ui/alert';
-import { Loader2, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Loader2, Mail, Lock, ArrowRight, Phone } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../contexts/AuthContext';
 import { redirectByRole } from '../../lib/redirects';
@@ -112,6 +112,7 @@ export const LoginPage: React.FC = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
+            className="space-y-3"
           >
             <Button
               type="button"
@@ -123,9 +124,20 @@ export const LoginPage: React.FC = () => {
               <FcGoogle className="mr-2 h-4 w-4" />
               <span className="truncate">Sign in with Google</span>
             </Button>
+
+            {/* <Button
+              type="button"
+              variant="outline"
+              className="btn-responsive w-full border-gray-300 hover:bg-gray-50 text-black"
+              onClick={() => navigate('/auth/phone-login')}
+              disabled={loading}
+            >
+              <Phone className="mr-2 h-4 w-4" />
+              <span className="truncate">Sign in with Phone</span>
+            </Button> */}
           </motion.div>
 
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -139,9 +151,9 @@ export const LoginPage: React.FC = () => {
                 Or continue with email
               </span>
             </div>
-          </motion.div>
+          </motion.div> */}
 
-          <motion.form 
+          {/* <motion.form 
             onSubmit={handleEmailLogin} 
             className="form-responsive"
             initial={{ opacity: 0, y: 20 }}
@@ -207,9 +219,9 @@ export const LoginPage: React.FC = () => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </motion.div>
-          </motion.form>
+          </motion.form> */}
 
-          <motion.div 
+          {/* <motion.div 
             className="text-center space-responsive-sm"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -227,7 +239,7 @@ export const LoginPage: React.FC = () => {
                 Sign up
               </Link>
             </p>
-          </motion.div>
+          </motion.div> */}
         </CardContent>
       </Card>
       </motion.div>

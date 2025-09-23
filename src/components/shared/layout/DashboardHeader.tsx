@@ -5,7 +5,7 @@ import { HeaderNavigation } from '../navigation/HeaderNavigation'
 import { MobileNavigation } from '../navigation/MobileNavigation'
 
 interface DashboardHeaderProps {
-  role: 'admin' | 'manager'
+  role: 'admin' | 'manager' | 'agent'
   basePath: string
   userRole: string
   userName?: string
@@ -38,11 +38,17 @@ export function DashboardHeader({
               </div>
               <div className="flex flex-col">
                 <span className="text-sm font-semibold text-gray-900">
-                  {role === 'admin' ? 'Admin' : 'Manager'}
+                  {role === 'admin' ? 'Admin' : role === 'manager' ? 'Manager' : 'Agent'}
                 </span>
                 <span className="text-xs text-gray-500">AVR Lodge</span>
                 {userRole === 'admin' && role === 'manager' && (
                   <span className="text-xs text-blue-600">Admin as Manager</span>
+                )}
+                {userRole === 'admin' && role === 'agent' && (
+                  <span className="text-xs text-blue-600">Admin as Agent</span>
+                )}
+                {userRole === 'manager' && role === 'agent' && (
+                  <span className="text-xs text-blue-600">Manager as Agent</span>
                 )}
               </div>
             </div>

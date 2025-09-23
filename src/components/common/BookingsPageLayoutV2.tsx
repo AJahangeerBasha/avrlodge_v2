@@ -23,7 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAuth } from '@/contexts/AuthContext'
 
 interface BookingsPageLayoutV2Props {
-  role: 'admin' | 'manager'
+  role: 'admin' | 'manager' | 'agent'
 }
 
 export default function BookingsPageLayoutV2({ role }: BookingsPageLayoutV2Props) {

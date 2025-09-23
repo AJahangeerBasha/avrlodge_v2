@@ -4,7 +4,7 @@ import { ROLES } from '@/lib/types/auth'
 import { DashboardHeader } from '@/components/shared/layout/DashboardHeader'
 
 interface UnifiedDashboardLayoutProps {
-  role: 'admin' | 'manager'
+  role: 'admin' | 'manager' | 'agent'
 }
 
 export function UnifiedDashboardLayout({ role }: UnifiedDashboardLayoutProps) {
@@ -30,6 +30,8 @@ export function UnifiedDashboardLayout({ role }: UnifiedDashboardLayoutProps) {
     if (userRole !== ROLES.ADMIN) {
       if (userRole === ROLES.MANAGER) {
         return <Navigate to="/manager" replace />
+      } else if (userRole === ROLES.AGENT) {
+        return <Navigate to="/agent" replace />
       } else {
         return <Navigate to="/" replace />
       }
@@ -37,6 +39,15 @@ export function UnifiedDashboardLayout({ role }: UnifiedDashboardLayoutProps) {
   } else if (role === 'manager') {
     // Both managers and admins can access manager panel
     if (userRole !== ROLES.MANAGER && userRole !== ROLES.ADMIN) {
+      if (userRole === ROLES.AGENT) {
+        return <Navigate to="/agent" replace />
+      } else {
+        return <Navigate to="/" replace />
+      }
+    }
+  } else if (role === 'agent') {
+    // Agents, managers, and admins can access agent panel
+    if (userRole !== ROLES.AGENT && userRole !== ROLES.MANAGER && userRole !== ROLES.ADMIN) {
       return <Navigate to="/" replace />
     }
   }
@@ -53,7 +64,7 @@ export function UnifiedDashboardLayout({ role }: UnifiedDashboardLayoutProps) {
     window.location.href = '/admin'
   }
 
-  const basePath = role === 'admin' ? '/admin' : '/manager'
+  const basePath = role === 'admin' ? '/admin' : role === 'manager' ? '/manager' : '/agent'
 
   return (
     <div className="min-h-screen bg-gray-100">

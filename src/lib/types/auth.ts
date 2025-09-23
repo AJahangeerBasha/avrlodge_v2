@@ -1,9 +1,10 @@
-export type UserRole = 'guest' | 'manager' | 'admin';
+export type UserRole = 'guest' | 'agent' | 'manager' | 'admin';
 
 export interface UserClaims {
   role: UserRole;
   admin?: boolean;
   manager?: boolean;
+  agent?: boolean;
   guest?: boolean;
 }
 
@@ -24,14 +25,16 @@ export interface AuthUser extends UserProfile {
 
 export const ROLES = {
   GUEST: 'guest' as const,
+  AGENT: 'agent' as const,
   MANAGER: 'manager' as const,
   ADMIN: 'admin' as const,
 } as const;
 
 export const ROLE_HIERARCHY = {
   [ROLES.GUEST]: 1,
-  [ROLES.MANAGER]: 2,
-  [ROLES.ADMIN]: 3,
+  [ROLES.AGENT]: 2,
+  [ROLES.MANAGER]: 3,
+  [ROLES.ADMIN]: 4,
 } as const;
 
 export const hasPermission = (userRole: UserRole, requiredRole: UserRole): boolean => {
