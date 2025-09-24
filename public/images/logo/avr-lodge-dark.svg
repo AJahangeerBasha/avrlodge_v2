@@ -1,0 +1,32 @@
+<svg width="240" height="80" viewBox="0 0 240 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Transparent background for dark version -->
+
+  <!-- Mountain/Hills Icon -->
+  <g transform="translate(16, 16)">
+    <!-- Back mountain -->
+    <path d="M0 32 L12 16 L24 20 L36 12 L48 32 Z" fill="#f9fafb" opacity="0.7"/>
+    <!-- Front mountain -->
+    <path d="M8 32 L20 18 L32 22 L44 14 L48 32 Z" fill="#ffffff"/>
+    <!-- Lodge/House shape -->
+    <rect x="18" y="24" width="12" height="8" fill="#f3f4f6"/>
+    <path d="M18 24 L24 20 L30 24 Z" fill="#e5e7eb"/>
+    <!-- Window -->
+    <rect x="21" y="26" width="2" height="2" fill="#fbbf24"/>
+    <rect x="25" y="26" width="2" height="2" fill="#fbbf24"/>
+  </g>
+
+  <!-- Text -->
+  <g transform="translate(80, 16)">
+    <!-- AVR -->
+    <text x="0" y="24" fill="#ffffff" font-family="serif" font-size="28" font-weight="bold" letter-spacing="2px">AVR</text>
+    <!-- Lodge -->
+    <text x="0" y="44" fill="#d1d5db" font-family="serif" font-size="16" font-weight="normal" letter-spacing="1px">LODGE</text>
+    <!-- Tagline -->
+    <text x="0" y="56" fill="#9ca3af" font-family="sans-serif" font-size="10" font-weight="normal" letter-spacing="0.5px">Resort & Stay • Kolli Hills</text>
+  </g>
+
+  <!-- Decorative elements -->
+  <circle cx="200" cy="20" r="2" fill="#fbbf24" opacity="0.8"/>
+  <circle cx="210" cy="25" r="1.5" fill="#fbbf24" opacity="0.6"/>
+  <circle cx="220" cy="30" r="1" fill="#fbbf24" opacity="0.4"/>
+</svg>

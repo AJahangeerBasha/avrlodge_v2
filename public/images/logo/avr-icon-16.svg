@@ -1,0 +1,8 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Black square icon -->
+  <rect x="2" y="2" width="12" height="12" fill="#000000" rx="1"/>
+  <!-- Outer white border -->
+  <rect x="3" y="3" width="10" height="10" fill="none" stroke="#ffffff" stroke-width="1"/>
+  <!-- Inner black square -->
+  <rect x="5" y="5" width="6" height="6" fill="#000000"/>
+</svg>

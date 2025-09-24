@@ -33,9 +33,11 @@ export function DashboardHeader({
           <div className="flex items-center space-x-6">
             {/* Logo */}
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-                <div className="w-4 h-4 border-2 border-white rounded-sm"></div>
-              </div>
+              <img
+                src="/images/logo/avr-icon-32.svg"
+                alt="AVR Lodge"
+                className="w-8 h-8"
+              />
               <div className="flex flex-col">
                 <span className="text-sm font-semibold text-gray-900">
                   {role === 'admin' ? 'Admin' : role === 'manager' ? 'Manager' : 'Agent'}

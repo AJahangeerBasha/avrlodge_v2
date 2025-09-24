@@ -36,6 +36,11 @@ const AgentCalendar = lazy(() => import('../pages/agent/AgentCalendar'))
 const AgentReservation = lazy(() => import('../pages/agent/AgentReservation'))
 const AgentBookings = lazy(() => import('../pages/agent/AgentBookings'))
 
+// Public/Shared pages
+const PrivacyPolicy = lazy(() => import('../pages/PrivacyPolicy'))
+const DataDeletionPolicy = lazy(() => import('../pages/DataDeletionPolicy'))
+const TermsOfService = lazy(() => import('../pages/TermsOfService'))
+
 function AppRoutes() {
   return (
     <Suspense fallback={<RouteLoader />}>
@@ -44,6 +49,9 @@ function AppRoutes() {
           {/* Public routes with home layout */}
           <Route path="/" element={<HomeLayout />}>
             <Route index element={<HomePage />} />
+            <Route path="privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="data-deletion-policy" element={<DataDeletionPolicy />} />
+            <Route path="terms-of-service" element={<TermsOfService />} />
           </Route>
 
           {/* Auth routes - no layout */}

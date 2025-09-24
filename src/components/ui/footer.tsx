@@ -69,7 +69,31 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2025 AVR Lodge. All rights reserved. | Privacy Policy | Terms of Service</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <p>&copy; 2025 AVR Lodge. All rights reserved.</p>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => window.location.href = '/privacy-policy'}
+                className="hover:text-white transition-colors duration-200 underline"
+              >
+                Privacy Policy
+              </button>
+              <span>•</span>
+              <button
+                onClick={() => window.location.href = '/data-deletion-policy'}
+                className="hover:text-white transition-colors duration-200 underline"
+              >
+                Data Deletion Policy
+              </button>
+              <span>•</span>
+              <button
+                onClick={() => window.location.href = '/terms-of-service'}
+                className="hover:text-white transition-colors duration-200 underline"
+              >
+                Terms of Service
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

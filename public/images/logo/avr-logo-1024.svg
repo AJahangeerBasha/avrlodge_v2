@@ -1,0 +1,19 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- White background -->
+  <rect width="1024" height="1024" fill="#ffffff"/>
+
+  <!-- Black square icon (scaled proportionally) -->
+  <rect x="128" y="352" width="256" height="256" fill="#000000" rx="12"/>
+
+  <!-- Outer white border -->
+  <rect x="160" y="384" width="192" height="192" fill="none" stroke="#ffffff" stroke-width="12"/>
+
+  <!-- Inner black square -->
+  <rect x="192" y="416" width="128" height="128" fill="#000000"/>
+
+  <!-- AVR text -->
+  <text x="440" y="520" fill="#000000" font-family="Arial, sans-serif" font-size="152" font-weight="900" letter-spacing="6px">AVR</text>
+
+  <!-- Lodge text -->
+  <text x="440" y="600" fill="#666666" font-family="Arial, sans-serif" font-size="76" font-weight="normal" letter-spacing="4px">Lodge</text>
+</svg>

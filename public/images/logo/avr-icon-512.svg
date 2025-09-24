@@ -1,0 +1,16 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- White background -->
+  <rect width="512" height="512" fill="#ffffff"/>
+
+  <!-- Black square icon centered -->
+  <rect x="128" y="128" width="256" height="256" fill="#000000" rx="16"/>
+
+  <!-- Outer white border -->
+  <rect x="160" y="160" width="192" height="192" fill="none" stroke="#ffffff" stroke-width="12"/>
+
+  <!-- Inner black square -->
+  <rect x="192" y="192" width="128" height="128" fill="#000000"/>
+
+  <!-- Subtle outer border -->
+  <rect x="32" y="32" width="448" height="448" fill="none" stroke="#f0f0f0" stroke-width="4" rx="24"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg width="400" height="80" viewBox="0 0 400 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Black square icon -->
+  <rect x="10" y="10" width="60" height="60" fill="#000000" rx="3"/>
+
+  <!-- Outer white border -->
+  <rect x="17" y="17" width="46" height="46" fill="none" stroke="#ffffff" stroke-width="3"/>
+
+  <!-- Inner black square -->
+  <rect x="24" y="24" width="32" height="32" fill="#000000"/>
+
+  <!-- AVR text -->
+  <text x="90" y="45" fill="#000000" font-family="Arial, sans-serif" font-size="36" font-weight="900" letter-spacing="2px">AVR</text>
+
+  <!-- Lodge text -->
+  <text x="90" y="65" fill="#666666" font-family="Arial, sans-serif" font-size="18" font-weight="normal" letter-spacing="1px">Lodge</text>
+</svg>
