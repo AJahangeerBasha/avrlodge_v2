@@ -508,7 +508,7 @@ const AdminRevenues = () => {
         <Card className="bg-white/95 backdrop-blur-sm border border-gray-200">
           <CardHeader>
             <CardTitle className="text-lg font-semibold">
-              Payment Records ({filteredPayments.length} payments found for {dateFilterType})
+              Payment Records 
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -595,98 +595,6 @@ const AdminRevenues = () => {
                 </p>
               </div>
             )}
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* Results Summary */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-      >
-        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">
-              Analytics Summary
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Key Insights */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Guest Analytics */}
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="font-medium text-blue-900 mb-2">Guest Insights</h4>
-                  <div className="space-y-1">
-                    <p className="text-sm text-blue-700">
-                      <span className="font-medium">{new Set(filteredPayments.filter(p => p.guestName !== 'N/A').map(p => p.guestName)).size}</span> unique guests
-                    </p>
-                    <p className="text-sm text-blue-700">
-                      <span className="font-medium">{filteredPayments.filter(p => p.guestPhone !== 'N/A').length}</span> payments with contact info
-                    </p>
-                  </div>
-                </div>
-
-                {/* Room Analytics */}
-                <div className="bg-green-50 rounded-lg p-4">
-                  <h4 className="font-medium text-green-900 mb-2">Room Utilization</h4>
-                  <div className="space-y-1">
-                    <p className="text-sm text-green-700">
-                      <span className="font-medium">{new Set(filteredPayments.flatMap(p => p.roomNumbers?.split(', ') || []).filter(r => r !== 'N/A')).size}</span> rooms generated revenue
-                    </p>
-                    <p className="text-sm text-green-700">
-                      <span className="font-medium">{filteredPayments.filter(p => p.nights > 0).reduce((sum, p) => sum + p.nights, 0)}</span> total room nights sold
-                    </p>
-                  </div>
-                </div>
-
-                {/* Stay Analytics */}
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <h4 className="font-medium text-purple-900 mb-2">Stay Patterns</h4>
-                  <div className="space-y-1">
-                    <p className="text-sm text-purple-700">
-                      Avg: <span className="font-medium">{filteredPayments.filter(p => p.nights > 0).length > 0 ? (filteredPayments.filter(p => p.nights > 0).reduce((sum, p) => sum + p.nights, 0) / filteredPayments.filter(p => p.nights > 0).length).toFixed(1) : 0}</span> nights per stay
-                    </p>
-                    <p className="text-sm text-purple-700">
-                      <span className="font-medium">{filteredPayments.filter(p => p.nights >= 7).length}</span> week+ stays
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment Method Breakdown */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-3">Payment Method Distribution</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {Object.entries(
-                    filteredPayments.reduce((acc, payment) => {
-                      const method = payment.paymentMethod || 'Unknown'
-                      if (!acc[method]) acc[method] = { count: 0, amount: 0 }
-                      acc[method].count++
-                      acc[method].amount += payment.amount
-                      return acc
-                    }, {} as Record<string, { count: number; amount: number }>)
-                  ).map(([method, data]) => (
-                    <div key={method} className="text-center">
-                      <div className="text-sm font-medium text-gray-900 capitalize">
-                        {method.replace(/[_-]/g, ' ')}
-                      </div>
-                      <div className="text-xs text-gray-600">{data.count} payments</div>
-                      <div className="text-sm font-semibold text-green-600">
-                        ₹{data.amount.toLocaleString()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Summary Note */}
-              <div className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
-                <span className="font-medium">Data Source:</span> Real-time payment records with guest details from reservations and room assignments from reservation rooms.
-                Use filters to analyze revenue patterns across different time periods and payment methods.
-              </div>
-            </div>
           </CardContent>
         </Card>
       </motion.div>
