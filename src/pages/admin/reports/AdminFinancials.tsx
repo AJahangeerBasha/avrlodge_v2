@@ -223,6 +223,18 @@ const AdminFinancials = () => {
     }
   }, [filteredPayments, filteredExpenses, previousPeriodRevenue])
 
+  // Get date range display text
+  const getDateRangeText = useCallback(() => {
+    const dateRange = getDateRange()
+    const startStr = format(dateRange.start, 'MMM dd, yyyy')
+    const endStr = format(dateRange.end, 'MMM dd, yyyy')
+
+    if (startStr === endStr) {
+      return startStr
+    }
+    return `${startStr} - ${endStr}`
+  }, [getDateRange])
+
   // Get period label for comparison (memoized)
   const getPeriodLabel = useCallback(() => {
     switch (dateFilterType) {
@@ -427,6 +439,12 @@ const AdminFinancials = () => {
               />
             </div>
           )}
+        </div>
+
+        {/* Date Range Display */}
+        <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg border border-gray-100 px-3 py-2">
+          <span className="font-medium">Date Range:</span>
+          <span>{getDateRangeText()}</span>
         </div>
       </motion.div>
 

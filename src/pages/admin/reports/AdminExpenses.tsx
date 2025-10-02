@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, DollarSign, TrendingUp, FileText, Download, Filter, BarChart3, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Calendar, DollarSign, TrendingUp, FileText, Download, Filter, BarChart3, RefreshCw, ChevronLeft, ChevronRight, Wallet, CreditCard, Banknote, Smartphone } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -146,9 +146,9 @@ const AdminExpenses = () => {
       try {
         const expenseDate = new Date(expense.date)
         return !isNaN(expenseDate.getTime()) &&
-               expenseDate >= dateRange.start &&
-               expenseDate <= dateRange.end &&
-               !expense.deletedAt
+          expenseDate >= dateRange.start &&
+          expenseDate <= dateRange.end &&
+          !expense.deletedAt
       } catch (e) {
         return false
       }
@@ -202,7 +202,11 @@ const AdminExpenses = () => {
 
     const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0)
     const totalCount = filteredExpenses.length
-    const avgExpenseAmount = totalExpenses / totalCount
+
+    // Calculate number of days in the date range
+    const dateRange = getDateRange()
+    const numberOfDays = Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+    const avgExpenseAmount = totalExpenses / numberOfDays
 
     // Find top category by total amount
     const categoryTotals = filteredExpenses.reduce((acc, expense) => {
@@ -224,7 +228,29 @@ const AdminExpenses = () => {
       paidExpenses,
       pendingExpenses
     }
+  }, [filteredExpenses, getDateRange])
+
+  // Payment mode statistics
+  const paymentModeStats = useMemo(() => {
+    const cash = filteredExpenses.filter(e => e.paymentMode?.toLowerCase().includes('cash')).reduce((sum, e) => sum + e.amount, 0)
+    const upi = filteredExpenses.filter(e => e.paymentMode?.toLowerCase().includes('upi')).reduce((sum, e) => sum + e.amount, 0)
+    const bank = filteredExpenses.filter(e => e.paymentMode?.toLowerCase().includes('bank')).reduce((sum, e) => sum + e.amount, 0)
+    const card = filteredExpenses.filter(e => e.paymentMode?.toLowerCase().includes('card')).reduce((sum, e) => sum + e.amount, 0)
+
+    return { cash, upi, bank, card }
   }, [filteredExpenses])
+
+  // Get date range display text
+  const getDateRangeText = useCallback(() => {
+    const dateRange = getDateRange()
+    const startStr = format(dateRange.start, 'MMM dd, yyyy')
+    const endStr = format(dateRange.end, 'MMM dd, yyyy')
+
+    if (startStr === endStr) {
+      return startStr
+    }
+    return `${startStr} - ${endStr}`
+  }, [getDateRange])
 
   // Get period label for comparison (memoized)
   const getPeriodLabel = useCallback(() => {
@@ -405,26 +431,16 @@ const AdminExpenses = () => {
               />
             </div>
           )}
+          {/* Date Range Display */}
+          <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg border border-gray-100 px-3 py-2">
+            <span className="font-medium">Date Range:</span>
+            <span>{getDateRangeText()}</span>
+          </div>
         </div>
 
-        {/* Payment Mode and Status Filters */}
-        <div className="flex flex-wrap gap-4">
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-600" />
-            <Select value={paymentModeFilter} onValueChange={setPaymentModeFilter}>
-              <SelectTrigger className="w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-                <SelectItem value="all">All Payment Modes</SelectItem>
-                <SelectItem value="cash">Cash</SelectItem>
-                <SelectItem value="bank">Bank Transfer</SelectItem>
-                <SelectItem value="upi">UPI</SelectItem>
-                <SelectItem value="card">Card</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
+        {/* Status Filter */}
+        <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-gray-600" />
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -442,7 +458,7 @@ const AdminExpenses = () => {
         </div>
       </motion.div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Row 1 */}
       <motion.div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         initial={{ opacity: 0, y: 20 }}
@@ -469,7 +485,7 @@ const AdminExpenses = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">₹{stats.avgExpenseAmount.toFixed(0)}</div>
-            <p className="text-xs text-gray-600">Per transaction</p>
+            <p className="text-xs text-gray-600">Per day</p>
           </CardContent>
         </Card>
 
@@ -498,6 +514,58 @@ const AdminExpenses = () => {
         </Card>
       </motion.div>
 
+      {/* Stats Cards - Row 2: Payment Modes */}
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35, duration: 0.5 }}
+      >
+        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Cash</CardTitle>
+            <Wallet className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">₹{paymentModeStats.cash.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Cash payments</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">UPI</CardTitle>
+            <Smartphone className="h-4 w-4 text-indigo-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-indigo-600">₹{paymentModeStats.upi.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">UPI payments</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Bank</CardTitle>
+            <Banknote className="h-4 w-4 text-cyan-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-cyan-600">₹{paymentModeStats.bank.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Bank transfers</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Card</CardTitle>
+            <CreditCard className="h-4 w-4 text-amber-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-600">₹{paymentModeStats.card.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Card payments</p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {/* Expenses Table */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -507,133 +575,131 @@ const AdminExpenses = () => {
         <Card className="bg-white/95 backdrop-blur-sm border border-gray-200">
           <CardHeader>
             <CardTitle className="text-lg font-semibold">
-              Expense Record
+              Expense Record ({filteredExpenses.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
             {filteredExpenses.length > 0 ? (
               <>
                 <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Expense ID</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Date</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Category</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">SubCategory</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Description</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Amount</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Payment Mode</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedExpenses.map((expense, index) => (
-                      <motion.tr
-                        key={expense.id}
-                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05, duration: 0.3 }}
-                      >
-                        <td className="py-3 px-4 text-sm font-mono text-gray-900">
-                          {expense.expenseId || 'N/A'}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-gray-600">
-                          {format(new Date(expense.date), 'MMM dd, yyyy')}
-                        </td>
-                        <td className="py-3 px-4 text-sm font-medium text-gray-900">
-                          {expense.categoryName}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-gray-600">
-                          {expense.subCategoryName}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-gray-600 max-w-xs truncate">
-                          {expense.description}
-                        </td>
-                        <td className="py-3 px-4 text-sm font-semibold text-red-600">
-                          ₹{expense.amount.toLocaleString()}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-gray-600">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            expense.paymentMode?.toLowerCase().includes('cash')
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-green-100 text-green-800'
-                          }`}>
-                            {expense.paymentMode || 'Unknown'}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-sm text-gray-600">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            expense.status === 'Paid'
-                              ? 'bg-green-100 text-green-800'
-                              : expense.status === 'Pending'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {expense.status}
-                          </span>
-                        </td>
-                      </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                  <div className="text-sm text-gray-500">
-                    Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredExpenses.length)} of {filteredExpenses.length} expenses
-                  </div>
-                  <div className="flex gap-2 items-center">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-                      disabled={currentPage === 1}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-
-                    <div className="flex gap-1">
-                      {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                        let pageNumber
-                        if (totalPages <= 5) {
-                          pageNumber = i + 1
-                        } else if (currentPage <= 3) {
-                          pageNumber = i + 1
-                        } else if (currentPage >= totalPages - 2) {
-                          pageNumber = totalPages - 4 + i
-                        } else {
-                          pageNumber = currentPage - 2 + i
-                        }
-
-                        return (
-                          <Button
-                            key={pageNumber}
-                            variant={currentPage === pageNumber ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setCurrentPage(pageNumber)}
-                            className={currentPage === pageNumber ? "bg-black text-white" : ""}
-                          >
-                            {pageNumber}
-                          </Button>
-                        )
-                      })}
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
-                      disabled={currentPage === totalPages}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-3 px-4 font-medium text-gray-900">Expense ID</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-900">Date</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-900">Category</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-900">SubCategory</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-900">Description</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-900">Amount</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-900">Payment Mode</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedExpenses.map((expense, index) => (
+                        <motion.tr
+                          key={expense.id}
+                          className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05, duration: 0.3 }}
+                        >
+                          <td className="py-3 px-4 text-sm font-mono text-gray-900">
+                            {expense.expenseId || 'N/A'}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-600">
+                            {format(new Date(expense.date), 'MMM dd, yyyy')}
+                          </td>
+                          <td className="py-3 px-4 text-sm font-medium text-gray-900">
+                            {expense.categoryName}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-600">
+                            {expense.subCategoryName}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-600 max-w-xs truncate">
+                            {expense.description}
+                          </td>
+                          <td className="py-3 px-4 text-sm font-semibold text-red-600">
+                            ₹{expense.amount.toLocaleString()}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-600">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${expense.paymentMode?.toLowerCase().includes('cash')
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-green-100 text-green-800'
+                              }`}>
+                              {expense.paymentMode || 'Unknown'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-600">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${expense.status === 'Paid'
+                                ? 'bg-green-100 text-green-800'
+                                : expense.status === 'Pending'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                              {expense.status}
+                            </span>
+                          </td>
+                        </motion.tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              )}
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                    <div className="text-sm text-gray-500">
+                      Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredExpenses.length)} of {filteredExpenses.length} expenses
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+                        disabled={currentPage === 1}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+
+                      <div className="flex gap-1">
+                        {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                          let pageNumber
+                          if (totalPages <= 5) {
+                            pageNumber = i + 1
+                          } else if (currentPage <= 3) {
+                            pageNumber = i + 1
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNumber = totalPages - 4 + i
+                          } else {
+                            pageNumber = currentPage - 2 + i
+                          }
+
+                          return (
+                            <Button
+                              key={pageNumber}
+                              variant={currentPage === pageNumber ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(pageNumber)}
+                              className={currentPage === pageNumber ? "bg-black text-white" : ""}
+                            >
+                              {pageNumber}
+                            </Button>
+                          )
+                        })}
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <div className="text-center py-8">
@@ -649,7 +715,7 @@ const AdminExpenses = () => {
           </CardContent>
         </Card>
       </motion.div>
-      
+
       {/* Error Display */}
       {(error || queryError) && (
         <motion.div

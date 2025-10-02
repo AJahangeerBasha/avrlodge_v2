@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, DollarSign, TrendingUp, FileText, Download, Filter, BarChart3, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Calendar, DollarSign, TrendingUp, FileText, Download, Filter, BarChart3, RefreshCw, ChevronLeft, ChevronRight, Wallet, QrCode } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -278,6 +278,27 @@ const AdminRevenues = () => {
     }
   }, [filteredPayments])
 
+  // Payment method statistics
+  const paymentMethodStats = useMemo(() => {
+    const cash = filteredPayments.filter(p => p.paymentMethod?.toLowerCase().includes('cash')).reduce((sum, p) => sum + p.amount, 0)
+    const jubair = filteredPayments.filter(p => p.paymentMethod?.toLowerCase().includes('jubair')).reduce((sum, p) => sum + p.amount, 0)
+    const basha = filteredPayments.filter(p => p.paymentMethod?.toLowerCase().includes('basha')).reduce((sum, p) => sum + p.amount, 0)
+
+    return { cash, jubair, basha }
+  }, [filteredPayments])
+
+  // Get date range display text
+  const getDateRangeText = useCallback(() => {
+    const dateRange = getDateRange()
+    const startStr = format(dateRange.start, 'MMM dd, yyyy')
+    const endStr = format(dateRange.end, 'MMM dd, yyyy')
+
+    if (startStr === endStr) {
+      return startStr
+    }
+    return `${startStr} - ${endStr}`
+  }, [getDateRange])
+
   // Get period label for comparison (memoized)
   const getPeriodLabel = useCallback(() => {
     switch (dateFilterType) {
@@ -463,24 +484,14 @@ const AdminRevenues = () => {
           )}
         </div>
 
-        {/* Payment Method Filter */}
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-gray-600" />
-          <Select value={paymentMethodFilter} onValueChange={setPaymentMethodFilter}>
-            <SelectTrigger className="w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-              <SelectItem value="all">All Payment Methods</SelectItem>
-              <SelectItem value="cash">Cash</SelectItem>
-              <SelectItem value="jubair">Jubair QR</SelectItem>
-              <SelectItem value="basha">Basha QR</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Date Range Display */}
+        <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg border border-gray-100 px-3 py-2">
+          <span className="font-medium">Date Range:</span>
+          <span>{getDateRangeText()}</span>
         </div>
       </motion.div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Row 1 */}
       <motion.div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         initial={{ opacity: 0, y: 20 }}
@@ -495,41 +506,41 @@ const AdminRevenues = () => {
           <CardContent>
             <div className="text-2xl font-bold text-green-600">₹{stats.totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-gray-600">
-              {stats.monthlyGrowth >= 0 ? '+' : ''}{stats.monthlyGrowth.toFixed(1)}% from {getPeriodLabel()}
+              {stats.totalPayments} payment transactions
             </p>
           </CardContent>
         </Card>
 
         <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Payments</CardTitle>
-            <FileText className="h-4 w-4 text-blue-600" />
+            <CardTitle className="text-sm font-medium">Cash</CardTitle>
+            <Wallet className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.totalPayments}</div>
-            <p className="text-xs text-gray-600">Payment transactions</p>
+            <div className="text-2xl font-bold text-blue-600">₹{paymentMethodStats.cash.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Cash payments</p>
           </CardContent>
         </Card>
 
         <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Payment</CardTitle>
-            <TrendingUp className="h-4 w-4 text-purple-600" />
+            <CardTitle className="text-sm font-medium">Jubair QR</CardTitle>
+            <QrCode className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">₹{stats.avgPaymentAmount.toFixed(0)}</div>
-            <p className="text-xs text-gray-600">Per transaction</p>
+            <div className="text-2xl font-bold text-purple-600">₹{paymentMethodStats.jubair.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Jubair QR payments</p>
           </CardContent>
         </Card>
 
         <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Payment Mix</CardTitle>
-            <BarChart3 className="h-4 w-4 text-orange-600" />
+            <CardTitle className="text-sm font-medium">Basha QR</CardTitle>
+            <QrCode className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{stats.cashPayments}:{stats.digitalPayments}</div>
-            <p className="text-xs text-gray-600">Cash : Digital</p>
+            <div className="text-2xl font-bold text-orange-600">₹{paymentMethodStats.basha.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Basha QR payments</p>
           </CardContent>
         </Card>
       </motion.div>
@@ -543,7 +554,7 @@ const AdminRevenues = () => {
         <Card className="bg-white/95 backdrop-blur-sm border border-gray-200">
           <CardHeader>
             <CardTitle className="text-lg font-semibold">
-              Payment Records 
+              Payment Records ({filteredPayments.length}) 
             </CardTitle>
           </CardHeader>
           <CardContent>
