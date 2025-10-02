@@ -6,10 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui/date-picker'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
-import { format, startOfMonth, endOfMonth, subMonths, startOfDay, endOfDay, startOfWeek, endOfWeek, subDays, subWeeks } from 'date-fns'
+import { format, startOfMonth, endOfMonth, subMonths, startOfDay, endOfDay, startOfWeek, endOfWeek, subDays, subWeeks, differenceInDays } from 'date-fns'
 
 // Modern hooks using TanStack Query + Zustand
 import { usePayments } from '@/hooks/usePayments'
+import { useQuery } from '@tanstack/react-query'
+import { getAllReservations } from '@/lib/reservations'
+import { getAllReservationRooms } from '@/lib/reservationRooms'
 import {
   RevenueDateFilterType,
   useDateFilterType,
@@ -65,6 +68,68 @@ const AdminRevenues = () => {
 
   // TanStack Query for server state
   const { data: allPayments = [], isLoading, error: queryError } = usePayments()
+
+  // Get reservations data for payment details
+  const { data: reservations = [] } = useQuery({
+    queryKey: ['reservations'],
+    queryFn: () => getAllReservations(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+
+  // Get reservation rooms data for room details
+  const { data: reservationRooms = [] } = useQuery({
+    queryKey: ['reservationRooms'],
+    queryFn: () => getAllReservationRooms(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+
+  // Create enhanced payment data with reservation details (memoized)
+  const enhancedPayments = useMemo(() => {
+    return allPayments.map(payment => {
+      const reservation = payment.reservationId
+        ? reservations.find(r => r.id === payment.reservationId)
+        : null
+
+      // Get room numbers from reservation rooms
+      const rooms = payment.reservationId
+        ? reservationRooms.filter(rr => rr.reservationId === payment.reservationId)
+        : []
+
+      // Calculate nights if reservation exists
+      const nights = reservation
+        ? differenceInDays(new Date(reservation.checkOutDate), new Date(reservation.checkInDate))
+        : 0
+
+      // Format stay period
+      const stayPeriod = reservation
+        ? `${format(new Date(reservation.checkInDate), 'MMM dd')} - ${format(new Date(reservation.checkOutDate), 'MMM dd')}`
+        : 'N/A'
+
+      // Format room numbers - show all rooms for this reservation
+      const roomNumbers = rooms.length > 0
+        ? rooms.map(r => r.roomNumber).join(', ')
+        : 'N/A'
+
+      // Format reservation ID (last 8 chars)
+      const reservationIdShort = payment.reservationId
+        ? payment.reservationId.slice(-8)
+        : 'N/A'
+
+      return {
+        ...payment,
+        // Reservation details
+        guestName: reservation?.guestName || 'N/A',
+        guestPhone: reservation?.guestPhone || 'N/A',
+        stayPeriod,
+        nights,
+        roomNumbers,
+        reservationIdShort,
+        // Keep original data
+        reservation,
+        rooms
+      }
+    })
+  }, [allPayments, reservations, reservationRooms])
 
   // Date range calculation based on filter type (memoized)
   const getDateRange = useCallback(() => {
@@ -125,12 +190,12 @@ const AdminRevenues = () => {
 
   // Memoized filtered payments for performance
   const filteredPayments = useMemo(() => {
-    if (!allPayments.length) return []
+    if (!enhancedPayments.length) return []
 
     const dateRange = getDateRange()
 
     // Filter by date range
-    let filtered = allPayments.filter(payment => {
+    let filtered = enhancedPayments.filter(payment => {
       try {
         const paymentDate = new Date(payment.paymentDate)
         return !isNaN(paymentDate.getTime()) &&
@@ -157,7 +222,7 @@ const AdminRevenues = () => {
     }
 
     return filtered
-  }, [allPayments, getDateRange, paymentMethodFilter])
+  }, [enhancedPayments, getDateRange, paymentMethodFilter])
 
   // Memoized revenue statistics
   const stats: RevenueStats = useMemo(() => {
@@ -217,9 +282,9 @@ const AdminRevenues = () => {
     setExporting(true)
     try {
       const csvContent = [
-        'Receipt Number,Payment Date,Amount,Payment Method,Payment Type,Reservation ID',
+        'Receipt Number,Guest Name,Phone,Stay Period,Nights,Rooms,Reservation ID,Amount,Payment Method,Payment Date',
         ...filteredPayments.map(payment =>
-          `${payment.receiptNumber || ''},${format(new Date(payment.paymentDate), 'yyyy-MM-dd')},${payment.amount},${payment.paymentMethod},${payment.paymentType},${payment.reservationId || ''}`
+          `${payment.receiptNumber || ''},${payment.guestName},${payment.guestPhone},${payment.stayPeriod},${payment.nights},${payment.roomNumbers},${payment.reservationIdShort},${payment.amount},${payment.paymentMethod},${format(new Date(payment.paymentDate), 'yyyy-MM-dd')}`
         )
       ].join('\n')
 
@@ -453,11 +518,14 @@ const AdminRevenues = () => {
                   <thead>
                     <tr className="border-b border-gray-200">
                       <th className="text-left py-3 px-4 font-medium text-gray-900">Receipt #</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Date</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Guest Name</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Phone</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Stay Period</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Nights</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Rooms | Reservation</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-900">Amount</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-900">Method</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Type</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Reservation</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Payment Date</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -472,8 +540,29 @@ const AdminRevenues = () => {
                         <td className="py-3 px-4 text-sm font-mono text-gray-900">
                           {payment.receiptNumber || 'N/A'}
                         </td>
+                        <td className="py-3 px-4 text-sm font-medium text-gray-900">
+                          {payment.guestName}
+                        </td>
                         <td className="py-3 px-4 text-sm text-gray-600">
-                          {format(new Date(payment.paymentDate), 'MMM dd, yyyy')}
+                          <a href={`tel:${payment.guestPhone}`} className="hover:text-blue-600 transition-colors">
+                            {payment.guestPhone}
+                          </a>
+                        </td>
+                        <td className="py-3 px-4 text-sm text-gray-600">
+                          {payment.stayPeriod}
+                        </td>
+                        <td className="py-3 px-4 text-sm text-center text-gray-600">
+                          {payment.nights > 0 ? `${payment.nights} ${payment.nights === 1 ? 'night' : 'nights'}` : 'N/A'}
+                        </td>
+                        <td className="py-3 px-4 text-sm text-gray-600">
+                          <div className="space-y-1">
+                            <div className="font-mono text-gray-900">
+                              {payment.roomNumbers}
+                            </div>
+                            <div className="text-xs font-mono text-gray-500">
+                              ID: {payment.reservationIdShort}
+                            </div>
+                          </div>
                         </td>
                         <td className="py-3 px-4 text-sm font-semibold text-green-600">
                           ₹{payment.amount.toLocaleString()}
@@ -487,17 +576,8 @@ const AdminRevenues = () => {
                             {payment.paymentMethod || 'Unknown'}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-sm text-gray-600 capitalize">
-                          {payment.paymentType?.replace(/_/g, ' ') || 'N/A'}
-                        </td>
-                        <td className="py-3 px-4 text-sm font-mono text-gray-500">
-                          {payment.reservationId ? (
-                            <span className="truncate max-w-[100px] block">
-                              {payment.reservationId.slice(-8)}
-                            </span>
-                          ) : (
-                            'N/A'
-                          )}
+                        <td className="py-3 px-4 text-sm text-gray-600">
+                          {format(new Date(payment.paymentDate), 'MMM dd, yyyy')}
                         </td>
                       </motion.tr>
                     ))}
