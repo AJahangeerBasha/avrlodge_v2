@@ -329,7 +329,7 @@ const AdminExpenses = () => {
       {/* Expenses Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Expense Entries ({filteredEntries.length})</CardTitle>
+          <CardTitle>Expenses ({filteredEntries.length})</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (

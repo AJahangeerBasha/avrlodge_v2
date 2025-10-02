@@ -1,5 +1,5 @@
 // Navigation configuration for both admin and manager roles
-import { LucideIcon, BarChart3, Calendar, BookOpen, Users, Home, Bed, DollarSign, Settings, UserCheck, UserCog, FileText, TrendingUp, TrendingDown, PieChart, Calculator, Receipt } from 'lucide-react'
+import { LucideIcon, BarChart3, Calendar, BookOpen, Users, Home, Bed, DollarSign, Settings, UserCheck, UserCog, FileText, TrendingUp, TrendingDown, PieChart, Receipt } from 'lucide-react'
 
 export interface NavigationItem {
   id: string
@@ -58,13 +58,6 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
         to: '/reports/bookings',
         icon: BookOpen,
         label: 'Bookings',
-        roles: ['admin']
-      },
-      {
-        id: 'daily-accounts',
-        to: '/reports/daily-accounts',
-        icon: Calculator,
-        label: 'Daily Accounts',
         roles: ['admin']
       },
       {
