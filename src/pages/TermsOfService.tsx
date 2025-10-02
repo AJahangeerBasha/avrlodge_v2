@@ -1,22 +1,30 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { Helmet } from 'react-helmet-async'
-import { FileText, Calendar, ChevronDown, ChevronRight, Mail, Phone, ExternalLink } from 'lucide-react'
 
 export const TermsOfService: React.FC = () => {
-  const [expandedSections, setExpandedSections] = useState<number[]>([])
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
 
-  const toggleSection = (index: number) => {
-    setExpandedSections(prev =>
-      prev.includes(index)
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
-    )
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5 }
+    }
   }
 
   const terms = [
     {
-      title: "📅 Booking & Reservations",
+      title: "Booking & Reservations",
       items: [
         "Subject to availability • Valid ID required",
         "Online/phone/third-party bookings accepted",
@@ -25,7 +33,7 @@ export const TermsOfService: React.FC = () => {
       ]
     },
     {
-      title: "🕐 Check-in & Check-out",
+      title: "Check-in & Check-out",
       items: [
         "Check-in: 12:00 noon onwards",
         "Check-out: 11:00 AM sharp",
@@ -34,7 +42,7 @@ export const TermsOfService: React.FC = () => {
       ]
     },
     {
-      title: "💳 Cancellation & Refunds",
+      title: "Cancellation & Refunds",
       items: [
         "Terms vary by booking platform",
         "Refunds via original payment method",
@@ -43,7 +51,7 @@ export const TermsOfService: React.FC = () => {
       ]
     },
     {
-      title: "👥 Guest Conduct",
+      title: "Guest Conduct",
       items: [
         "Respect guests, staff, and property",
         "No illegal activities permitted",
@@ -52,7 +60,7 @@ export const TermsOfService: React.FC = () => {
       ]
     },
     {
-      title: "💻 Website & Online Services",
+      title: "Website & Online Services",
       items: [
         "Provide accurate booking information",
         "No unauthorized website access",
@@ -61,7 +69,7 @@ export const TermsOfService: React.FC = () => {
       ]
     },
     {
-      title: "⚠️ Liability Limitations",
+      title: "Liability Limitations",
       items: [
         "Not responsible for personal property loss",
         "No liability for force majeure events",
@@ -84,171 +92,186 @@ export const TermsOfService: React.FC = () => {
         <link rel="canonical" href="https://avrlodge.com/terms-of-service" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-        {/* Compact Header */}
+      <div className="min-h-screen bg-white">
+        {/* Header Section */}
         <motion.section
-          className="bg-gradient-to-r from-slate-900 to-blue-900 text-white py-12 relative overflow-hidden"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          className="bg-black text-white py-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
         >
-          <div className="absolute inset-0 bg-black/20"></div>
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-transparent"></div>
+          <div className="container mx-auto px-2">
+            <div className="max-w-4xl mx-auto text-center">
+              <motion.h1
+                className="text-2xl md:text-4xl font-serif font-bold mb-6"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+              >
+                Terms of Service
+              </motion.h1>
+              <motion.p
+                className="text-xl text-gray-300"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+              >
+                Effective Date: 1st September 2025
+              </motion.p>
+            </div>
+          </div>
+        </motion.section>
 
-          <div className="relative max-w-6xl mx-auto px-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center space-x-3 mb-2">
-                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur">
-                    <FileText className="w-6 h-6" />
-                  </div>
-                  <h1 className="text-2xl md:text-4xl font-bold">Terms of Service</h1>
-                </div>
-                <p className="text-slate-300 flex items-center space-x-2">
-                  <Calendar className="w-4 h-4" />
-                  <span>Effective: 1st September 2025</span>
+        {/* Introduction */}
+        <motion.section
+          className="py-16"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.8 }}
+        >
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <motion.div
+                className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
+                whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+                transition={{ duration: 0.3 }}
+              >
+                <p className="text-gray-700 leading-relaxed text-lg text-center">
+                  Welcome to <strong className="text-black">AVR Lodge, Kolli Hills</strong>. By booking or staying with us, you agree to these terms and conditions. Please read them carefully.
                 </p>
+              </motion.div>
+            </div>
+          </div>
+        </motion.section>
+
+        {/* Main Content Sections */}
+        <motion.section
+          className="pb-16 bg-gray-50"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="space-y-8">
+                {terms.map((section, index) => (
+                  <motion.div
+                    key={index}
+                    variants={itemVariants}
+                    className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
+                    whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <h2 className="text-2xl font-serif font-bold text-black mb-6">{section.title}</h2>
+                    <ul className="space-y-4">
+                      {section.items.map((item, itemIndex) => (
+                        <motion.li
+                          key={itemIndex}
+                          className="flex items-start space-x-4"
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ delay: itemIndex * 0.1, duration: 0.5 }}
+                          viewport={{ once: true }}
+                        >
+                          <span className="w-2 h-2 bg-black rounded-full mt-3 flex-shrink-0"></span>
+                          <span className="text-gray-700 leading-relaxed text-base">{item}</span>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                ))}
               </div>
             </div>
           </div>
         </motion.section>
 
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          {/* Quick Intro */}
-          <motion.div
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-slate-200"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <p className="text-slate-700 leading-relaxed">
-              Welcome to <span className="font-semibold text-slate-900">AVR Lodge, Kolli Hills</span>.
-              By booking or staying with us, you agree to these terms.
-              <span className="text-slate-600"> Tap sections below to expand details.</span>
-            </p>
-          </motion.div>
-
-          {/* Accordion Terms */}
-          <div className="space-y-4">
-            {terms.map((section, index) => (
-              <motion.div
-                key={index}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200 overflow-hidden"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + index * 0.1 }}
+        {/* Contact Section */}
+        <motion.section
+          className="py-16 bg-black text-white"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <motion.h2
+                className="text-3xl font-serif font-bold text-white mb-8"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                viewport={{ once: true }}
               >
-                <button
-                  onClick={() => toggleSection(index)}
-                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-slate-50/80 transition-colors"
-                >
-                  <h3 className="font-semibold text-slate-900">{section.title}</h3>
-                  {expandedSections.includes(index) ?
-                    <ChevronDown className="w-5 h-5 text-slate-600" /> :
-                    <ChevronRight className="w-5 h-5 text-slate-600" />
-                  }
-                </button>
+                Questions? Contact Us
+              </motion.h2>
 
-                {expandedSections.includes(index) && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="border-t border-slate-100"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <motion.div
+                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <h3 className="text-xl font-serif font-bold text-white mb-4">Phone</h3>
+                  <a
+                    href="tel:+918122369100"
+                    className="text-gray-300 hover:text-white text-lg transition-colors duration-300"
                   >
-                    <div className="px-6 py-4 space-y-2">
-                      {section.items.map((item, itemIndex) => (
-                        <div key={itemIndex} className="flex items-start space-x-3">
-                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-slate-700 text-sm">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
+                    +91 81223 69100
+                  </a>
+                </motion.div>
+                <motion.div
+                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, duration: 0.6 }}
+                  viewport={{ once: true }}
+                >
+                  <h3 className="text-xl font-serif font-bold text-white mb-4">Email</h3>
+                  <a
+                    href="mailto:johneyresort@gmail.com"
+                    className="text-gray-300 hover:text-white text-lg transition-colors duration-300"
+                  >
+                    johneyresort@gmail.com
+                  </a>
+                </motion.div>
+              </div>
+
+              <motion.div
+                className="pt-8 border-t border-white/20"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <p className="text-gray-400 mb-4">Related Policies</p>
+                <div className="space-x-6">
+                  <motion.a
+                    href="/privacy-policy"
+                    className="text-gray-300 hover:text-white transition-colors duration-300 underline underline-offset-4"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Privacy Policy
+                  </motion.a>
+                  <motion.a
+                    href="/data-deletion-policy"
+                    className="text-gray-300 hover:text-white transition-colors duration-300 underline underline-offset-4"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Data Deletion Policy
+                  </motion.a>
+                </div>
               </motion.div>
-            ))}
-          </div>
-
-          {/* Quick Info Cards */}
-          <div className="grid md:grid-cols-2 gap-4 mt-8">
-            <motion.div
-              className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8 }}
-            >
-              <h4 className="font-semibold mb-2">🔒 Privacy & Data</h4>
-              <p className="text-blue-100 text-sm mb-3">Your data is protected. Read our policies:</p>
-              <div className="flex flex-col space-y-2">
-                <button
-                  onClick={() => window.location.href = '/privacy-policy'}
-                  className="text-left text-blue-100 hover:text-white text-sm flex items-center space-x-1"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  <span>Privacy Policy</span>
-                </button>
-                <button
-                  onClick={() => window.location.href = '/data-deletion-policy'}
-                  className="text-left text-blue-100 hover:text-white text-sm flex items-center space-x-1"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  <span>Data Deletion Policy</span>
-                </button>
-              </div>
-            </motion.div>
-
-            <motion.div
-              className="bg-gradient-to-br from-slate-500 to-slate-600 text-white rounded-2xl p-6"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.9 }}
-            >
-              <h4 className="font-semibold mb-2">⚖️ Legal Info</h4>
-              <div className="text-slate-100 text-sm space-y-1">
-                <p><span className="font-medium">Governed by:</span> Indian Law</p>
-                <p><span className="font-medium">Jurisdiction:</span> Tamil Nadu Courts</p>
-                <p className="text-slate-200 text-xs mt-2">Terms may be updated. Check this page for latest version.</p>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Contact Footer */}
-          <motion.div
-            className="bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-2xl p-6 mt-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1 }}
-          >
-            <h4 className="font-semibold mb-4 text-center">Questions? Contact Us</h4>
-            <div className="grid md:grid-cols-2 gap-4">
-              <a
-                href="tel:+918122369100"
-                className="flex items-center space-x-3 p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors"
-              >
-                <Phone className="w-5 h-5 text-blue-400" />
-                <div>
-                  <div className="font-medium">+91 81223 69100</div>
-                  <div className="text-slate-400 text-sm">Call us directly</div>
-                </div>
-              </a>
-              <a
-                href="mailto:johneyresort@gmail.com"
-                className="flex items-center space-x-3 p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors"
-              >
-                <Mail className="w-5 h-5 text-blue-400" />
-                <div>
-                  <div className="font-medium">johneyresort@gmail.com</div>
-                  <div className="text-slate-400 text-sm">Email support</div>
-                </div>
-              </a>
             </div>
-            <p className="text-center text-slate-400 text-xs mt-4">
-              By booking with us, you agree to these terms and conditions.
-            </p>
-          </motion.div>
-        </div>
+          </div>
+        </motion.section>
       </div>
     </>
   )

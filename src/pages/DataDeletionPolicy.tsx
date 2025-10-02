@@ -1,9 +1,27 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { Helmet } from 'react-helmet-async'
-import { Trash2, Mail, Phone, Clock, Shield, Facebook, ExternalLink } from 'lucide-react'
 
 export const DataDeletionPolicy: React.FC = () => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5 }
+    }
+  }
+
   return (
     <>
       <Helmet>
@@ -17,194 +35,277 @@ export const DataDeletionPolicy: React.FC = () => {
         <link rel="canonical" href="https://avrlodge.com/data-deletion-policy" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-red-50">
-        {/* Compact Header */}
+      <div className="min-h-screen bg-white">
+        {/* Header Section */}
         <motion.section
-          className="bg-gradient-to-r from-rose-600 to-red-600 text-white py-12 relative overflow-hidden"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          className="bg-black text-white py-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
         >
-          <div className="absolute inset-0 bg-black/20"></div>
-          <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent"></div>
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <motion.h1
+                className="text-2xl md:text-4xl font-serif font-bold mb-6"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+              >
+                Data Deletion Policy
+              </motion.h1>
+              <motion.p
+                className="text-xl text-gray-300"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+              >
+                Your Right to Delete Personal Information
+              </motion.p>
+            </div>
+          </div>
+        </motion.section>
 
-          <div className="relative max-w-6xl mx-auto px-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur">
-                <Trash2 className="w-6 h-6" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-4xl font-bold">Data Deletion Policy</h1>
-                <p className="text-rose-100 text-sm">Your right to delete personal information</p>
+        {/* Introduction */}
+        <motion.section
+          className="py-16"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.8 }}
+        >
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <motion.div
+                className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
+                whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+                transition={{ duration: 0.3 }}
+              >
+                <p className="text-gray-700 leading-relaxed text-lg text-center">
+                  At <strong className="text-black">AVR Lodge</strong>, you have the right to request deletion of your personal data.
+                  If you used Facebook Login or interacted with us via Meta platforms (Facebook, Instagram, WhatsApp),
+                  you can request data deletion at any time.
+                </p>
+              </motion.div>
+            </div>
+          </div>
+        </motion.section>
+
+        {/* Main Content Sections */}
+        <motion.section
+          className="pb-16 bg-gray-50"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="space-y-8">
+                {/* How to Request */}
+                <motion.div
+                  variants={itemVariants}
+                  className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
+                  whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h2 className="text-2xl font-serif font-bold text-black mb-6">How to Request Data Deletion</h2>
+                  <div className="space-y-6">
+                    {[
+                      { number: 1, title: "Send Email", desc: "Subject: 'Data Deletion Request'" },
+                      { number: 2, title: "Include Details", desc: "Account or booking information" },
+                      { number: 3, title: "Processing", desc: "Completed within 7 business days" }
+                    ].map((step, index) => (
+                      <motion.div
+                        key={step.number}
+                        className="flex items-start space-x-4"
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.2, duration: 0.5 }}
+                        viewport={{ once: true }}
+                      >
+                        <div className="bg-black text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                          {step.number}
+                        </div>
+                        <div>
+                          <p className="text-lg font-semibold text-black">{step.title}</p>
+                          <p className="text-gray-600">{step.desc}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* Facebook Users */}
+                <motion.div
+                  variants={itemVariants}
+                  className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
+                  whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h2 className="text-2xl font-serif font-bold text-black mb-6">Facebook Users</h2>
+                  <p className="text-gray-700 text-lg mb-6">Remove AVR Lodge access directly through:</p>
+                  <motion.div
+                    className="bg-blue-50/80 backdrop-blur-sm border border-blue-200 rounded-xl p-6"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <p className="text-blue-800 font-semibold text-lg">
+                      Facebook Settings → Apps and Websites → AVR Lodge → Remove
+                    </p>
+                  </motion.div>
+                </motion.div>
+
+                {/* Legal Compliance */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <motion.div
+                    variants={itemVariants}
+                    className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
+                    whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <h2 className="text-2xl font-serif font-bold text-green-800 mb-6">Can be Deleted</h2>
+                    <ul className="space-y-4">
+                      {["Marketing preferences", "Social login data", "Non-essential details"].map((item, index) => (
+                        <motion.li
+                          key={item}
+                          className="flex items-start space-x-3"
+                          initial={{ opacity: 0, x: -10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1, duration: 0.5 }}
+                          viewport={{ once: true }}
+                        >
+                          <span className="w-2 h-2 bg-green-500 rounded-full mt-3 flex-shrink-0"></span>
+                          <span className="text-gray-700 text-base">{item}</span>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </motion.div>
+
+                  <motion.div
+                    variants={itemVariants}
+                    className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
+                    whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <h2 className="text-2xl font-serif font-bold text-orange-800 mb-6">Must be Retained</h2>
+                    <ul className="space-y-4 mb-6">
+                      {["Government ID records", "Financial transactions", "Legal compliance data"].map((item, index) => (
+                        <motion.li
+                          key={item}
+                          className="flex items-start space-x-3"
+                          initial={{ opacity: 0, x: -10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1, duration: 0.5 }}
+                          viewport={{ once: true }}
+                        >
+                          <span className="w-2 h-2 bg-orange-500 rounded-full mt-3 flex-shrink-0"></span>
+                          <span className="text-gray-700 text-base">{item}</span>
+                        </motion.li>
+                      ))}
+                    </ul>
+                    <motion.div
+                      className="bg-gray-50/80 backdrop-blur-sm border border-gray-200 rounded-xl p-4"
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        Per Indian regulations, some records must be retained until legally permissible to delete.
+                      </p>
+                    </motion.div>
+                  </motion.div>
+                </div>
               </div>
             </div>
           </div>
         </motion.section>
 
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          {/* Alert Notice */}
-          <motion.div
-            className="bg-gradient-to-r from-amber-100 to-orange-100 border border-amber-200 rounded-2xl p-4 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="flex items-start space-x-3">
-              <Shield className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm">
-                <p className="font-medium text-amber-800 mb-1">Important Notice</p>
-                <p className="text-amber-700">
-                  If you used Facebook Login or interacted via Meta platforms (Facebook, Instagram, WhatsApp),
-                  you can request data deletion at any time.
-                </p>
+        {/* Contact Section */}
+        <motion.section
+          className="py-16 bg-black text-white"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <motion.h2
+                className="text-3xl font-serif font-bold text-white mb-8"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                Contact Us for Data Deletion
+              </motion.h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <motion.div
+                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <h3 className="text-xl font-serif font-bold text-white mb-4">Email</h3>
+                  <a
+                    href="mailto:johneyresort@gmail.com?subject=Data Deletion Request"
+                    className="text-gray-300 hover:text-white text-lg transition-colors duration-300 block mb-2"
+                  >
+                    johneyresort@gmail.com
+                  </a>
+                  <p className="text-gray-400 text-sm">Subject: "Data Deletion Request"</p>
+                </motion.div>
+                <motion.div
+                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, duration: 0.6 }}
+                  viewport={{ once: true }}
+                >
+                  <h3 className="text-xl font-serif font-bold text-white mb-4">Phone</h3>
+                  <a
+                    href="tel:+918122369100"
+                    className="text-gray-300 hover:text-white text-lg transition-colors duration-300 block mb-2"
+                  >
+                    +91 81223 69100
+                  </a>
+                  <p className="text-gray-400 text-sm">Business hours only</p>
+                </motion.div>
               </div>
+
+              <motion.div
+                className="pt-8 border-t border-white/20"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <p className="text-gray-400 mb-4">Related Policies</p>
+                <div className="space-x-6">
+                  <motion.a
+                    href="/privacy-policy"
+                    className="text-gray-300 hover:text-white transition-colors duration-300 underline underline-offset-4"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Privacy Policy
+                  </motion.a>
+                  <motion.a
+                    href="/terms-of-service"
+                    className="text-gray-300 hover:text-white transition-colors duration-300 underline underline-offset-4"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Terms of Service
+                  </motion.a>
+                </div>
+              </motion.div>
             </div>
-          </motion.div>
-
-          {/* 3-Step Process */}
-          <motion.div
-            className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-gray-200"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-              <Mail className="w-5 h-5 text-red-500" />
-              <span>How to Request Data Deletion</span>
-            </h2>
-
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="bg-red-50 rounded-xl p-4 text-center">
-                <div className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold">1</div>
-                <h3 className="font-semibold text-gray-900 mb-1">Send Email</h3>
-                <p className="text-xs text-gray-600">Subject: "Data Deletion Request"</p>
-              </div>
-
-              <div className="bg-red-50 rounded-xl p-4 text-center">
-                <div className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold">2</div>
-                <h3 className="font-semibold text-gray-900 mb-1">Include Details</h3>
-                <p className="text-xs text-gray-600">Account or booking information</p>
-              </div>
-
-              <div className="bg-red-50 rounded-xl p-4 text-center">
-                <div className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold">3</div>
-                <h3 className="font-semibold text-gray-900 mb-1">Processing</h3>
-                <p className="text-xs text-gray-600">Completed within 7 business days</p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Facebook Option */}
-          <motion.div
-            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl p-6 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <div className="flex items-center space-x-3 mb-3">
-              <Facebook className="w-6 h-6" />
-              <h3 className="font-semibold">Facebook Users</h3>
-            </div>
-            <p className="text-blue-100 text-sm">
-              Remove AVR Lodge access directly: <strong>Facebook Settings → Apps and Websites → AVR Lodge → Remove</strong>
-            </p>
-          </motion.div>
-
-          {/* Legal Exceptions */}
-          <motion.div
-            className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-gray-200"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <h3 className="font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-              <Shield className="w-5 h-5 text-yellow-500" />
-              <span>Legal Compliance</span>
-            </h3>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-green-50 rounded-xl p-4">
-                <h4 className="text-sm font-semibold text-green-800 mb-2">✓ Can be deleted</h4>
-                <ul className="text-xs text-green-700 space-y-1">
-                  <li>• Marketing preferences</li>
-                  <li>• Social login data</li>
-                  <li>• Non-essential details</li>
-                </ul>
-              </div>
-
-              <div className="bg-orange-50 rounded-xl p-4">
-                <h4 className="text-sm font-semibold text-orange-800 mb-2">⚠️ Must be retained</h4>
-                <ul className="text-xs text-orange-700 space-y-1">
-                  <li>• Government ID records</li>
-                  <li>• Financial transactions</li>
-                  <li>• Legal compliance data</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="mt-4 bg-gray-50 rounded-xl p-3">
-              <p className="text-xs text-gray-600">
-                <Clock className="w-3 h-3 inline mr-1" />
-                Some records must be retained per Indian regulations until legally permissible to delete.
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Contact Cards */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <motion.a
-              href="mailto:johneyresort@gmail.com?subject=Data Deletion Request"
-              className="bg-gradient-to-br from-slate-600 to-slate-700 text-white rounded-2xl p-6 block hover:from-slate-700 hover:to-slate-800 transition-all"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              <Mail className="w-6 h-6 mb-3" />
-              <h3 className="font-semibold mb-1">Email Request</h3>
-              <p className="text-slate-300 text-sm">johneyresort@gmail.com</p>
-              <p className="text-slate-400 text-xs mt-1">Subject: "Data Deletion Request"</p>
-            </motion.a>
-
-            <motion.a
-              href="tel:+918122369100"
-              className="bg-gradient-to-br from-slate-600 to-slate-700 text-white rounded-2xl p-6 block hover:from-slate-700 hover:to-slate-800 transition-all"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.7 }}
-            >
-              <Phone className="w-6 h-6 mb-3" />
-              <h3 className="font-semibold mb-1">Phone Support</h3>
-              <p className="text-slate-300 text-sm">+91 81223 69100</p>
-              <p className="text-slate-400 text-xs mt-1">Business hours only</p>
-            </motion.a>
           </div>
-
-          {/* Related Links */}
-          <motion.div
-            className="bg-gray-100 rounded-2xl p-4 mt-8 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-          >
-            <p className="text-gray-600 text-sm mb-2">Related Policies</p>
-            <div className="flex justify-center space-x-4 text-xs">
-              <button
-                onClick={() => window.location.href = '/privacy-policy'}
-                className="text-blue-600 hover:text-blue-800 flex items-center space-x-1"
-              >
-                <ExternalLink className="w-3 h-3" />
-                <span>Privacy Policy</span>
-              </button>
-              <button
-                onClick={() => window.location.href = '/terms-of-service'}
-                className="text-blue-600 hover:text-blue-800 flex items-center space-x-1"
-              >
-                <ExternalLink className="w-3 h-3" />
-                <span>Terms of Service</span>
-              </button>
-            </div>
-          </motion.div>
-        </div>
+        </motion.section>
       </div>
     </>
   )

@@ -1,74 +1,77 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { Helmet } from 'react-helmet-async'
-import { Shield, Mail, Phone, ChevronDown, ChevronRight, User, Lock, Eye, FileText, Globe, Scale, ExternalLink, Calendar } from 'lucide-react'
 
 export const PrivacyPolicy: React.FC = () => {
-  const [expandedSections, setExpandedSections] = useState<number[]>([])
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
 
-  const toggleSection = (index: number) => {
-    setExpandedSections(prev =>
-      prev.includes(index)
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
-    )
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5 }
+    }
   }
 
   const sections = [
     {
-      title: "📋 Information We Collect",
-      items: [
-        "Personal details: Name, phone, email, address",
-        "Government ID (required under Indian law)",
-        "Booking information: Dates, preferences, payments",
-        "Communication data: Emails, calls, messages",
-        "Website data: IP address, browser, cookies"
+      title: "Information We Collect",
+      content: [
+        "Personal Details: Name, phone, email, postal address, and government-issued ID (required under Indian law).",
+        "Booking & Stay Information: Dates of stay, room preferences, payment details, and special requests.",
+        "Communication Data: Emails, calls, or messages regarding reservations or inquiries.",
+        "Website/Online Data: IP address, browser type, cookies, and usage details."
       ]
     },
     {
-      title: "🎯 How We Use Your Information",
-      items: [
-        "Managing and confirming reservations",
-        "Legal compliance for guest registration",
-        "Processing payments securely",
-        "Communication and customer service",
-        "Improving services and user experience"
+      title: "How We Use Your Information",
+      content: [
+        "Managing and confirming reservations.",
+        "Complying with legal requirements for guest registration.",
+        "Processing payments through secure gateways.",
+        "Communicating updates, offers, or responses to your inquiries.",
+        "Improving our website, guest services, and overall experience."
       ]
     },
     {
-      title: "🔗 Information Sharing",
-      items: [
-        "Government authorities (legal compliance)",
-        "Trusted service providers (payment processors)",
-        "Third-party booking platforms",
-        "Legal protection when required by law"
+      title: "Sharing of Information",
+      content: [
+        "Legal & Regulatory Compliance: With government authorities as mandated for lodging establishments.",
+        "Service Providers: With trusted partners like payment processors or online booking platforms.",
+        "Legal Protection: If required to protect the safety, rights, or property of our lodge, guests, or others."
       ]
     },
     {
-      title: "🍪 Cookies & Website Usage",
-      items: [
-        "Cookies enhance browsing experience",
-        "Remember preferences and analyze traffic",
-        "You can disable cookies (may affect features)",
-        "Third-party links not our responsibility"
+      title: "Cookies & Website Usage",
+      content: [
+        "We may use cookies to enhance your browsing experience, remember preferences, and analyze site traffic.",
+        "You may disable cookies in your browser, but some features may not work properly.",
+        "Our website may contain links to third-party sites. We are not responsible for their privacy practices."
       ]
     },
     {
-      title: "🔒 Data Security",
-      items: [
-        "Physical, technical, administrative safeguards",
-        "Reasonable protection measures implemented",
-        "No system is 100% secure",
-        "Cannot guarantee absolute data protection"
+      title: "Data Security",
+      content: [
+        "We adopt reasonable physical, technical, and administrative measures to protect your information.",
+        "However, no system is completely secure, and we cannot guarantee absolute protection of your data."
       ]
     },
     {
-      title: "⚖️ Your Rights",
-      items: [
-        "Request access to your data",
-        "Request correction of inaccurate information",
-        "Request data deletion (subject to legal requirements)",
-        "Contact us to exercise these rights"
+      title: "Your Rights",
+      content: [
+        "Request access to the information we hold about you.",
+        "Request correction of inaccurate or incomplete details.",
+        "Request deletion of your data, subject to legal and regulatory requirements.",
+        "To exercise these rights, please contact us using the information provided below."
       ]
     }
   ]
@@ -86,164 +89,229 @@ export const PrivacyPolicy: React.FC = () => {
         <link rel="canonical" href="https://avrlodge.com/privacy-policy" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-teal-50">
-        {/* Compact Header */}
+      <div className="min-h-screen bg-white">
+        {/* Header Section */}
         <motion.section
-          className="bg-gradient-to-r from-green-600 to-teal-600 text-white py-12 relative overflow-hidden"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          className="bg-black text-white py-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
         >
-          <div className="absolute inset-0 bg-black/20"></div>
-          <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent"></div>
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <motion.h1
+                className="text-2xl md:text-4xl font-serif font-bold mb-6"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+              >
+                Privacy Policy
+              </motion.h1>
+              <motion.p
+                className="text-xl text-gray-300 mb-4"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+              >
+                Your Privacy & Data Protection Rights
+              </motion.p>
+              <motion.p
+                className="text-lg text-gray-300"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.8 }}
+              >
+                Effective Date: 1st September 2025
+              </motion.p>
+            </div>
+          </div>
+        </motion.section>
 
-          <div className="relative max-w-6xl mx-auto px-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center space-x-3 mb-2">
-                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur">
-                    <Shield className="w-6 h-6" />
-                  </div>
-                  <h1 className="text-2xl md:text-4xl font-bold">Privacy Policy</h1>
-                </div>
-                <p className="text-green-100 flex items-center space-x-2">
-                  <Calendar className="w-4 h-4" />
-                  <span>Effective: 1st September 2025</span>
+        {/* Introduction */}
+        <motion.section
+          className="py-16"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9, duration: 0.8 }}
+        >
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <motion.div
+                className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
+                whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+                transition={{ duration: 0.3 }}
+              >
+                <p className="text-gray-700 leading-relaxed text-lg text-center">
+                  At <strong className="text-black">AVR Lodge, Kolli Hills</strong>, we respect your privacy and are committed to protecting your personal information.
+                  This Privacy Policy explains what data we collect, how we use it, and your rights regarding your information.
                 </p>
+              </motion.div>
+            </div>
+          </div>
+        </motion.section>
+
+        {/* Main Content Sections */}
+        <motion.section
+          className="pb-16 bg-gray-50"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="space-y-8">
+                {sections.map((section, index) => (
+                  <motion.div
+                    key={index}
+                    variants={itemVariants}
+                    className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
+                    whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <h2 className="text-2xl font-serif font-bold text-black mb-6">{section.title}</h2>
+                    <ul className="space-y-4">
+                      {section.content.map((item, itemIndex) => (
+                        <motion.li
+                          key={itemIndex}
+                          className="flex items-start space-x-4"
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ delay: itemIndex * 0.1, duration: 0.5 }}
+                          viewport={{ once: true }}
+                        >
+                          <span className="w-2 h-2 bg-black rounded-full mt-3 flex-shrink-0"></span>
+                          <span className="text-gray-700 leading-relaxed text-base">{item}</span>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                ))}
               </div>
             </div>
           </div>
         </motion.section>
 
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          {/* Quick Intro */}
-          <motion.div
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-green-200"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <p className="text-green-700 leading-relaxed">
-              At <span className="font-semibold text-green-900">AVR Lodge, Kolli Hills</span>,
-              we respect your privacy and protect your personal information.
-              <span className="text-green-600"> Tap sections below to learn more.</span>
-            </p>
-          </motion.div>
-
-          {/* Accordion Sections */}
-          <div className="space-y-4">
-            {sections.map((section, index) => (
+        {/* Updates Policy */}
+        <motion.section
+          className="py-16 bg-gray-100"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
               <motion.div
-                key={index}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl border border-green-200 overflow-hidden"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + index * 0.1 }}
+                className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
+                whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
+                transition={{ duration: 0.3 }}
               >
-                <button
-                  onClick={() => toggleSection(index)}
-                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-green-50/80 transition-colors"
-                >
-                  <h3 className="font-semibold text-green-900">{section.title}</h3>
-                  {expandedSections.includes(index) ?
-                    <ChevronDown className="w-5 h-5 text-green-600" /> :
-                    <ChevronRight className="w-5 h-5 text-green-600" />
-                  }
-                </button>
-
-                {expandedSections.includes(index) && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="border-t border-green-100"
-                  >
-                    <div className="px-6 py-4 space-y-2">
-                      {section.items.map((item, itemIndex) => (
-                        <div key={itemIndex} className="flex items-start space-x-3">
-                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-green-700 text-sm">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
+                <h2 className="text-2xl font-serif font-bold text-black mb-6">Updates to This Policy</h2>
+                <p className="text-gray-700 leading-relaxed text-lg">
+                  We may update this Privacy Policy from time to time to reflect changes in our practices or applicable laws.
+                  The revised version will be posted on our website with the effective date.
+                </p>
               </motion.div>
-            ))}
-          </div>
-
-          {/* Policy Updates */}
-          <motion.div
-            className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-2xl p-6 mt-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-          >
-            <div className="flex items-center space-x-3 mb-3">
-              <FileText className="w-6 h-6" />
-              <h3 className="font-semibold">Policy Updates</h3>
             </div>
-            <p className="text-teal-100 text-sm">
-              We may update this policy periodically. Check this page for the latest version with updated effective dates.
-            </p>
-          </motion.div>
-
-          {/* Contact Cards */}
-          <div className="grid md:grid-cols-2 gap-4 mt-8">
-            <motion.a
-              href="tel:+918122369100"
-              className="bg-gradient-to-br from-slate-600 to-slate-700 text-white rounded-2xl p-6 block hover:from-slate-700 hover:to-slate-800 transition-all"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.9 }}
-            >
-              <Phone className="w-6 h-6 mb-3" />
-              <h3 className="font-semibold mb-1">Phone Support</h3>
-              <p className="text-slate-300 text-sm">+91 81223 69100</p>
-              <p className="text-slate-400 text-xs mt-1">Business hours only</p>
-            </motion.a>
-
-            <motion.a
-              href="mailto:johneyresort@gmail.com?subject=Privacy Policy Inquiry"
-              className="bg-gradient-to-br from-slate-600 to-slate-700 text-white rounded-2xl p-6 block hover:from-slate-700 hover:to-slate-800 transition-all"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1 }}
-            >
-              <Mail className="w-6 h-6 mb-3" />
-              <h3 className="font-semibold mb-1">Email Support</h3>
-              <p className="text-slate-300 text-sm">johneyresort@gmail.com</p>
-              <p className="text-slate-400 text-xs mt-1">Subject: "Privacy Policy Inquiry"</p>
-            </motion.a>
           </div>
+        </motion.section>
 
-          {/* Related Links */}
-          <motion.div
-            className="bg-gray-100 rounded-2xl p-4 mt-8 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1 }}
-          >
-            <p className="text-gray-600 text-sm mb-2">Related Policies</p>
-            <div className="flex justify-center space-x-4 text-xs">
-              <button
-                onClick={() => window.location.href = '/terms-of-service'}
-                className="text-blue-600 hover:text-blue-800 flex items-center space-x-1"
+        {/* Contact Section */}
+        <motion.section
+          className="py-16 bg-black text-white"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <motion.h2
+                className="text-3xl font-serif font-bold text-white mb-6"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                viewport={{ once: true }}
               >
-                <ExternalLink className="w-3 h-3" />
-                <span>Terms of Service</span>
-              </button>
-              <button
-                onClick={() => window.location.href = '/data-deletion-policy'}
-                className="text-blue-600 hover:text-blue-800 flex items-center space-x-1"
+                Questions? Contact Us
+              </motion.h2>
+              <motion.p
+                className="text-gray-300 text-lg mb-12"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+                viewport={{ once: true }}
               >
-                <ExternalLink className="w-3 h-3" />
-                <span>Data Deletion Policy</span>
-              </button>
+                For questions, concerns, or requests related to this Privacy Policy, please reach out to us:
+              </motion.p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <motion.div
+                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <h3 className="text-xl font-serif font-bold text-white mb-4">Phone</h3>
+                  <a
+                    href="tel:+918122369100"
+                    className="text-gray-300 hover:text-white text-lg transition-colors duration-300"
+                  >
+                    +91 81223 69100
+                  </a>
+                </motion.div>
+                <motion.div
+                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, duration: 0.6 }}
+                  viewport={{ once: true }}
+                >
+                  <h3 className="text-xl font-serif font-bold text-white mb-4">Email</h3>
+                  <a
+                    href="mailto:johneyresort@gmail.com"
+                    className="text-gray-300 hover:text-white text-lg transition-colors duration-300"
+                  >
+                    johneyresort@gmail.com
+                  </a>
+                </motion.div>
+              </div>
+
+              <motion.div
+                className="pt-8 border-t border-white/20"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <p className="text-gray-400 mb-4">Related Policies</p>
+                <div className="space-x-6">
+                  <motion.a
+                    href="/terms-of-service"
+                    className="text-gray-300 hover:text-white transition-colors duration-300 underline underline-offset-4"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Terms of Service
+                  </motion.a>
+                  <motion.a
+                    href="/data-deletion-policy"
+                    className="text-gray-300 hover:text-white transition-colors duration-300 underline underline-offset-4"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Data Deletion Policy
+                  </motion.a>
+                </div>
+              </motion.div>
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.section>
       </div>
     </>
   )
