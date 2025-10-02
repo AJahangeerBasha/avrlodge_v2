@@ -1,0 +1,84 @@
+{
+  "categories": [
+    {
+      "category": "Utilities",
+      "subCategories": [
+        {"name": "Electricity Bill"},
+        {"name": "Water Bill"},
+        {"name": "Internet Recharge"}
+      ]
+    },
+    {
+      "category": "Purchases & Consumables",
+      "subCategories": [
+        {"name": "Cleaning Materials", "items": ["Soap Powder"]},
+        {"name": "Toiletries", "items": ["Soap", "Shampoo", "Tissue Rolls"]},
+        {"name": "Linen & Towels", "items": ["Bedsheets", "Towels"]},
+        {"name": "Fuel", "items": ["Gas", "Diesel"]}
+      ]
+    },
+    {
+      "category": "Salaries & Wages",
+      "subCategories": [
+        {"name": "Staff Salary"},
+        {"name": "Bonus"},
+        {"name": "Contractor / Daily Wages"}
+      ]
+    },
+    {
+      "category": "Maintenance & Repairs",
+      "subCategories": [
+        {"name": "Electrician Services"},
+        {"name": "AC & Fan Servicing"},
+        {"name": "Painting Work"},
+        {"name": "Carpentry"},
+        {"name": "Plumbing Repairs"},
+        {"name": "General Building Repairs"}
+      ]
+    },
+    {
+      "category": "Marketing & Promotion",
+      "subCategories": [
+        {"name": "Google Ads"},
+        {"name": "Online Ads"},
+        {"name": "Pamphlets & Flyers"},
+        {"name": "OTA Commissions", "items": ["Booking.com", "Agoda", "Makemytrip"]}
+      ]
+    },
+    {
+      "category": "Bank & Finance",
+      "subCategories": [
+        {"name": "Bank Charges", "items": ["QR / UPI Charges", "ATM / Bank Service Charges"]},
+        {"name": "Loan EMI"}
+      ]
+    },
+    {
+      "category": "Licenses & Legal",
+      "subCategories": [
+        {"name": "Trade License Renewal"},
+        {"name": "Taxes", "items": ["GST", "Property Tax", "Professional Tax"]},
+        {"name": "Legal & Consultancy Charges"}
+      ]
+    },
+    {
+      "category": "Insurance",
+      "subCategories": [
+        {"name": "Building Insurance"},
+        {"name": "General Liability Insurance"},
+        {"name": "Fire / Accident Insurance"}
+      ]
+    },
+    {
+      "category": "Miscellaneous Expenses",
+      "subCategories": [
+        {"name": "Guest Amenities", "items": ["Tea", "Coffee", "Water Bottles"]},
+        {"name": "Travel & Fuel"},
+        {"name": "Printing & Stationery"},
+        {"name": "Tips & Staff Welfare"},
+        {"name": "Minor Repairs"},
+        {"name": "Emergency Expenses"},
+        {"name": "Contingency Expenses"}
+      ]
+    }
+  ]
+}
