@@ -140,7 +140,7 @@ export const LoginPage: React.FC = () => {
               <span className="truncate">Sign in with Google</span>
             </Button>
 
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               className="btn-responsive w-full border-gray-300 hover:bg-gray-50 text-black"
@@ -149,7 +149,7 @@ export const LoginPage: React.FC = () => {
             >
               <FaFacebook className="mr-2 h-4 w-4 text-blue-600" />
               <span className="truncate">Sign in with Facebook</span>
-            </Button>
+            </Button> */}
 
             {/* <Button
               type="button"
