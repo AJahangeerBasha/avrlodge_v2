@@ -66,7 +66,7 @@ export default function BookingCard({
   const { openPaymentModal, openCheckInModal, openCheckOutModal, openRoomChangeModal } = useBookingsModals()
   const { refreshBookings } = useBookingsActions()
   const { toast } = useToast()
-  const { currentUser } = useAuth()
+  const { currentUser, userRole } = useAuth()
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -1035,8 +1035,8 @@ export default function BookingCard({
                 Edit Reservation
               </Button> */}
 
-              {/* Additional Options Button - Only show when there's remaining balance */}
-              {calculatePaymentTotals().remainingBalance > 0 && getCalculatedStatus() !== 'cancelled' && (
+              {/* Additional Options Button - Only show when there's remaining balance and user is admin */}
+              {calculatePaymentTotals().remainingBalance > 0 && getCalculatedStatus() !== 'cancelled' && userRole === 'admin' && (
                 <Button
                   onClick={() => setShowAdditionalOptions(true)}
                   variant="outline"
