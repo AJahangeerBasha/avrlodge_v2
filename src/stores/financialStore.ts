@@ -29,6 +29,10 @@ interface FinancialUIState {
   // Filter states
   filters: FinancialFilters
 
+  // Pagination states
+  currentPage: number
+  itemsPerPage: number
+
   // Error states
   error: string | null
 }
@@ -39,6 +43,10 @@ interface FinancialActions {
   setSelectedMonth: (month: string) => void
   setCustomDate: (date: string) => void
   setCustomDateRange: (startDate: string, endDate: string) => void
+
+  // Pagination actions
+  setCurrentPage: (page: number) => void
+  setItemsPerPage: (items: number) => void
 
   // UI state actions
   setLoadingStats: (loading: boolean) => void
@@ -64,6 +72,8 @@ const initialUIState: FinancialUIState = {
   isLoadingStats: false,
   isExporting: false,
   filters: initialFilters,
+  currentPage: 1,
+  itemsPerPage: 10,
   error: null,
 }
 
@@ -93,6 +103,19 @@ export const useFinancialStore = create<FinancialStore>()(
           set((state) => {
             state.filters.customStartDate = startDate
             state.filters.customEndDate = endDate
+            state.currentPage = 1 // Reset to page 1 when filter changes
+          }),
+
+        // Pagination actions
+        setCurrentPage: (page) =>
+          set((state) => {
+            state.currentPage = page
+          }),
+
+        setItemsPerPage: (items) =>
+          set((state) => {
+            state.itemsPerPage = items
+            state.currentPage = 1 // Reset to page 1 when changing items per page
           }),
 
         // UI state actions
@@ -148,12 +171,16 @@ export const useFinancialCustomEndDate = () => useFinancialStore((state) => stat
 export const useFinancialIsLoadingStats = () => useFinancialStore((state) => state.isLoadingStats)
 export const useFinancialIsExporting = () => useFinancialStore((state) => state.isExporting)
 export const useFinancialError = () => useFinancialStore((state) => state.error)
+export const useFinancialCurrentPage = () => useFinancialStore((state) => state.currentPage)
+export const useFinancialItemsPerPage = () => useFinancialStore((state) => state.itemsPerPage)
 
 // Action selectors
 export const useFinancialSetDateFilterType = () => useFinancialStore((state) => state.setDateFilterType)
 export const useFinancialSetSelectedMonth = () => useFinancialStore((state) => state.setSelectedMonth)
 export const useFinancialSetCustomDate = () => useFinancialStore((state) => state.setCustomDate)
 export const useFinancialSetCustomDateRange = () => useFinancialStore((state) => state.setCustomDateRange)
+export const useFinancialSetCurrentPage = () => useFinancialStore((state) => state.setCurrentPage)
+export const useFinancialSetItemsPerPage = () => useFinancialStore((state) => state.setItemsPerPage)
 export const useFinancialSetLoadingStats = () => useFinancialStore((state) => state.setLoadingStats)
 export const useFinancialSetExporting = () => useFinancialStore((state) => state.setExporting)
 export const useFinancialSetError = () => useFinancialStore((state) => state.setError)

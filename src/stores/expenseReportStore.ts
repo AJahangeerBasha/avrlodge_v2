@@ -34,6 +34,10 @@ interface ExpenseReportUIState {
   // Filter states
   filters: ExpenseReportFilters
 
+  // Pagination states
+  currentPage: number
+  itemsPerPage: number
+
   // Error states
   error: string | null
 }
@@ -46,6 +50,10 @@ interface ExpenseReportActions {
   setCustomDateRange: (startDate: string, endDate: string) => void
   setPaymentModeFilter: (mode: ExpenseReportPaymentModeFilter) => void
   setStatusFilter: (status: ExpenseReportStatusFilter) => void
+
+  // Pagination actions
+  setCurrentPage: (page: number) => void
+  setItemsPerPage: (items: number) => void
 
   // UI state actions
   setLoadingStats: (loading: boolean) => void
@@ -73,6 +81,8 @@ const initialUIState: ExpenseReportUIState = {
   isLoadingStats: false,
   isExporting: false,
   filters: initialFilters,
+  currentPage: 1,
+  itemsPerPage: 10,
   error: null,
 }
 
@@ -112,6 +122,19 @@ export const useExpenseReportStore = create<ExpenseReportStore>()(
         setStatusFilter: (status) =>
           set((state) => {
             state.filters.statusFilter = status
+            state.currentPage = 1 // Reset to page 1 when filter changes
+          }),
+
+        // Pagination actions
+        setCurrentPage: (page) =>
+          set((state) => {
+            state.currentPage = page
+          }),
+
+        setItemsPerPage: (items) =>
+          set((state) => {
+            state.itemsPerPage = items
+            state.currentPage = 1 // Reset to page 1 when changing items per page
           }),
 
         // UI state actions
@@ -169,6 +192,8 @@ export const useExpenseReportStatusFilter = () => useExpenseReportStore((state) 
 export const useExpenseReportIsLoadingStats = () => useExpenseReportStore((state) => state.isLoadingStats)
 export const useExpenseReportIsExporting = () => useExpenseReportStore((state) => state.isExporting)
 export const useExpenseReportError = () => useExpenseReportStore((state) => state.error)
+export const useExpenseReportCurrentPage = () => useExpenseReportStore((state) => state.currentPage)
+export const useExpenseReportItemsPerPage = () => useExpenseReportStore((state) => state.itemsPerPage)
 
 // Action selectors
 export const useExpenseReportSetDateFilterType = () => useExpenseReportStore((state) => state.setDateFilterType)
@@ -177,6 +202,8 @@ export const useExpenseReportSetCustomDate = () => useExpenseReportStore((state)
 export const useExpenseReportSetCustomDateRange = () => useExpenseReportStore((state) => state.setCustomDateRange)
 export const useExpenseReportSetPaymentModeFilter = () => useExpenseReportStore((state) => state.setPaymentModeFilter)
 export const useExpenseReportSetStatusFilter = () => useExpenseReportStore((state) => state.setStatusFilter)
+export const useExpenseReportSetCurrentPage = () => useExpenseReportStore((state) => state.setCurrentPage)
+export const useExpenseReportSetItemsPerPage = () => useExpenseReportStore((state) => state.setItemsPerPage)
 export const useExpenseReportSetLoadingStats = () => useExpenseReportStore((state) => state.setLoadingStats)
 export const useExpenseReportSetExporting = () => useExpenseReportStore((state) => state.setExporting)
 export const useExpenseReportSetError = () => useExpenseReportStore((state) => state.setError)

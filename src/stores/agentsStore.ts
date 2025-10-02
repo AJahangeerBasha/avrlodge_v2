@@ -29,6 +29,10 @@ interface AgentState {
   error: string | null
   filters: AgentFilters
 
+  // Pagination state
+  currentPage: number
+  itemsPerPage: number
+
   // Modal state
   isCreateModalOpen: boolean
   isEditModalOpen: boolean
@@ -70,6 +74,10 @@ interface AgentActions {
   setFilters: (filters: AgentFilters) => void
   updateFilters: (partialFilters: Partial<AgentFilters>) => void
   clearFilters: () => void
+
+  // Pagination actions
+  setCurrentPage: (page: number) => void
+  setItemsPerPage: (items: number) => void
 
   // Modal actions
   openCreateModal: () => void
@@ -123,6 +131,8 @@ export const useAgentsStore = create<AgentState & AgentActions>()(
       loading: false,
       error: null,
       filters: {},
+      currentPage: 1,
+      itemsPerPage: 9,
       isCreateModalOpen: false,
       isEditModalOpen: false,
       isViewModalOpen: false,
@@ -316,7 +326,12 @@ export const useAgentsStore = create<AgentState & AgentActions>()(
         'updateFilters'
       ),
 
-      clearFilters: () => set({ filters: {} }, false, 'clearFilters'),
+      clearFilters: () => set({ filters: {}, currentPage: 1 }, false, 'clearFilters'),
+
+      // Pagination actions
+      setCurrentPage: (page) => set({ currentPage: page }, false, 'setCurrentPage'),
+
+      setItemsPerPage: (items) => set({ itemsPerPage: items, currentPage: 1 }, false, 'setItemsPerPage'),
 
       // Modal actions
       openCreateModal: () => set({

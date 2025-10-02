@@ -33,6 +33,10 @@ interface RevenueUIState {
   // Filter states
   filters: RevenueFilters
 
+  // Pagination states
+  currentPage: number
+  itemsPerPage: number
+
   // Error states
   error: string | null
 }
@@ -44,6 +48,10 @@ interface RevenueActions {
   setCustomDate: (date: string) => void
   setCustomDateRange: (startDate: string, endDate: string) => void
   setPaymentMethodFilter: (method: PaymentMethodFilter) => void
+
+  // Pagination actions
+  setCurrentPage: (page: number) => void
+  setItemsPerPage: (items: number) => void
 
   // UI state actions
   setLoadingStats: (loading: boolean) => void
@@ -70,6 +78,8 @@ const initialUIState: RevenueUIState = {
   isLoadingStats: false,
   isExporting: false,
   filters: initialFilters,
+  currentPage: 1,
+  itemsPerPage: 10,
   error: null,
 }
 
@@ -104,6 +114,19 @@ export const useRevenueStore = create<RevenueStore>()(
         setPaymentMethodFilter: (method) =>
           set((state) => {
             state.filters.paymentMethodFilter = method
+            state.currentPage = 1 // Reset to page 1 when filter changes
+          }),
+
+        // Pagination actions
+        setCurrentPage: (page) =>
+          set((state) => {
+            state.currentPage = page
+          }),
+
+        setItemsPerPage: (items) =>
+          set((state) => {
+            state.itemsPerPage = items
+            state.currentPage = 1 // Reset to page 1 when changing items per page
           }),
 
         // UI state actions
@@ -160,6 +183,8 @@ export const usePaymentMethodFilter = () => useRevenueStore((state) => state.fil
 export const useIsLoadingStats = () => useRevenueStore((state) => state.isLoadingStats)
 export const useIsExporting = () => useRevenueStore((state) => state.isExporting)
 export const useRevenueError = () => useRevenueStore((state) => state.error)
+export const useRevenueCurrentPage = () => useRevenueStore((state) => state.currentPage)
+export const useRevenueItemsPerPage = () => useRevenueStore((state) => state.itemsPerPage)
 
 // Action selectors
 export const useSetDateFilterType = () => useRevenueStore((state) => state.setDateFilterType)
@@ -167,6 +192,8 @@ export const useSetSelectedMonth = () => useRevenueStore((state) => state.setSel
 export const useSetCustomDate = () => useRevenueStore((state) => state.setCustomDate)
 export const useSetCustomDateRange = () => useRevenueStore((state) => state.setCustomDateRange)
 export const useSetPaymentMethodFilter = () => useRevenueStore((state) => state.setPaymentMethodFilter)
+export const useSetRevenueCurrentPage = () => useRevenueStore((state) => state.setCurrentPage)
+export const useSetRevenueItemsPerPage = () => useRevenueStore((state) => state.setItemsPerPage)
 export const useSetLoadingStats = () => useRevenueStore((state) => state.setLoadingStats)
 export const useSetExporting = () => useRevenueStore((state) => state.setExporting)
 export const useSetError = () => useRevenueStore((state) => state.setError)

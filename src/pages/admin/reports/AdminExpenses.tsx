@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, DollarSign, TrendingUp, FileText, Download, Filter, BarChart3, RefreshCw } from 'lucide-react'
+import { Calendar, DollarSign, TrendingUp, FileText, Download, Filter, BarChart3, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -22,12 +22,16 @@ import {
   useExpenseReportIsLoadingStats,
   useExpenseReportIsExporting,
   useExpenseReportError,
+  useExpenseReportCurrentPage,
+  useExpenseReportItemsPerPage,
   useExpenseReportSetDateFilterType,
   useExpenseReportSetSelectedMonth,
   useExpenseReportSetCustomDate,
   useExpenseReportSetCustomDateRange,
   useExpenseReportSetPaymentModeFilter,
   useExpenseReportSetStatusFilter,
+  useExpenseReportSetCurrentPage,
+  useExpenseReportSetItemsPerPage,
   useExpenseReportSetLoadingStats,
   useExpenseReportSetExporting,
   useExpenseReportSetError
@@ -52,6 +56,8 @@ const AdminExpenses = () => {
   const customEndDate = useExpenseReportCustomEndDate()
   const paymentModeFilter = useExpenseReportPaymentModeFilter()
   const statusFilter = useExpenseReportStatusFilter()
+  const currentPage = useExpenseReportCurrentPage()
+  const itemsPerPage = useExpenseReportItemsPerPage()
 
   const isLoadingStats = useExpenseReportIsLoadingStats()
   const isExporting = useExpenseReportIsExporting()
@@ -63,6 +69,8 @@ const AdminExpenses = () => {
   const setCustomDateRange = useExpenseReportSetCustomDateRange()
   const setPaymentModeFilter = useExpenseReportSetPaymentModeFilter()
   const setStatusFilter = useExpenseReportSetStatusFilter()
+  const setCurrentPage = useExpenseReportSetCurrentPage()
+  const setItemsPerPage = useExpenseReportSetItemsPerPage()
   const setLoadingStats = useExpenseReportSetLoadingStats()
   const setExporting = useExpenseReportSetExporting()
   const setError = useExpenseReportSetError()
@@ -170,6 +178,14 @@ const AdminExpenses = () => {
 
     return filtered
   }, [allExpenses, getDateRange, paymentModeFilter, statusFilter])
+
+  // Pagination
+  const totalPages = Math.ceil(filteredExpenses.length / itemsPerPage)
+  const paginatedExpenses = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return filteredExpenses.slice(startIndex, endIndex)
+  }, [filteredExpenses, currentPage, itemsPerPage])
 
   // Memoized expense statistics
   const stats: ExpenseStats = useMemo(() => {
@@ -496,7 +512,8 @@ const AdminExpenses = () => {
           </CardHeader>
           <CardContent>
             {filteredExpenses.length > 0 ? (
-              <div className="overflow-x-auto">
+              <>
+                <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="border-b border-gray-200">
@@ -511,7 +528,7 @@ const AdminExpenses = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredExpenses.map((expense, index) => (
+                    {paginatedExpenses.map((expense, index) => (
                       <motion.tr
                         key={expense.id}
                         className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
@@ -562,6 +579,62 @@ const AdminExpenses = () => {
                   </tbody>
                 </table>
               </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                  <div className="text-sm text-gray-500">
+                    Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredExpenses.length)} of {filteredExpenses.length} expenses
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+
+                    <div className="flex gap-1">
+                      {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                        let pageNumber
+                        if (totalPages <= 5) {
+                          pageNumber = i + 1
+                        } else if (currentPage <= 3) {
+                          pageNumber = i + 1
+                        } else if (currentPage >= totalPages - 2) {
+                          pageNumber = totalPages - 4 + i
+                        } else {
+                          pageNumber = currentPage - 2 + i
+                        }
+
+                        return (
+                          <Button
+                            key={pageNumber}
+                            variant={currentPage === pageNumber ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setCurrentPage(pageNumber)}
+                            className={currentPage === pageNumber ? "bg-black text-white" : ""}
+                          >
+                            {pageNumber}
+                          </Button>
+                        )
+                      })}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+              </>
             ) : (
               <div className="text-center py-8">
                 <div className="text-gray-400 mb-2">
