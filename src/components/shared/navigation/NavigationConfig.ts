@@ -1,5 +1,5 @@
 // Navigation configuration for both admin and manager roles
-import { LucideIcon, BarChart3, Calendar, BookOpen, Users, Home, Bed, DollarSign, Settings, UserCheck, UserCog } from 'lucide-react'
+import { LucideIcon, BarChart3, Calendar, BookOpen, Users, Home, Bed, DollarSign, Settings, UserCheck, UserCog, FileText, TrendingUp, TrendingDown, PieChart } from 'lucide-react'
 
 export interface NavigationItem {
   id: string
@@ -38,6 +38,36 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     icon: Users,
     label: 'Bookings',
     roles: ['admin', 'manager', 'agent']
+  },
+  {
+    id: 'reports',
+    to: '/reports',
+    icon: FileText,
+    label: 'Reports',
+    roles: ['admin'], // Admin only
+    submenu: [
+      {
+        id: 'revenues',
+        to: '/reports/revenues',
+        icon: TrendingUp,
+        label: 'Revenues',
+        roles: ['admin']
+      },
+      {
+        id: 'expenses',
+        to: '/reports/expenses',
+        icon: TrendingDown,
+        label: 'Expenses',
+        roles: ['admin']
+      },
+      {
+        id: 'financials',
+        to: '/reports/financials',
+        icon: PieChart,
+        label: 'Financials',
+        roles: ['admin']
+      }
+    ]
   },
   {
     id: 'settings',
@@ -102,7 +132,7 @@ export const getNavigationItemsForRole = (role: 'admin' | 'manager' | 'agent', b
 // Get primary navigation items (for header)
 export const getPrimaryNavigationItems = (role: 'admin' | 'manager' | 'agent', basePath: string = ''): NavigationItem[] => {
   const primaryIds = role === 'admin'
-    ? ['calendar', 'reservation', 'bookings', 'settings']
+    ? ['calendar', 'reservation', 'bookings', 'reports', 'settings']
     : ['calendar', 'reservation', 'bookings']
   return getNavigationItemsForRole(role, basePath).filter(item => primaryIds.includes(item.id))
 }

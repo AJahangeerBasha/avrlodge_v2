@@ -25,6 +25,11 @@ const AdminSpecialCharges = lazy(() => import('../pages/admin/AdminSpecialCharge
 const AdminAgents = lazy(() => import('../pages/admin/AdminAgents'))
 const AdminUsers = lazy(() => import('../pages/admin/AdminUsers'))
 
+// Admin Reports pages
+const AdminRevenues = lazy(() => import('../pages/admin/reports/AdminRevenues'))
+const AdminExpenses = lazy(() => import('../pages/admin/reports/AdminExpenses'))
+const AdminFinancials = lazy(() => import('../pages/admin/reports/AdminFinancials'))
+
 // Manager pages
 const ManagerDashboard = lazy(() => import('../pages/manager/ManagerDashboard'))
 const ManagerCalendar = lazy(() => import('../pages/manager/ManagerCalendar'))
@@ -68,6 +73,9 @@ function AppRoutes() {
             <Route path="calendar" element={<AdminCalendar />} />
             <Route path="reservation" element={<AdminReservation />} />
             <Route path="bookings" element={<AdminBookings />} />
+            <Route path="reports/revenues" element={<AdminRevenues />} />
+            <Route path="reports/expenses" element={<AdminExpenses />} />
+            <Route path="reports/financials" element={<AdminFinancials />} />
             <Route path="room-types" element={<AdminRoomTypes />} />
             <Route path="rooms" element={<AdminRooms />} />
             <Route path="special-charges" element={<AdminSpecialCharges />} />
