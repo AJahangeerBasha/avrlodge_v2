@@ -39,7 +39,7 @@ export default function BookingCard({
   const [showDocuments, setShowDocuments] = useState(false)
   const [showPaymentHistory, setShowPaymentHistory] = useState(false)
   const [showAdditionalOptions, setShowAdditionalOptions] = useState(false)
-  const [showPrimaryGuestEdit, setShowPrimaryGuestEdit] = useState(true)
+  const [showPrimaryGuestEdit, setShowPrimaryGuestEdit] = useState(false)
   const [selectedDocument, setSelectedDocument] = useState<RoomCheckinDocument | null>(null)
   const [payments, setPayments] = useState<Payment[]>([])
   const [documents, setDocuments] = useState<RoomCheckinDocument[]>([])
