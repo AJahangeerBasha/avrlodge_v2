@@ -7,7 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAuth } from '@/contexts/AuthContext'
 import { getPayments } from '@/lib/payments'
 import { Payment } from '@/lib/types/payments'
-import { format, startOfMonth, endOfMonth, subMonths, parseISO } from 'date-fns'
+import { DatePicker } from '@/components/ui/date-picker'
+import { DateRangePicker } from '@/components/ui/date-range-picker'
+import { format, startOfMonth, endOfMonth, subMonths, parseISO, startOfDay, endOfDay, startOfWeek, endOfWeek, subDays, subWeeks } from 'date-fns'
+
+type DateFilterType = 'today' | 'yesterday' | 'this_week' | 'last_week' | 'this_month' | 'last_month' | 'custom_date' | 'custom_range'
 
 interface RevenueStats {
   totalRevenue: number
@@ -31,8 +35,84 @@ const AdminRevenues = () => {
     monthlyGrowth: 0
   })
   const [loading, setLoading] = useState(true)
-  const [selectedMonth, setSelectedMonth] = useState('2024-09') // Set to September 2024 for debugging
+  const [dateFilterType, setDateFilterType] = useState<DateFilterType>('this_month')
+  const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'))
+  const [customDate, setCustomDate] = useState(format(new Date(), 'yyyy-MM-dd'))
+  const [customStartDate, setCustomStartDate] = useState(format(new Date(), 'yyyy-MM-dd'))
+  const [customEndDate, setCustomEndDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [paymentMethodFilter, setPaymentMethodFilter] = useState('all')
+
+  // Get period label for stats display
+  const getPeriodLabel = () => {
+    switch (dateFilterType) {
+      case 'today': return 'yesterday'
+      case 'yesterday': return 'previous day'
+      case 'this_week': return 'last week'
+      case 'last_week': return 'previous week'
+      case 'this_month': return 'last month'
+      case 'last_month': return 'previous month'
+      case 'custom_date': return 'previous day'
+      case 'custom_range': return 'previous period'
+      default: return 'last period'
+    }
+  }
+
+  // Get date range based on filter type
+  const getDateRange = () => {
+    const now = new Date()
+
+    switch (dateFilterType) {
+      case 'today':
+        return {
+          start: startOfDay(now),
+          end: endOfDay(now)
+        }
+      case 'yesterday':
+        const yesterday = subDays(now, 1)
+        return {
+          start: startOfDay(yesterday),
+          end: endOfDay(yesterday)
+        }
+      case 'this_week':
+        return {
+          start: startOfWeek(now, { weekStartsOn: 1 }), // Monday start
+          end: endOfWeek(now, { weekStartsOn: 1 })
+        }
+      case 'last_week':
+        const lastWeek = subWeeks(now, 1)
+        return {
+          start: startOfWeek(lastWeek, { weekStartsOn: 1 }),
+          end: endOfWeek(lastWeek, { weekStartsOn: 1 })
+        }
+      case 'this_month':
+        return {
+          start: startOfMonth(new Date(selectedMonth)),
+          end: endOfMonth(new Date(selectedMonth))
+        }
+      case 'last_month':
+        const lastMonth = subMonths(now, 1)
+        return {
+          start: startOfMonth(lastMonth),
+          end: endOfMonth(lastMonth)
+        }
+      case 'custom_date':
+        const customDateObj = new Date(customDate)
+        return {
+          start: startOfDay(customDateObj),
+          end: endOfDay(customDateObj)
+        }
+      case 'custom_range':
+        return {
+          start: startOfDay(new Date(customStartDate)),
+          end: endOfDay(new Date(customEndDate))
+        }
+      default:
+        return {
+          start: startOfMonth(now),
+          end: endOfMonth(now)
+        }
+    }
+  }
 
   // Load payments data
   const loadPayments = async () => {
@@ -114,17 +194,29 @@ const AdminRevenues = () => {
 
   // Calculate revenue statistics
   const calculateStats = (paymentsData: Payment[]) => {
-    const currentMonthStart = startOfMonth(new Date(selectedMonth))
-    const currentMonthEnd = endOfMonth(new Date(selectedMonth))
-    const previousMonthStart = startOfMonth(subMonths(new Date(selectedMonth), 1))
-    const previousMonthEnd = endOfMonth(subMonths(new Date(selectedMonth), 1))
+    const dateRange = getDateRange()
+    const currentStart = dateRange.start
+    const currentEnd = dateRange.end
 
-    // Filter payments for current month with better date handling
-    console.log('📅 DEBUG: Date filtering for month:', selectedMonth)
-    console.log('📅 DEBUG: Current month start:', currentMonthStart)
-    console.log('📅 DEBUG: Current month end:', currentMonthEnd)
+    // Calculate previous period for comparison
+    let previousStart: Date, previousEnd: Date
+    if (dateFilterType === 'today' || dateFilterType === 'yesterday') {
+      previousStart = startOfDay(subDays(currentStart, 1))
+      previousEnd = endOfDay(subDays(currentEnd, 1))
+    } else if (dateFilterType === 'this_week' || dateFilterType === 'last_week') {
+      previousStart = startOfWeek(subWeeks(currentStart, 1), { weekStartsOn: 1 })
+      previousEnd = endOfWeek(subWeeks(currentEnd, 1), { weekStartsOn: 1 })
+    } else {
+      previousStart = startOfMonth(subMonths(currentStart, 1))
+      previousEnd = endOfMonth(subMonths(currentEnd, 1))
+    }
 
-    const currentMonthPayments = paymentsData.filter(payment => {
+    // Filter payments for current period with better date handling
+    console.log('📅 DEBUG: Date filtering for:', dateFilterType)
+    console.log('📅 DEBUG: Current period start:', currentStart)
+    console.log('📅 DEBUG: Current period end:', currentEnd)
+
+    const currentPeriodPayments = paymentsData.filter(payment => {
       try {
         // Handle both ISO string and timestamp formats
         const paymentDate = payment.paymentDate instanceof Date
@@ -132,7 +224,7 @@ const AdminRevenues = () => {
           : new Date(payment.paymentDate)
 
         const isValidDate = !isNaN(paymentDate.getTime())
-        const isInRange = paymentDate >= currentMonthStart && paymentDate <= currentMonthEnd
+        const isInRange = paymentDate >= currentStart && paymentDate <= currentEnd
 
         // Debug each payment
         if (isValidDate) {
@@ -146,67 +238,66 @@ const AdminRevenues = () => {
       }
     })
 
-    console.log('📅 DEBUG: Filtered payments for current month:', currentMonthPayments.length)
-    console.log('📅 DEBUG: Current month payments:', currentMonthPayments)
+    console.log('📅 DEBUG: Filtered payments for current period:', currentPeriodPayments.length)
+    console.log('📅 DEBUG: Current period payments:', currentPeriodPayments)
 
-    // Filter payments for previous month
-    const previousMonthPayments = paymentsData.filter(payment => {
+    // Filter payments for previous period
+    const previousPeriodPayments = paymentsData.filter(payment => {
       try {
         const paymentDate = payment.paymentDate instanceof Date
           ? payment.paymentDate
           : new Date(payment.paymentDate)
 
         return !isNaN(paymentDate.getTime()) &&
-               paymentDate >= previousMonthStart &&
-               paymentDate <= previousMonthEnd
+               paymentDate >= previousStart &&
+               paymentDate <= previousEnd
       } catch (e) {
         return false
       }
     })
 
-    const totalRevenue = currentMonthPayments.reduce((sum, payment) => sum + (payment.amount || 0), 0)
-    const previousRevenue = previousMonthPayments.reduce((sum, payment) => sum + (payment.amount || 0), 0)
+    const totalRevenue = currentPeriodPayments.reduce((sum, payment) => sum + (payment.amount || 0), 0)
+    const previousRevenue = previousPeriodPayments.reduce((sum, payment) => sum + (payment.amount || 0), 0)
 
     // Count payment methods more accurately
-    const cashPayments = currentMonthPayments.filter(p =>
+    const cashPayments = currentPeriodPayments.filter(p =>
       p.paymentMethod?.toLowerCase().includes('cash')
     ).length
 
-    const digitalPayments = currentMonthPayments.filter(p =>
+    const digitalPayments = currentPeriodPayments.filter(p =>
       p.paymentMethod && !p.paymentMethod.toLowerCase().includes('cash')
     ).length
 
-    const monthlyGrowth = previousRevenue > 0
+    const periodGrowth = previousRevenue > 0
       ? ((totalRevenue - previousRevenue) / previousRevenue) * 100
       : totalRevenue > 0 ? 100 : 0 // If no previous data but current data exists, show 100% growth
 
     console.log('Revenue stats calculated:', {
-      currentMonth: format(currentMonthStart, 'MMM yyyy'),
+      period: dateFilterType,
       totalRevenue,
-      totalPayments: currentMonthPayments.length,
+      totalPayments: currentPeriodPayments.length,
       cashPayments,
       digitalPayments,
-      monthlyGrowth: monthlyGrowth.toFixed(1) + '%'
+      periodGrowth: periodGrowth.toFixed(1) + '%'
     })
 
     setStats({
       totalRevenue,
-      totalPayments: currentMonthPayments.length,
-      avgPaymentAmount: currentMonthPayments.length > 0 ? totalRevenue / currentMonthPayments.length : 0,
+      totalPayments: currentPeriodPayments.length,
+      avgPaymentAmount: currentPeriodPayments.length > 0 ? totalRevenue / currentPeriodPayments.length : 0,
       cashPayments,
       digitalPayments,
-      monthlyGrowth
+      monthlyGrowth: periodGrowth
     })
 
-    setFilteredPayments(currentMonthPayments)
+    setFilteredPayments(currentPeriodPayments)
   }
 
   // Filter payments by payment method
   const filterPayments = () => {
-    const currentMonthStart = startOfMonth(new Date(selectedMonth))
-    const currentMonthEnd = endOfMonth(new Date(selectedMonth))
+    const dateRange = getDateRange()
 
-    // Filter payments for the selected month
+    // Filter payments for the selected date range
     let filtered = payments.filter(payment => {
       try {
         const paymentDate = payment.paymentDate instanceof Date
@@ -214,8 +305,8 @@ const AdminRevenues = () => {
           : new Date(payment.paymentDate)
 
         return !isNaN(paymentDate.getTime()) &&
-               paymentDate >= currentMonthStart &&
-               paymentDate <= currentMonthEnd
+               paymentDate >= dateRange.start &&
+               paymentDate <= dateRange.end
       } catch (e) {
         return false
       }
@@ -237,7 +328,7 @@ const AdminRevenues = () => {
       })
     }
 
-    console.log('Filtered payments:', filtered.length, 'for', format(currentMonthStart, 'MMM yyyy'))
+    console.log('Filtered payments:', filtered.length, 'for', dateFilterType)
     setFilteredPayments(filtered)
   }
 
@@ -249,11 +340,11 @@ const AdminRevenues = () => {
 
   useEffect(() => {
     calculateStats(payments)
-  }, [selectedMonth, payments])
+  }, [dateFilterType, selectedMonth, customDate, customStartDate, customEndDate, payments])
 
   useEffect(() => {
     filterPayments()
-  }, [paymentMethodFilter, selectedMonth, payments])
+  }, [paymentMethodFilter, dateFilterType, selectedMonth, customDate, customStartDate, customEndDate, payments])
 
   const exportData = () => {
     const csvContent = [
@@ -306,30 +397,81 @@ const AdminRevenues = () => {
 
       {/* Filters */}
       <motion.div
-        className="flex flex-col sm:flex-row gap-4"
+        className="flex flex-col gap-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-gray-600" />
-          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-            <SelectTrigger className="w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-              {Array.from({ length: 12 }, (_, i) => {
-                const date = subMonths(new Date(), i)
-                const value = format(date, 'yyyy-MM')
-                const label = format(date, 'MMMM yyyy')
-                return (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                )
-              })}
-            </SelectContent>
-          </Select>
+        {/* Date Filter Type */}
+        <div className="flex flex-wrap gap-4">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-gray-600" />
+            <Select value={dateFilterType} onValueChange={(value: DateFilterType) => setDateFilterType(value)}>
+              <SelectTrigger className="w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="yesterday">Yesterday</SelectItem>
+                <SelectItem value="this_week">This Week</SelectItem>
+                <SelectItem value="last_week">Last Week</SelectItem>
+                <SelectItem value="this_month">This Month</SelectItem>
+                <SelectItem value="last_month">Last Month</SelectItem>
+                <SelectItem value="custom_date">Custom Date</SelectItem>
+                <SelectItem value="custom_range">Custom Range</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Month Selector (only for this_month filter) */}
+          {dateFilterType === 'this_month' && (
+            <div className="flex items-center gap-2">
+              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                <SelectTrigger className="w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                  {Array.from({ length: 12 }, (_, i) => {
+                    const date = subMonths(new Date(), i)
+                    const value = format(date, 'yyyy-MM')
+                    const label = format(date, 'MMMM yyyy')
+                    return (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    )
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Custom Date Picker */}
+          {dateFilterType === 'custom_date' && (
+            <div className="flex items-center gap-2">
+              <DatePicker
+                selectedDate={customDate}
+                onDateChange={setCustomDate}
+                placeholder="Select date"
+                minDate={format(subMonths(new Date(), 24), 'yyyy-MM-dd')} // Allow 2 years back
+                className="w-48"
+              />
+            </div>
+          )}
+
+          {/* Custom Date Range Picker */}
+          {dateFilterType === 'custom_range' && (
+            <div className="flex items-center gap-2">
+              <DateRangePicker
+                startDate={customStartDate}
+                endDate={customEndDate}
+                onStartDateChange={setCustomStartDate}
+                onEndDateChange={setCustomEndDate}
+                minDate={format(subMonths(new Date(), 24), 'yyyy-MM-dd')} // Allow 2 years back
+                className="w-80"
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -363,7 +505,7 @@ const AdminRevenues = () => {
           <CardContent>
             <div className="text-2xl font-bold text-green-600">₹{stats.totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-gray-600">
-              {stats.monthlyGrowth >= 0 ? '+' : ''}{stats.monthlyGrowth.toFixed(1)}% from last month
+              {stats.monthlyGrowth >= 0 ? '+' : ''}{stats.monthlyGrowth.toFixed(1)}% from {getPeriodLabel()}
             </p>
           </CardContent>
         </Card>
