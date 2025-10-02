@@ -252,10 +252,10 @@ const AdminAgents = () => {
             value={filters.agentType || 'all'}
             onValueChange={(value) => updateFilters({ agentType: value === 'all' ? undefined : value as 'individual' | 'company' })}
           >
-            <SelectTrigger className="w-full sm:w-40 bg-white/95 backdrop-blur-sm border-black/20">
+            <SelectTrigger className="w-full sm:w-40 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
               <SelectValue placeholder="Agent Type" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="individual">Individual</SelectItem>
               <SelectItem value="company">Company</SelectItem>
@@ -266,10 +266,10 @@ const AdminAgents = () => {
             value={filters.status || 'all'}
             onValueChange={(value) => updateFilters({ status: value === 'all' ? undefined : value as 'active' | 'inactive' | 'suspended' })}
           >
-            <SelectTrigger className="w-full sm:w-32 bg-white/95 backdrop-blur-sm border-black/20">
+            <SelectTrigger className="w-full sm:w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="inactive">Inactive</SelectItem>
@@ -287,7 +287,7 @@ const AdminAgents = () => {
         </Button>
 
         <Dialog open={isCreateModalOpen} onOpenChange={closeCreateModal}>
-          <DialogContent className="max-w-md bg-white/95 backdrop-blur-sm border border-black/20">
+          <DialogContent className="max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
             <DialogHeader>
               <DialogTitle className="text-black">Add New Agent</DialogTitle>
               <DialogDescription>Create a new agent profile for booking management.</DialogDescription>
@@ -311,10 +311,10 @@ const AdminAgents = () => {
                     value={formData.agentType}
                     onValueChange={(value) => updateFormData({ agentType: value as 'individual' | 'company' })}
                   >
-                    <SelectTrigger className="bg-white/95 backdrop-blur-sm border-black/20">
+                    <SelectTrigger className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
                       <SelectItem value="individual">Individual</SelectItem>
                       <SelectItem value="company">Company</SelectItem>
                     </SelectContent>
@@ -373,7 +373,7 @@ const AdminAgents = () => {
                   <SelectTrigger className="bg-white/95 backdrop-blur-sm border-black/20">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
                     <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="inactive">Inactive</SelectItem>
                     <SelectItem value="suspended">Suspended</SelectItem>
@@ -492,10 +492,10 @@ const AdminAgents = () => {
                       value={agent.status}
                       onValueChange={(value) => handleStatusUpdate(agent.id, value as 'active' | 'inactive' | 'suspended')}
                     >
-                      <SelectTrigger className="w-32 h-8 text-xs bg-white/95 backdrop-blur-sm border-black/20">
+                      <SelectTrigger className="w-32 h-8 text-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
                         <SelectItem value="active">Active</SelectItem>
                         <SelectItem value="inactive">Inactive</SelectItem>
                         <SelectItem value="suspended">Suspended</SelectItem>
@@ -576,7 +576,7 @@ const AdminAgents = () => {
                   <SelectTrigger className="bg-white/95 backdrop-blur-sm border-black/20">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
                     <SelectItem value="individual">Individual</SelectItem>
                     <SelectItem value="company">Company</SelectItem>
                   </SelectContent>
@@ -635,7 +635,7 @@ const AdminAgents = () => {
                 <SelectTrigger className="bg-white/95 backdrop-blur-sm border-black/20">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
                   <SelectItem value="suspended">Suspended</SelectItem>

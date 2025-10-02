@@ -243,11 +243,11 @@ const AdminRooms = () => {
             value={filters.status || 'all'}
             onValueChange={(value) => updateFilters({ status: value === 'all' ? undefined : value as RoomStatus })}
           >
-            <SelectTrigger className="w-full sm:w-48 bg-white/95 backdrop-blur-sm border-black/20">
+            <SelectTrigger className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
               <Filter className="mr-2 h-4 w-4" />
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="available">Available</SelectItem>
               <SelectItem value="occupied">Occupied</SelectItem>
@@ -266,7 +266,7 @@ const AdminRooms = () => {
         </Button>
 
         <Dialog open={isCreateModalOpen} onOpenChange={closeCreateModal}>
-          <DialogContent className="max-w-md bg-white/95 backdrop-blur-sm border border-black/20">
+          <DialogContent className="max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
             <DialogHeader>
               <DialogTitle className="text-black">Add New Room</DialogTitle>
               <DialogDescription>Create a new room for booking management.</DialogDescription>
@@ -290,10 +290,10 @@ const AdminRooms = () => {
                     value={formData.roomTypeId}
                     onValueChange={(value) => updateFormData({ roomTypeId: value })}
                   >
-                    <SelectTrigger className="bg-white/95 backdrop-blur-sm border-black/20">
+                    <SelectTrigger className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
                       <SelectValue placeholder="Select room type" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
                       {roomTypes.map((roomType) => (
                         <SelectItem key={roomType.id} value={roomType.id}>
                           {roomType.name} (₹{roomType.pricePerNight}/night)
@@ -323,10 +323,10 @@ const AdminRooms = () => {
                     value={formData.status}
                     onValueChange={(value) => updateFormData({ status: value as RoomStatus })}
                   >
-                    <SelectTrigger className="bg-white/95 backdrop-blur-sm border-black/20">
+                    <SelectTrigger className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
                       <SelectItem value="available">Available</SelectItem>
                       <SelectItem value="occupied">Occupied</SelectItem>
                       <SelectItem value="maintenance">Maintenance</SelectItem>
@@ -436,10 +436,10 @@ const AdminRooms = () => {
                           value={room.status}
                           onValueChange={(value) => handleStatusUpdate(room.id, value as RoomStatus)}
                         >
-                          <SelectTrigger className="h-8 w-32 text-xs">
+                          <SelectTrigger className="h-8 w-32 text-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
                             <SelectItem value="available">Available</SelectItem>
                             <SelectItem value="occupied">Occupied</SelectItem>
                             <SelectItem value="maintenance">Maintenance</SelectItem>
@@ -497,10 +497,10 @@ const AdminRooms = () => {
                   value={formData.roomTypeId}
                   onValueChange={(value) => updateFormData({ roomTypeId: value })}
                 >
-                  <SelectTrigger className="bg-white/95 backdrop-blur-sm border-black/20">
+                  <SelectTrigger className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
                     {roomTypes.map((roomType) => (
                       <SelectItem key={roomType.id} value={roomType.id}>
                         {roomType.name} (₹{roomType.pricePerNight}/night)
@@ -530,10 +530,10 @@ const AdminRooms = () => {
                   value={formData.status}
                   onValueChange={(value) => updateFormData({ status: value as RoomStatus })}
                 >
-                  <SelectTrigger className="bg-white/95 backdrop-blur-sm border-black/20">
+                  <SelectTrigger className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
                     <SelectItem value="available">Available</SelectItem>
                     <SelectItem value="occupied">Occupied</SelectItem>
                     <SelectItem value="maintenance">Maintenance</SelectItem>

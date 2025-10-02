@@ -23,6 +23,7 @@ const AdminRoomTypes = lazy(() => import('../pages/admin/AdminRoomTypes'))
 const AdminRooms = lazy(() => import('../pages/admin/AdminRooms'))
 const AdminSpecialCharges = lazy(() => import('../pages/admin/AdminSpecialCharges'))
 const AdminAgents = lazy(() => import('../pages/admin/AdminAgents'))
+const AdminUsers = lazy(() => import('../pages/admin/AdminUsers'))
 
 // Manager pages
 const ManagerDashboard = lazy(() => import('../pages/manager/ManagerDashboard'))
@@ -71,6 +72,7 @@ function AppRoutes() {
             <Route path="rooms" element={<AdminRooms />} />
             <Route path="special-charges" element={<AdminSpecialCharges />} />
             <Route path="agents" element={<AdminAgents />} />
+            <Route path="users" element={<AdminUsers />} />
           </Route>
 
           {/* Manager routes - protected with UnifiedDashboardLayout */}

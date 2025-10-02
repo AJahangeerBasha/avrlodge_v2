@@ -288,10 +288,10 @@ const AdminRoomTypes = () => {
                   })
                 }}
               >
-                <SelectTrigger className="w-32 h-12 border-2 border-gray-200">
+                <SelectTrigger className="w-32 h-12 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="true">Active</SelectItem>
                   <SelectItem value="false">Inactive</SelectItem>
@@ -440,7 +440,7 @@ const AdminRoomTypes = () => {
 
       {/* Create Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={closeCreateModal}>
-        <DialogContent className="bg-white/95 backdrop-blur-sm max-w-2xl">
+        <DialogContent className="bg-white border border-gray-300 shadow-lg max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-black">Create Room Type</DialogTitle>
             <DialogDescription className="text-gray-600">
@@ -561,7 +561,7 @@ const AdminRoomTypes = () => {
 
       {/* Edit Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={closeEditModal}>
-        <DialogContent className="bg-white/95 backdrop-blur-sm max-w-2xl">
+        <DialogContent className="bg-white border border-gray-300 shadow-lg max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-black">Edit Room Type</DialogTitle>
             <DialogDescription className="text-gray-600">
