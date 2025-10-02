@@ -8,6 +8,7 @@ import { Label } from '../../components/ui/label';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Loader2, Mail, Lock, ArrowRight, Phone } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
+import { FaFacebook } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
 import { redirectByRole } from '../../lib/redirects';
 
@@ -16,7 +17,7 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, loginWithGoogle, currentUser, userRole, loading: authLoading } = useAuth();
+  const { login, loginWithGoogle, loginWithFacebook, currentUser, userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   // Redirect authenticated users based on their role
@@ -73,6 +74,20 @@ export const LoginPage: React.FC = () => {
     }
   };
 
+  const handleFacebookLogin = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      await loginWithFacebook();
+      // Let the layouts handle redirects based on role
+      navigate('/');
+    } catch (error: unknown) {
+      setError((error as Error).message || 'Failed to login with Facebook');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-black container-responsive">
       <div className="absolute inset-0 bg-black bg-opacity-90"></div>
@@ -123,6 +138,17 @@ export const LoginPage: React.FC = () => {
             >
               <FcGoogle className="mr-2 h-4 w-4" />
               <span className="truncate">Sign in with Google</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="btn-responsive w-full border-gray-300 hover:bg-gray-50 text-black"
+              onClick={handleFacebookLogin}
+              disabled={loading}
+            >
+              <FaFacebook className="mr-2 h-4 w-4 text-blue-600" />
+              <span className="truncate">Sign in with Facebook</span>
             </Button>
 
             {/* <Button

@@ -1,7 +1,7 @@
 import * as React from 'react';
 const { createContext, useContext, useEffect, useState } = React;
 import { User } from 'firebase/auth';
-import { onAuthStateChange, signOutUser, signInUser, createUser, signInWithGoogle, resetPassword, createUserDocument, updateUserProfile } from '@/lib/auth';
+import { onAuthStateChange, signOutUser, signInUser, createUser, signInWithGoogle, signInWithFacebook, resetPassword, createUserDocument, updateUserProfile } from '@/lib/auth';
 import { UserRole, UserClaims, ROLES } from '@/lib/types/auth';
 import { getUserRoleAndClaims, initializeUserRole, subscribeToUserRole } from '@/lib/roles';
 
@@ -13,6 +13,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, displayName?: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
+  loginWithFacebook: () => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   refreshUserRole: () => Promise<void>;
@@ -52,6 +53,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const loginWithGoogle = async (): Promise<void> => {
     await signInWithGoogle();
+  };
+
+  const loginWithFacebook = async (): Promise<void> => {
+    await signInWithFacebook();
   };
 
   const logout = async (): Promise<void> => {
@@ -136,6 +141,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     signup,
     loginWithGoogle,
+    loginWithFacebook,
     logout,
     resetPassword,
     refreshUserRole,

@@ -3,6 +3,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  FacebookAuthProvider,
   signOut,
   sendPasswordResetEmail,
   updateProfile,
@@ -60,6 +61,27 @@ googleProvider.setCustomParameters({
 
 export const signInWithGoogle = async (): Promise<UserCredential> => {
   const result = await signInWithPopup(auth, googleProvider);
+
+  // Create user document in Firestore ONLY if it doesn't exist
+  if (result.user) {
+    const { getDocument } = await import('./firestore');
+    const existingUser = await getDocument('users', result.user.uid);
+    if (!existingUser) {
+      await createUserDocument(result.user);
+    }
+  }
+
+  return result;
+};
+
+// Facebook Authentication
+const facebookProvider = new FacebookAuthProvider();
+facebookProvider.setCustomParameters({
+  display: 'popup'
+});
+
+export const signInWithFacebook = async (): Promise<UserCredential> => {
+  const result = await signInWithPopup(auth, facebookProvider);
 
   // Create user document in Firestore ONLY if it doesn't exist
   if (result.user) {
