@@ -131,12 +131,12 @@ const DropdownMenuItem = React.forwardRef<
   }
 >(({ className, inset, onClick, ...props }, ref) => {
   const { setIsOpen } = useDropdownContext()
-  
+
   const handleClick = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     onClick?.(e)
     setIsOpen(false)
   }, [onClick, setIsOpen])
-  
+
   return (
     <div
       ref={ref}
@@ -152,9 +152,22 @@ const DropdownMenuItem = React.forwardRef<
 })
 DropdownMenuItem.displayName = 'DropdownMenuItem'
 
+const DropdownMenuSeparator = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn('-mx-1 my-1 h-px bg-gray-200 dark:bg-gray-700', className)}
+    {...props}
+  />
+))
+DropdownMenuSeparator.displayName = 'DropdownMenuSeparator'
+
 export {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 }
