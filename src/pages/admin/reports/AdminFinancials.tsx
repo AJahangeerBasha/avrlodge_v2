@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, TrendingUp, TrendingDown, DollarSign, Download, BarChart3, PieChart, Filter } from 'lucide-react'
+import { Calendar, TrendingUp, TrendingDown, DollarSign, Download, BarChart3, PieChart, Filter, RefreshCw } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -62,8 +62,8 @@ const AdminFinancials = () => {
   const setError = useFinancialSetError()
 
   // TanStack Query for server state
-  const { data: allPayments = [], isLoading: isLoadingPayments, error: paymentsError } = usePayments()
-  const { data: allExpenses = [], isLoading: isLoadingExpenses, error: expensesError } = useExpenseEntries()
+  const { data: allPayments = [], isLoading: isLoadingPayments, error: paymentsError, refetch: refetchPayments } = usePayments()
+  const { data: allExpenses = [], isLoading: isLoadingExpenses, error: expensesError, refetch: refetchExpenses } = useExpenseEntries()
 
   // Date range calculation based on filter type (memoized)
   const getDateRange = useCallback(() => {
@@ -292,6 +292,14 @@ const AdminFinancials = () => {
     setCustomDateRange(customStartDate, date)
   }, [setCustomDateRange, customStartDate])
 
+  // Refresh handler
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([
+      refetchPayments(),
+      refetchExpenses()
+    ])
+  }, [refetchPayments, refetchExpenses])
+
   // Loading state
   const isLoading = isLoadingPayments || isLoadingExpenses
 
@@ -321,14 +329,24 @@ const AdminFinancials = () => {
           <h1 className="text-3xl font-bold text-gray-900">Financial Reports</h1>
           <p className="text-gray-600 mt-2">Comprehensive profit & loss analysis and financial insights</p>
         </div>
-        <Button
-          onClick={handleExport}
-          disabled={isExporting}
-          className="bg-black hover:bg-gray-800 text-white"
-        >
-          <Download className="mr-2 h-4 w-4" />
-          {isExporting ? 'Exporting...' : 'Export Report'}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleRefresh}
+            variant="outline"
+            className="border-gray-300 hover:bg-gray-50"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Refresh
+          </Button>
+          <Button
+            onClick={handleExport}
+            disabled={isExporting}
+            className="bg-black hover:bg-gray-800 text-white"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            {isExporting ? 'Exporting...' : 'Export Report'}
+          </Button>
+        </div>
       </motion.div>
 
       {/* Filters */}

@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Search, Users, Building2, UserCheck, UserX, AlertTriangle, Edit, Trash2 } from 'lucide-react'
+import { Plus, Search, Users, Building2, UserCheck, UserX, AlertTriangle, Edit, Trash2, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -35,7 +35,8 @@ const AdminAgents = () => {
     updateAgent,
     deleteAgent,
     updateAgentStatus,
-    selectedAgent
+    selectedAgent,
+    refreshAgents
   } = useAgentsCRUD()
 
   const handleCreateAgent = async (e: React.FormEvent) => {
@@ -153,13 +154,23 @@ const AdminAgents = () => {
     >
       {/* Header */}
       <motion.div
-        className="mb-8"
+        className="mb-8 flex justify-between items-start"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.5 }}
       >
-        <h1 className="text-4xl font-bold text-black mb-2">Agents Management</h1>
-        <p className="text-gray-600">Manage travel agents and booking partners</p>
+        <div>
+          <h1 className="text-4xl font-bold text-black mb-2">Agents Management</h1>
+          <p className="text-gray-600">Manage travel agents and booking partners</p>
+        </div>
+        <Button
+          onClick={refreshAgents}
+          variant="outline"
+          className="border-gray-300 hover:bg-gray-50"
+        >
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Refresh
+        </Button>
       </motion.div>
 
       {/* Stats Cards */}

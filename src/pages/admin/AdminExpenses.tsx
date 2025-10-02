@@ -14,7 +14,8 @@ import {
   TrendingDown,
   Wallet,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  RefreshCw
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -48,7 +49,7 @@ const AdminExpenses = () => {
   const itemsPerPage = 10
 
   // Fetch expense entries
-  const { data: entries = [], isLoading } = useExpenseEntries({
+  const { data: entries = [], isLoading, refetch } = useExpenseEntries({
     status: statusFilter === 'all' ? undefined : statusFilter,
     startDate: startDate || undefined,
     endDate: endDate || undefined,
@@ -174,10 +175,20 @@ const AdminExpenses = () => {
           <h1 className="text-3xl font-bold">Expense Management</h1>
           <p className="text-gray-500 mt-1">Track and manage all expenses</p>
         </div>
-        <Button className="bg-black hover:bg-gray-800 text-white" onClick={handleAdd}>
-          <Plus className="mr-2 h-4 w-4" />
-          <span>Add Expense</span>
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => refetch()}
+            variant="outline"
+            className="border-gray-300 hover:bg-gray-50"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Refresh
+          </Button>
+          <Button className="bg-black hover:bg-gray-800 text-white" onClick={handleAdd}>
+            <Plus className="mr-2 h-4 w-4" />
+            <span>Add Expense</span>
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}

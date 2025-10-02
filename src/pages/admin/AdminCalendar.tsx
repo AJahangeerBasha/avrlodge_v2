@@ -284,7 +284,8 @@ const AdminCalendar: React.FC = () => {
             <Button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              variant="outline"
+              className="border-gray-300 hover:bg-gray-50"
               title={`${isSubscribed ? 'Real-time updates active' : 'Click to enable real-time updates'}${lastRefreshTime ? ` • Last updated: ${new Date(lastRefreshTime).toLocaleTimeString()}` : ''}`}
             >
               <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />

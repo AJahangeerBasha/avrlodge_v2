@@ -122,7 +122,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
         id: 'expenses',
         to: '/expenses',
         icon: Receipt,
-        label: 'Expense Categories',
+        label: 'Expenses',
         roles: ['admin']
       }
     ]

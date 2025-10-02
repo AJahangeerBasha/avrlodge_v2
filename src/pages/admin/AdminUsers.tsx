@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Search, Users, UserCheck, UserX, Crown, Shield, UserCircle, Mail, Phone, Edit, Trash2, AlertTriangle } from 'lucide-react'
+import { Plus, Search, Users, UserCheck, UserX, Crown, Shield, UserCircle, Mail, Phone, Edit, Trash2, AlertTriangle, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -245,13 +245,23 @@ const AdminUsers = () => {
     >
       {/* Header */}
       <motion.div
-        className="mb-8"
+        className="mb-8 flex justify-between items-start"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.5 }}
       >
-        <h1 className="text-4xl font-bold text-black mb-2">User Management</h1>
-        <p className="text-gray-600">Manage user accounts and permissions</p>
+        <div>
+          <h1 className="text-4xl font-bold text-black mb-2">User Management</h1>
+          <p className="text-gray-600">Manage user accounts and permissions</p>
+        </div>
+        <Button
+          onClick={loadData}
+          variant="outline"
+          className="border-gray-300 hover:bg-gray-50"
+        >
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Refresh
+        </Button>
       </motion.div>
 
       {/* Stats Cards */}

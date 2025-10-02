@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, DollarSign, TrendingUp, FileText, Download, Filter, BarChart3 } from 'lucide-react'
+import { Calendar, DollarSign, TrendingUp, FileText, Download, Filter, BarChart3, RefreshCw } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -67,17 +67,17 @@ const AdminRevenues = () => {
   const setError = useSetError()
 
   // TanStack Query for server state
-  const { data: allPayments = [], isLoading, error: queryError } = usePayments()
+  const { data: allPayments = [], isLoading, error: queryError, refetch: refetchPayments } = usePayments()
 
   // Get reservations data for payment details
-  const { data: reservations = [] } = useQuery({
+  const { data: reservations = [], refetch: refetchReservations } = useQuery({
     queryKey: ['reservations'],
     queryFn: () => getAllReservations(),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
   // Get reservation rooms data for room details
-  const { data: reservationRooms = [] } = useQuery({
+  const { data: reservationRooms = [], refetch: refetchReservationRooms } = useQuery({
     queryKey: ['reservationRooms'],
     queryFn: () => getAllReservationRooms(),
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -311,6 +311,15 @@ const AdminRevenues = () => {
     setCustomDateRange(customStartDate, date)
   }, [setCustomDateRange, customStartDate])
 
+  // Refresh handler
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([
+      refetchPayments(),
+      refetchReservations(),
+      refetchReservationRooms()
+    ])
+  }, [refetchPayments, refetchReservations, refetchReservationRooms])
+
   // Loading state
   if (isLoading) {
     return (
@@ -338,14 +347,24 @@ const AdminRevenues = () => {
           <h1 className="text-3xl font-bold text-gray-900">Revenue Reports</h1>
           <p className="text-gray-600 mt-2">Track room rental income and payment analytics</p>
         </div>
-        <Button
-          onClick={handleExport}
-          disabled={isExporting}
-          className="bg-black hover:bg-gray-800 text-white"
-        >
-          <Download className="mr-2 h-4 w-4" />
-          {isExporting ? 'Exporting...' : 'Export CSV'}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleRefresh}
+            variant="outline"
+            className="border-gray-300 hover:bg-gray-50"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Refresh
+          </Button>
+          <Button
+            onClick={handleExport}
+            disabled={isExporting}
+            className="bg-black hover:bg-gray-800 text-white"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            {isExporting ? 'Exporting...' : 'Export CSV'}
+          </Button>
+        </div>
       </motion.div>
 
       {/* Filters */}

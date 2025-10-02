@@ -1019,7 +1019,7 @@ const AdminReservation: React.FC = () => {
                   endDate={checkOutDate}
                   onStartDateChange={setCheckInDate}
                   onEndDateChange={setCheckOutDate}
-                  minDate={new Date().toISOString().split('T')[0]}
+                  minDate={new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
                   className="w-full p-3 border border-gray-300 rounded-lg bg-white hover:border-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-colors"
                 />
                 {checkInDate && checkOutDate && (
