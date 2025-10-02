@@ -54,6 +54,13 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
         roles: ['admin']
       },
       {
+        id: 'bookings-report',
+        to: '/reports/bookings',
+        icon: BookOpen,
+        label: 'Bookings',
+        roles: ['admin']
+      },
+      {
         id: 'daily-accounts',
         to: '/reports/daily-accounts',
         icon: Calculator,

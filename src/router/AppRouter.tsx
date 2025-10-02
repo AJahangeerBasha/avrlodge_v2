@@ -28,6 +28,7 @@ const AdminExpensesManagement = lazy(() => import('../pages/admin/AdminExpenses'
 
 // Admin Reports pages
 const AdminRevenues = lazy(() => import('../pages/admin/reports/AdminRevenues'))
+const AdminBookingsReport = lazy(() => import('../pages/admin/reports/AdminBookings'))
 const AdminDailyAccounts = lazy(() => import('../pages/admin/reports/AdminDailyAccounts'))
 const AdminExpenses = lazy(() => import('../pages/admin/reports/AdminExpenses'))
 const AdminFinancials = lazy(() => import('../pages/admin/reports/AdminFinancials'))
@@ -76,6 +77,7 @@ function AppRoutes() {
             <Route path="reservation" element={<AdminReservation />} />
             <Route path="bookings" element={<AdminBookings />} />
             <Route path="reports/revenues" element={<AdminRevenues />} />
+            <Route path="reports/bookings" element={<AdminBookingsReport />} />
             <Route path="reports/daily-accounts" element={<AdminDailyAccounts />} />
             <Route path="reports/expenses" element={<AdminExpenses />} />
             <Route path="reports/financials" element={<AdminFinancials />} />
