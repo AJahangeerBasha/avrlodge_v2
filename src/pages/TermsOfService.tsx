@@ -22,61 +22,46 @@ export const TermsOfService: React.FC = () => {
     }
   }
 
-  const terms = [
-    {
-      title: "Booking & Reservations",
-      items: [
-        "Subject to availability • Valid ID required",
-        "Online/phone/third-party bookings accepted",
-        "Advance payment may be required",
-        "We reserve cancellation rights for non-payment"
-      ]
-    },
-    {
-      title: "Check-in & Check-out",
-      items: [
-        "Check-in: 12:00 noon onwards",
-        "Check-out: 11:00 AM sharp",
-        "Late checkout available (charges apply)",
-        "Guests liable for property damage"
-      ]
-    },
-    {
-      title: "Cancellation & Refunds",
-      items: [
-        "Terms vary by booking platform",
-        "Refunds via original payment method",
-        "No-shows may forfeit refunds",
-        "Processing: 7-10 business days"
-      ]
-    },
-    {
-      title: "Guest Conduct",
-      items: [
-        "Respect guests, staff, and property",
-        "No illegal activities permitted",
-        "Eviction without refund for violations",
-        "Smoking in designated areas only"
-      ]
-    },
-    {
-      title: "Website & Online Services",
-      items: [
-        "Provide accurate booking information",
-        "No unauthorized website access",
-        "Third-party links not our responsibility",
-        "Account suspension for violations"
-      ]
-    },
-    {
-      title: "Liability Limitations",
-      items: [
-        "Not responsible for personal property loss",
-        "No liability for force majeure events",
-        "Limited to booking amount paid",
-        "Travel insurance recommended"
-      ]
-    }
+  const content = [
+    "Advance payment is required to confirm a booking. A valid government-issued photo ID proof with address is mandatory at check-in. Payments once made are non-refundable unless otherwise stated. Room tariff must be fully paid at the time of check-in.",
+
+    "Standard check-in time is 12:00 noon, and standard check-out time is 11:00 AM. Early check-in and late check-out are subject to availability and may incur additional charges. Fixed timings ensure smooth operations and proper room preparation.",
+
+    "Free cancellation or modification of bookings (guests/rooms) is allowed up to 48 hours before check-in. Cancellations within 24 hours of check-in may incur a one-night charge. No-shows will be charged for the entire stay.",
+
+    "Guests must respect property rules, maintain decorum, and avoid disturbing other guests. Any damage, loss, or violation of house rules will attract penalties. Management reserves the right to deny accommodation or evict guests who misbehave or disturb others. Noise must be minimized after 12:00 midnight.",
+
+    "Only registered guests are allowed inside rooms. Visitors may be permitted in common areas with prior approval. Extra guests will be charged as per the applicable tariff.",
+
+    "Bed linen will be changed upon request or after two nights of stay. Guests are requested to switch off lights, fans, and air conditioning when leaving rooms.",
+
+    "Smoking inside rooms is strictly prohibited. Alcohol consumption in reception areas and corridors is not allowed. The use of illegal substances, weapons, or hazardous materials is strictly prohibited. Pets may be allowed only in designated rooms upon prior confirmation.",
+
+    "Guests are requested to dispose of trash only in provided bins. Throwing waste in neighboring lands, farms, or open areas is strictly prohibited. Guests must respect the surrounding farms, nature, and workers while staying at AVR.",
+
+    "AVR Lodge is not responsible for loss or damage of personal belongings. Parking is at the owner's risk where provided. Main gates close at 11:00 PM for guest safety. Temporary outages of electricity, water, Wi-Fi, or other amenities are not the responsibility of AVR Lodge.",
+
+    "The premises are under CCTV surveillance for guest safety and compliance with legal/police requirements. Guests are expected to treat staff and fellow guests with respect. Any harassment, abuse, or misconduct towards staff or other guests may result in cancellation of stay and legal action if required.",
+
+    "Guests must provide accurate booking information and comply with all terms outlined in this agreement. Unauthorized access to AVR Lodge's website or systems is prohibited. AVR Lodge is not responsible for third-party website links or services.",
+
+    "AVR Lodge is not liable for events beyond its reasonable control, including natural disasters, strikes, or other force majeure events. Guests are responsible for arranging their own travel, health, and property insurance, as AVR Lodge does not provide or include any insurance coverage. No refunds or compensation will be provided in such events.",
+
+    "Liability for any loss, damage, or destruction of property caused by the guest, their visitors, or belongings rests entirely with the guest. AVR Lodge is not responsible for compensating guests for such damages, and guests may be charged for repair or replacement costs as necessary.",
+
+    "Guests must provide truthful information when making bookings and following lodge policies. Management reserves the right to refuse service or accommodation to guests who appear intoxicated, engage in illegal activities, or behave in a manner that poses a risk to staff, property, or other guests.",
+
+    "Guests may appear in lodge photographs or promotional materials. By staying at AVR Lodge, consent is assumed for use of non-sensitive imagery for marketing purposes unless explicitly communicated otherwise.",
+
+    "Guests are expected to follow safety instructions and comply with all local laws. Any violation of laws, lodge rules, or regulations may result in eviction and legal action if necessary.",
+
+    "Liability for any personal injury, theft, or loss of property during your stay at AVR Lodge is the responsibility of the guest.",
+
+    "AVR Lodge is not liable for such incidents, and guests are strongly encouraged to arrange their own travel, health, and property insurance for protection.",
+
+    "All disputes arising from bookings, stay, or related activities will be governed by Indian law. Courts in Tamil Nadu shall have exclusive jurisdiction.",
+
+    "Payment methods accepted include cash, UPI, and certified card payment gateways. All transactions are processed securely, and guests are responsible for safeguarding their own payment credentials."
   ]
 
   return (
@@ -94,184 +79,79 @@ export const TermsOfService: React.FC = () => {
 
       <div className="min-h-screen bg-white">
         {/* Header Section */}
-        <motion.section
-          className="bg-black text-white py-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="container mx-auto px-2">
-            <div className="max-w-4xl mx-auto text-center">
-              <motion.h1
-                className="text-2xl md:text-4xl font-serif font-bold mb-6"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
-              >
-                Terms of Service
-              </motion.h1>
-              <motion.p
-                className="text-xl text-gray-300"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-              >
+        <div className="bg-black text-white py-6">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="text-xl md:text-2xl font-bold mb-2">
+                Terms of Service - AVR Lodge, Kolli Hills
+              </h1>
+              <p className="text-sm text-gray-300">
                 Effective Date: 1st September 2025
-              </motion.p>
+              </p>
             </div>
           </div>
-        </motion.section>
+        </div>
 
-        {/* Introduction */}
-        <motion.section
-          className="py-16"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.8 }}
-        >
+        {/* Main Content */}
+        <div className="py-8 bg-gray-50">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <motion.div
-                className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
-                whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
-                transition={{ duration: 0.3 }}
-              >
-                <p className="text-gray-700 leading-relaxed text-lg text-center">
-                  Welcome to <strong className="text-black">AVR Lodge, Kolli Hills</strong>. By booking or staying with us, you agree to these terms and conditions. Please read them carefully.
-                </p>
-              </motion.div>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* Main Content Sections */}
-        <motion.section
-          className="pb-16 bg-gray-50"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="space-y-8">
-                {terms.map((section, index) => (
-                  <motion.div
-                    key={index}
-                    variants={itemVariants}
-                    className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
-                    whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <h2 className="text-2xl font-serif font-bold text-black mb-6">{section.title}</h2>
-                    <ul className="space-y-4">
-                      {section.items.map((item, itemIndex) => (
-                        <motion.li
-                          key={itemIndex}
-                          className="flex items-start space-x-4"
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          transition={{ delay: itemIndex * 0.1, duration: 0.5 }}
-                          viewport={{ once: true }}
-                        >
-                          <span className="w-2 h-2 bg-black rounded-full mt-3 flex-shrink-0"></span>
-                          <span className="text-gray-700 leading-relaxed text-base">{item}</span>
-                        </motion.li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                ))}
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div className="space-y-4 text-sm text-gray-700 leading-relaxed">
+                  {content.map((paragraph, index) => (
+                    <p key={index}>• {paragraph}</p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </motion.section>
+        </div>
 
         {/* Contact Section */}
-        <motion.section
-          className="py-16 bg-black text-white"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
+        <div className="py-6 bg-black text-white">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <motion.h2
-                className="text-3xl font-serif font-bold text-white mb-8"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-                viewport={{ once: true }}
-              >
-                Questions? Contact Us
-              </motion.h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                <motion.div
-                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
-                  whileHover={{ y: -5, scale: 1.02 }}
-                  transition={{ duration: 0.3 }}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                >
-                  <h3 className="text-xl font-serif font-bold text-white mb-4">Phone</h3>
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-lg font-bold text-white mb-4">Questions? Contact Us</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-white/10 rounded-lg p-4">
+                  <h3 className="text-sm font-bold text-white mb-2">Phone</h3>
                   <a
                     href="tel:+918122369100"
-                    className="text-gray-300 hover:text-white text-lg transition-colors duration-300"
+                    className="text-gray-300 hover:text-white text-sm transition-colors"
                   >
                     +91 81223 69100
                   </a>
-                </motion.div>
-                <motion.div
-                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
-                  whileHover={{ y: -5, scale: 1.02 }}
-                  transition={{ duration: 0.3 }}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1, duration: 0.6 }}
-                  viewport={{ once: true }}
-                >
-                  <h3 className="text-xl font-serif font-bold text-white mb-4">Email</h3>
+                </div>
+                <div className="bg-white/10 rounded-lg p-4">
+                  <h3 className="text-sm font-bold text-white mb-2">Email</h3>
                   <a
                     href="mailto:johneyresort@gmail.com"
-                    className="text-gray-300 hover:text-white text-lg transition-colors duration-300"
+                    className="text-gray-300 hover:text-white text-sm transition-colors"
                   >
                     johneyresort@gmail.com
                   </a>
-                </motion.div>
+                </div>
               </div>
-
-              <motion.div
-                className="pt-8 border-t border-white/20"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-                viewport={{ once: true }}
-              >
-                <p className="text-gray-400 mb-4">Related Policies</p>
-                <div className="space-x-6">
-                  <motion.a
+              <div className="pt-4 border-t border-white/20">
+                <p className="text-gray-400 text-xs mb-2">Related Policies</p>
+                <div className="space-x-4">
+                  <a
                     href="/privacy-policy"
-                    className="text-gray-300 hover:text-white transition-colors duration-300 underline underline-offset-4"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.2 }}
+                    className="text-gray-300 hover:text-white text-xs transition-colors underline"
                   >
                     Privacy Policy
-                  </motion.a>
-                  <motion.a
+                  </a>
+                  <a
                     href="/data-deletion-policy"
-                    className="text-gray-300 hover:text-white transition-colors duration-300 underline underline-offset-4"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.2 }}
+                    className="text-gray-300 hover:text-white text-xs transition-colors underline"
                   >
                     Data Deletion Policy
-                  </motion.a>
+                  </a>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
-        </motion.section>
+        </div>
       </div>
     </>
   )

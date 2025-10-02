@@ -22,58 +22,46 @@ export const PrivacyPolicy: React.FC = () => {
     }
   }
 
-  const sections = [
-    {
-      title: "Information We Collect",
-      content: [
-        "Personal Details: Name, phone, email, postal address, and government-issued ID (required under Indian law).",
-        "Booking & Stay Information: Dates of stay, room preferences, payment details, and special requests.",
-        "Communication Data: Emails, calls, or messages regarding reservations or inquiries.",
-        "Website/Online Data: IP address, browser type, cookies, and usage details."
-      ]
-    },
-    {
-      title: "How We Use Your Information",
-      content: [
-        "Managing and confirming reservations.",
-        "Complying with legal requirements for guest registration.",
-        "Processing payments through secure gateways.",
-        "Communicating updates, offers, or responses to your inquiries.",
-        "Improving our website, guest services, and overall experience."
-      ]
-    },
-    {
-      title: "Sharing of Information",
-      content: [
-        "Legal & Regulatory Compliance: With government authorities as mandated for lodging establishments.",
-        "Service Providers: With trusted partners like payment processors or online booking platforms.",
-        "Legal Protection: If required to protect the safety, rights, or property of our lodge, guests, or others."
-      ]
-    },
-    {
-      title: "Cookies & Website Usage",
-      content: [
-        "We may use cookies to enhance your browsing experience, remember preferences, and analyze site traffic.",
-        "You may disable cookies in your browser, but some features may not work properly.",
-        "Our website may contain links to third-party sites. We are not responsible for their privacy practices."
-      ]
-    },
-    {
-      title: "Data Security",
-      content: [
-        "We adopt reasonable physical, technical, and administrative measures to protect your information.",
-        "However, no system is completely secure, and we cannot guarantee absolute protection of your data."
-      ]
-    },
-    {
-      title: "Your Rights",
-      content: [
-        "Request access to the information we hold about you.",
-        "Request correction of inaccurate or incomplete details.",
-        "Request deletion of your data, subject to legal and regulatory requirements.",
-        "To exercise these rights, please contact us using the information provided below."
-      ]
-    }
+  const content = [
+    "All guests are required to provide valid government-issued photo identification at the time of check-in, as per the hospitality regulations. International guests must provide a passport, visa details, and any other documentation as mandated by law. This requirement is mandatory for security, verification, and lawful lodging records.",
+
+    "During the booking and stay process, AVR Lodge collects personal information including full name, postal address, contact details (phone number and email address), government-issued ID details (such as Aadhaar card, Passport, Voter ID, or Driving License), dates of stay, room preferences, number of guests, payment information (processed securely through gateways but without storing full card numbers), and special requests.",
+
+    "The information collected is used for managing and confirming bookings, fulfilling guest requests, complying with legal and regulatory obligations, and ensuring smooth communication before, during, and after a guest's stay.",
+
+    "Sensitive personal information is collected only when necessary, such as for identity verification for legal or security purposes, and is always handled with strict confidentiality.",
+
+    "Personal information is collected and processed only to the extent necessary to deliver services and comply with legal obligations. This includes processing and confirming reservations, legal guest registration with authorities, secure payment processing, and communication regarding stays, updates, or, where consent is provided, promotional offers.",
+
+    "Payment details are processed exclusively through certified third-party payment gateways to confirm deposits, settle bills, and prevent fraudulent activity. AVR Lodge does not store sensitive payment information such as credit or debit card numbers.",
+
+    "Communication using guest data may include booking confirmations, check-in or check-out details, reminders, updates about services, and promotional messages.",
+
+    "Guest data may also be analyzed internally to evaluate patterns such as booking trends, seasonal demand, and service preferences. This analysis is conducted only on aggregated or anonymized data to protect guest identities.",
+
+    "Personal identifiers such as ID numbers, financial details, or direct contact information will never be included in public reports, marketing material, or external communications.",
+
+    "Guest information may be shared with government authorities as required by Indian law, including local law enforcement and regulatory bodies, to ensure compliance with all hospitality regulations.",
+
+    "Guest information may be shared with trusted third-party service providers such as payment gateways, online booking platforms, and technology partners who assist in processing payments, managing reservations, or enhancing guest services.",
+
+    "Guest information will never be sold, rented, or traded to any third party for marketing or commercial gain.",
+
+    "All personal information collected by AVR Lodge is protected by reasonable physical, technical, and administrative safeguards to reduce the risk of unauthorized access, disclosure, or misuse.",
+
+    "While every effort is made to ensure security, no digital or physical system can be completely secure, and absolute protection of data cannot be guaranteed. Guests are encouraged to use secure methods of communication and payment.",
+
+    "Guests may withdraw consent for receiving promotional or marketing communication at any time without affecting the services they are entitled to.",
+
+    "AVR Lodge's website may use cookies to improve browsing experience, remember user preferences, and analyze traffic. Guests may disable cookies in their browser settings, though some website features may not function correctly. Links to third-party websites may be provided for convenience; AVR Lodge is not responsible for their privacy practices.",
+
+    "Guest records, including identification and booking details, are retained for the duration required under Indian law. Payment transaction records are retained by certified payment processors as per their policies.",
+
+    "Bookings for guests under 18 must be made or accompanied by a parent or legal guardian. AVR Lodge does not knowingly collect personal information from minors without proper consent.",
+
+    "AVR Lodge is not liable for unauthorized access, data breaches, system errors, or misuse of guest information beyond reasonable control. Guests are responsible for safeguarding their own credentials, devices, and payment methods.",
+
+    "AVR Lodge may update this Privacy Policy periodically to reflect changes in practices, technology, or applicable laws. The revised version will always be posted on the official website with the effective date clearly mentioned."
   ]
 
   return (
@@ -91,227 +79,79 @@ export const PrivacyPolicy: React.FC = () => {
 
       <div className="min-h-screen bg-white">
         {/* Header Section */}
-        <motion.section
-          className="bg-black text-white py-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        >
+        <div className="bg-black text-white py-6">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <motion.h1
-                className="text-2xl md:text-4xl font-serif font-bold mb-6"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
-              >
-                Privacy Policy
-              </motion.h1>
-              <motion.p
-                className="text-xl text-gray-300 mb-4"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-              >
-                Your Privacy & Data Protection Rights
-              </motion.p>
-              <motion.p
-                className="text-lg text-gray-300"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.8 }}
-              >
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="text-xl md:text-2xl font-bold mb-2">
+                Privacy Policy - AVR Lodge, Kolli Hills
+              </h1>
+              <p className="text-sm text-gray-300">
                 Effective Date: 1st September 2025
-              </motion.p>
+              </p>
             </div>
           </div>
-        </motion.section>
+        </div>
 
-        {/* Introduction */}
-        <motion.section
-          className="py-16"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9, duration: 0.8 }}
-        >
+        {/* Main Content */}
+        <div className="py-8 bg-gray-50">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <motion.div
-                className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
-                whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
-                transition={{ duration: 0.3 }}
-              >
-                <p className="text-gray-700 leading-relaxed text-lg text-center">
-                  At <strong className="text-black">AVR Lodge, Kolli Hills</strong>, we respect your privacy and are committed to protecting your personal information.
-                  This Privacy Policy explains what data we collect, how we use it, and your rights regarding your information.
-                </p>
-              </motion.div>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* Main Content Sections */}
-        <motion.section
-          className="pb-16 bg-gray-50"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="space-y-8">
-                {sections.map((section, index) => (
-                  <motion.div
-                    key={index}
-                    variants={itemVariants}
-                    className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
-                    whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <h2 className="text-2xl font-serif font-bold text-black mb-6">{section.title}</h2>
-                    <ul className="space-y-4">
-                      {section.content.map((item, itemIndex) => (
-                        <motion.li
-                          key={itemIndex}
-                          className="flex items-start space-x-4"
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          transition={{ delay: itemIndex * 0.1, duration: 0.5 }}
-                          viewport={{ once: true }}
-                        >
-                          <span className="w-2 h-2 bg-black rounded-full mt-3 flex-shrink-0"></span>
-                          <span className="text-gray-700 leading-relaxed text-base">{item}</span>
-                        </motion.li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                ))}
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div className="space-y-4 text-sm text-gray-700 leading-relaxed">
+                  {content.map((paragraph, index) => (
+                    <p key={index}>• {paragraph}</p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </motion.section>
-
-        {/* Updates Policy */}
-        <motion.section
-          className="py-16 bg-gray-100"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <motion.div
-                className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg"
-                whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
-                transition={{ duration: 0.3 }}
-              >
-                <h2 className="text-2xl font-serif font-bold text-black mb-6">Updates to This Policy</h2>
-                <p className="text-gray-700 leading-relaxed text-lg">
-                  We may update this Privacy Policy from time to time to reflect changes in our practices or applicable laws.
-                  The revised version will be posted on our website with the effective date.
-                </p>
-              </motion.div>
-            </div>
-          </div>
-        </motion.section>
+        </div>
 
         {/* Contact Section */}
-        <motion.section
-          className="py-16 bg-black text-white"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
+        <div className="py-6 bg-black text-white">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <motion.h2
-                className="text-3xl font-serif font-bold text-white mb-6"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-                viewport={{ once: true }}
-              >
-                Questions? Contact Us
-              </motion.h2>
-              <motion.p
-                className="text-gray-300 text-lg mb-12"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-                viewport={{ once: true }}
-              >
-                For questions, concerns, or requests related to this Privacy Policy, please reach out to us:
-              </motion.p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                <motion.div
-                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
-                  whileHover={{ y: -5, scale: 1.02 }}
-                  transition={{ duration: 0.3 }}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                >
-                  <h3 className="text-xl font-serif font-bold text-white mb-4">Phone</h3>
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-lg font-bold text-white mb-4">Questions? Contact Us</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-white/10 rounded-lg p-4">
+                  <h3 className="text-sm font-bold text-white mb-2">Phone</h3>
                   <a
                     href="tel:+918122369100"
-                    className="text-gray-300 hover:text-white text-lg transition-colors duration-300"
+                    className="text-gray-300 hover:text-white text-sm transition-colors"
                   >
                     +91 81223 69100
                   </a>
-                </motion.div>
-                <motion.div
-                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
-                  whileHover={{ y: -5, scale: 1.02 }}
-                  transition={{ duration: 0.3 }}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1, duration: 0.6 }}
-                  viewport={{ once: true }}
-                >
-                  <h3 className="text-xl font-serif font-bold text-white mb-4">Email</h3>
+                </div>
+                <div className="bg-white/10 rounded-lg p-4">
+                  <h3 className="text-sm font-bold text-white mb-2">Email</h3>
                   <a
                     href="mailto:johneyresort@gmail.com"
-                    className="text-gray-300 hover:text-white text-lg transition-colors duration-300"
+                    className="text-gray-300 hover:text-white text-sm transition-colors"
                   >
                     johneyresort@gmail.com
                   </a>
-                </motion.div>
+                </div>
               </div>
-
-              <motion.div
-                className="pt-8 border-t border-white/20"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-                viewport={{ once: true }}
-              >
-                <p className="text-gray-400 mb-4">Related Policies</p>
-                <div className="space-x-6">
-                  <motion.a
+              <div className="pt-4 border-t border-white/20">
+                <p className="text-gray-400 text-xs mb-2">Related Policies</p>
+                <div className="space-x-4">
+                  <a
                     href="/terms-of-service"
-                    className="text-gray-300 hover:text-white transition-colors duration-300 underline underline-offset-4"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.2 }}
+                    className="text-gray-300 hover:text-white text-xs transition-colors underline"
                   >
                     Terms of Service
-                  </motion.a>
-                  <motion.a
+                  </a>
+                  <a
                     href="/data-deletion-policy"
-                    className="text-gray-300 hover:text-white transition-colors duration-300 underline underline-offset-4"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.2 }}
+                    className="text-gray-300 hover:text-white text-xs transition-colors underline"
                   >
                     Data Deletion Policy
-                  </motion.a>
+                  </a>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
-        </motion.section>
+        </div>
       </div>
     </>
   )
