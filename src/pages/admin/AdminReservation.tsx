@@ -53,7 +53,7 @@ import {
 } from '@/lib/utils/referenceNumber';
 
 const AdminReservation: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, userRole } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -377,6 +377,22 @@ const AdminReservation: React.FC = () => {
 
     setAgentFeeAmount(calculatedAgentFee);
   }, [selectedAgentFee, roomAllocations, setAgentFeeAmount, calculateNumberOfNights]);
+
+  // Set default agent referral values based on user role
+  useEffect(() => {
+    if (userRole && !isEditMode) {
+      if (userRole === 'manager') {
+        // For manager role: Set to Direct Booking (empty string)
+        setSelectedAgentFee('');
+        setSelectedAgentId('');
+      } else if (userRole === 'agent' && currentUser?.uid) {
+        // For agent role: Set to Agent Referral with current user as agent
+        setSelectedAgentFee('agent');
+        setSelectedAgentId(currentUser.uid);
+      }
+      // For admin role: No default changes, retain existing functionality
+    }
+  }, [userRole, currentUser?.uid, isEditMode, setSelectedAgentFee, setSelectedAgentId]);
 
   // Load existing reservation data in edit mode - moved after function definition
   useEffect(() => {
@@ -1741,17 +1757,18 @@ const AdminReservation: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Agent Fees Section */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center space-x-2 text-lg font-semibold text-gray-900">
-              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-                <Users className="h-4 w-4 text-white" />
-              </div>
-              <span>Agent Referral</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        {/* Agent Fees Section - Only visible for admin role */}
+        {userRole === 'admin' && (
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center space-x-2 text-lg font-semibold text-gray-900">
+                <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                  <Users className="h-4 w-4 text-white" />
+                </div>
+                <span>Agent Referral</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Agent Referral Option */}
               <div
@@ -1868,6 +1885,7 @@ const AdminReservation: React.FC = () => {
             )}
           </CardContent>
         </Card>
+        )}
 
         {/* Final Summary */}
         <Card className="border-0 shadow-sm">
@@ -2170,7 +2188,7 @@ const AdminReservation: React.FC = () => {
                     >
                       Close
                     </button>
-                    <button
+                    {/* <button
                       onClick={() => {
                         setShowSuccessModal(false);
                         navigate('/admin/bookings');
@@ -2178,7 +2196,7 @@ const AdminReservation: React.FC = () => {
                       className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
                     >
                       Go to Bookings
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>
