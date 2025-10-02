@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, FileText, TrendingUp, Download, Filter, BarChart3, RefreshCw, Users, DollarSign, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react'
+import { Calendar, FileText, TrendingUp, Download, Filter, BarChart3, RefreshCw, Users, DollarSign, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Clock, CheckCircle, XCircle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -272,6 +272,27 @@ const AdminBookings = () => {
     return filteredBookings.slice(startIndex, endIndex)
   }, [filteredBookings, currentPage, itemsPerPage])
 
+  // Payment status statistics
+  const paymentStatusStats = useMemo(() => {
+    const pending = filteredBookings.filter(b => b.paymentStatus === 'pending').reduce((sum, b) => sum + b.totalPrice, 0)
+    const partial = filteredBookings.filter(b => b.paymentStatus === 'partial').reduce((sum, b) => sum + b.totalPrice, 0)
+    const paid = filteredBookings.filter(b => b.paymentStatus === 'paid').reduce((sum, b) => sum + b.totalPrice, 0)
+
+    return { pending, partial, paid }
+  }, [filteredBookings])
+
+  // Get date range display text
+  const getDateRangeText = useCallback(() => {
+    const dateRange = getDateRange()
+    const startStr = format(dateRange.start, 'MMM dd, yyyy')
+    const endStr = format(dateRange.end, 'MMM dd, yyyy')
+
+    if (startStr === endStr) {
+      return startStr
+    }
+    return `${startStr} - ${endStr}`
+  }, [getDateRange])
+
   // Get period label for comparison (memoized)
   const getPeriodLabel = useCallback(() => {
     switch (dateFilterType) {
@@ -491,7 +512,13 @@ const AdminBookings = () => {
           )}
         </div>
 
-        {/* Status Filters */}
+        {/* Date Range Display */}
+        <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg border border-gray-100 px-3 py-2">
+          <span className="font-medium">Date Range:</span>
+          <span>{getDateRangeText()}</span>
+        </div>
+
+        {/* Status Filter */}
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-gray-600" />
@@ -509,20 +536,6 @@ const AdminBookings = () => {
               </SelectContent>
             </Select>
           </div>
-
-          <div className="flex items-center gap-2">
-            <Select value={paymentStatusFilter} onValueChange={setPaymentStatusFilter}>
-              <SelectTrigger className="w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-                <SelectItem value="all">All Payment Status</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="partial">Partial</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
       </motion.div>
 
@@ -535,47 +548,45 @@ const AdminBookings = () => {
       >
         <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
-            <FileText className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.totalBookings}</div>
-            <p className="text-xs text-gray-600">
-              {stats.activeBookings} active
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-md transition-all duration-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">₹{stats.totalRevenue.toLocaleString()}</div>
-            <p className="text-xs text-gray-600">From selected bookings</p>
+            <p className="text-xs text-gray-600">From {stats.totalBookings} bookings</p>
           </CardContent>
         </Card>
 
         <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Booking Value</CardTitle>
-            <TrendingUp className="h-4 w-4 text-purple-600" />
+            <CardTitle className="text-sm font-medium">Pending</CardTitle>
+            <Clock className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">₹{stats.avgBookingValue.toFixed(0)}</div>
-            <p className="text-xs text-gray-600">Per booking</p>
+            <div className="text-2xl font-bold text-red-600">₹{paymentStatusStats.pending.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Pending payments</p>
           </CardContent>
         </Card>
 
         <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Stay</CardTitle>
-            <BarChart3 className="h-4 w-4 text-orange-600" />
+            <CardTitle className="text-sm font-medium">Partial</CardTitle>
+            <TrendingUp className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{stats.avgStayDuration.toFixed(1)}</div>
-            <p className="text-xs text-gray-600">Nights per booking</p>
+            <div className="text-2xl font-bold text-yellow-600">₹{paymentStatusStats.partial.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Partial payments</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Paid</CardTitle>
+            <CheckCircle className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">₹{paymentStatusStats.paid.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Paid in full</p>
           </CardContent>
         </Card>
       </motion.div>
