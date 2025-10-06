@@ -8,6 +8,7 @@ interface NavigationLinkProps {
   isActive?: boolean
   className?: string
   variant?: 'header' | 'sidebar' | 'mobile'
+  onClick?: () => void
 }
 
 export function NavigationLink({
@@ -16,7 +17,8 @@ export function NavigationLink({
   label,
   isActive,
   className = '',
-  variant = 'header'
+  variant = 'header',
+  onClick
 }: NavigationLinkProps) {
   const location = useLocation()
   const active = isActive ?? location.pathname === to
@@ -45,6 +47,7 @@ export function NavigationLink({
     <Link
       to={to}
       className={`${baseClasses} ${variantClasses[variant]} ${className}`}
+      onClick={onClick}
     >
       <Icon className="h-4 w-4" />
       <span>{label}</span>

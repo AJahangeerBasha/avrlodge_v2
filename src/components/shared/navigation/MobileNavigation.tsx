@@ -111,6 +111,7 @@ export function MobileNavigation({
                                       label={subItem.label}
                                       variant="mobile"
                                       className="text-sm"
+                                      onClick={onClose}
                                     />
                                   ))}
                                 </div>
@@ -125,6 +126,7 @@ export function MobileNavigation({
                           icon={item.icon}
                           label={item.label}
                           variant="mobile"
+                          onClick={onClose}
                         />
                       )}
                     </div>
