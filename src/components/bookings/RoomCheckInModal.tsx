@@ -83,10 +83,8 @@ export function RoomCheckInModal({
   // Reset form when modal opens with new booking
   useEffect(() => {
     if (isOpen && booking) {
-      // Set check-in date to booking's check-in date
-      const bookingCheckInDate = booking.check_in_date ?
-        new Date(booking.check_in_date).toISOString().split('T')[0] :
-        new Date().toISOString().split('T')[0]
+      // Set check-in date to booking's check-in date (already in YYYY-MM-DD format)
+      const bookingCheckInDate = booking.check_in_date || new Date().toISOString().split('T')[0]
       setCheckInDate(bookingCheckInDate)
 
       // Set current time
@@ -409,7 +407,7 @@ export function RoomCheckInModal({
                     <Calendar className="w-4 h-4 text-gray-600" />
                     <span className="text-sm text-gray-600">Booking Check-In:</span>
                     <span className="font-semibold text-gray-900">
-                      {new Date(booking.check_in_date).toLocaleDateString('en-IN', {
+                      {new Date(booking.check_in_date + 'T00:00:00').toLocaleDateString('en-IN', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
@@ -443,9 +441,9 @@ export function RoomCheckInModal({
                     {validationErrors.checkInDate}
                   </p>
                 )}
-                {!validationErrors.checkInDate && (
+                {!validationErrors.checkInDate && booking.check_in_date && (
                   <p className="text-xs text-gray-500 mt-1">
-                    Default: {new Date(booking.check_in_date).toLocaleDateString('en-IN')} (from booking)
+                    Booking check-in: {new Date(booking.check_in_date + 'T00:00:00').toLocaleDateString('en-IN')}
                   </p>
                 )}
               </div>

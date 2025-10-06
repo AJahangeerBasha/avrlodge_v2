@@ -37,7 +37,9 @@ export function DatePicker({
   // Set current month to selected date when it changes
   useEffect(() => {
     if (selectedDate) {
-      setCurrentMonth(new Date(selectedDate))
+      // Parse date as local date to avoid timezone shifts
+      const [year, month, day] = selectedDate.split('-').map(Number)
+      setCurrentMonth(new Date(year, month - 1, day))
     }
   }, [selectedDate])
 
@@ -49,7 +51,10 @@ export function DatePicker({
     return new Date(date.getFullYear(), date.getMonth(), 1).getDay()
   }
 
-  const formatDate = (date: Date) => {
+  const formatDate = (dateStr: string) => {
+    // Parse date string as local date to avoid timezone shifts
+    const [year, month, day] = dateStr.split('-').map(Number)
+    const date = new Date(year, month - 1, day)
     return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -58,25 +63,44 @@ export function DatePicker({
   }
 
   const isDateSelected = (date: Date) => {
-    return selectedDate && date.toDateString() === new Date(selectedDate).toDateString()
+    if (!selectedDate) return false
+    // Parse selected date as local date
+    const [year, month, day] = selectedDate.split('-').map(Number)
+    const selectedLocalDate = new Date(year, month - 1, day)
+    return date.toDateString() === selectedLocalDate.toDateString()
   }
 
   const isDateDisabled = (date: Date) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    
-    if (minDate && date < new Date(minDate)) return true
-    if (maxDate && date > new Date(maxDate)) return true
-    
+
+    if (minDate) {
+      const [minYear, minMonth, minDay] = minDate.split('-').map(Number)
+      const minDateLocal = new Date(minYear, minMonth - 1, minDay)
+      if (date < minDateLocal) return true
+    }
+
+    if (maxDate) {
+      const [maxYear, maxMonth, maxDay] = maxDate.split('-').map(Number)
+      const maxDateLocal = new Date(maxYear, maxMonth - 1, maxDay)
+      if (date > maxDateLocal) return true
+    }
+
     return false
   }
 
   const handleDateClick = (day: number) => {
     const selectedDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
-    
+
     if (isDateDisabled(selectedDate)) return
-    
-    onDateChange(selectedDate.toISOString().split('T')[0])
+
+    // Format date as YYYY-MM-DD in local timezone
+    const year = selectedDate.getFullYear()
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0')
+    const dayStr = String(selectedDate.getDate()).padStart(2, '0')
+    const dateStr = `${year}-${month}-${dayStr}`
+
+    onDateChange(dateStr)
     setIsOpen(false)
   }
 
@@ -148,7 +172,7 @@ export function DatePicker({
         <div className="flex items-center space-x-2">
           <Calendar className="w-4 h-4 text-gray-500" />
           <span className={`text-sm ${selectedDate ? 'text-gray-900' : 'text-gray-500'}`}>
-            {selectedDate ? formatDate(new Date(selectedDate)) : placeholder}
+            {selectedDate ? formatDate(selectedDate) : placeholder}
           </span>
         </div>
         {selectedDate && (
