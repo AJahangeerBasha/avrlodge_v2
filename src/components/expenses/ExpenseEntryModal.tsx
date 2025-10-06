@@ -278,7 +278,6 @@ export const ExpenseEntryModal: React.FC<ExpenseEntryModalProps> = ({
             <Input
               id="amount"
               type="number"
-              step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
