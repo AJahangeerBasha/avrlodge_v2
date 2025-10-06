@@ -203,14 +203,12 @@ export default function BookingsPageLayoutV2({ role }: BookingsPageLayoutV2Props
                     {isSearchMode ? (
                       <>
                         <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">Clear</span>
-                        <X className="sm:hidden h-4 w-4" />
+                        <span className="text-xs sm:text-sm">Clear</span>
                       </>
                     ) : (
                       <>
                         <Search className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">Search</span>
-                        <Search className="sm:hidden h-4 w-4" />
+                        <span className="text-xs sm:text-sm">Search</span>
                       </>
                     )}
                   </Button>
@@ -225,8 +223,7 @@ export default function BookingsPageLayoutV2({ role }: BookingsPageLayoutV2Props
                     disabled={loading}
                   >
                     <RefreshCw className={`mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 ${loading ? 'animate-spin' : ''}`} />
-                    <span className="hidden sm:inline">Refresh</span>
-                    <RefreshCw className="sm:hidden h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Refresh</span>
                   </Button>
                 </motion.div>
               </div>

@@ -1367,26 +1367,38 @@ export default function BookingCard({
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-md p-6"
+              className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      Cancel Reservation
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      {booking.guest_name} • {booking.reference_number}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Cancel Reservation
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {booking.reference_number}
-                  </p>
-                </div>
+                <button
+                  onClick={() => {
+                    setShowCancellationModal(false)
+                    setCancellationConfirmation('')
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
-              {/* Warning */}
-              <div className="mb-6">
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-6">
+                {/* Warning */}
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                   <p className="text-sm text-gray-700">
                     <strong>Warning:</strong> This action cannot be undone. The reservation will be permanently cancelled.
@@ -1408,8 +1420,8 @@ export default function BookingCard({
                 />
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-3">
+              {/* Footer */}
+              <div className="flex gap-3 p-6 border-t border-gray-200 flex-shrink-0">
                 <Button
                   onClick={() => {
                     setShowCancellationModal(false)
@@ -1455,21 +1467,21 @@ export default function BookingCard({
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-md p-6"
+              className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                     <User className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h2 className="text-xl font-semibold text-gray-900">
                       Edit Primary Guest
-                    </h3>
+                    </h2>
                     <p className="text-sm text-gray-500">
-                      {booking.reference_number}
+                      {booking.guest_name} • {booking.reference_number}
                     </p>
                   </div>
                 </div>
@@ -1481,8 +1493,9 @@ export default function BookingCard({
                 </button>
               </div>
 
-              {/* Form */}
-              <div className="space-y-4">
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="space-y-4">
                 {/* Full Name */}
                 <div>
                   <Label className="text-sm font-medium text-gray-700 mb-2 block">
@@ -1558,10 +1571,11 @@ export default function BookingCard({
                     <p className="text-sm text-red-600 mt-1">{guestFormErrors.whatsapp}</p>
                   )}
                 </div>
+                </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-3 mt-6">
+              {/* Footer */}
+              <div className="flex gap-3 p-6 border-t border-gray-200 flex-shrink-0">
                 <Button
                   onClick={() => setShowPrimaryGuestEdit(false)}
                   variant="outline"
