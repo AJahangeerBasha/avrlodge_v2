@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { NumberInput } from '@/components/ui/number-input';
 import { 
   createReservation, 
   updateReservation, 
@@ -1087,15 +1088,16 @@ const AdminReservation: React.FC = () => {
                 <Label htmlFor="guestCount" className="text-sm font-medium text-gray-700 mb-2 block">
                   Number of Pax (Adults + Kids) *
                 </Label>
-                <input
+                <NumberInput
                   id="guestCount"
-                  type="number"
-                  min="1"
-                  max="20"
                   value={guestCount}
-                  onChange={(e) => setGuestCount(parseInt(e.target.value) || 1)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
-                  required
+                  onChange={(val) => setGuestCount(val ?? 1)}
+                  min={1}
+                  max={20}
+                  step={1}
+                  showButtons={true}
+                  allowDecimals={false}
+                  className="w-full"
                 />
               </div>
               
@@ -1302,15 +1304,15 @@ const AdminReservation: React.FC = () => {
                       {/* Guest Count */}
                       <div>
                         <Label className="text-sm font-medium text-gray-700 mb-2 block">Pax Count</Label>
-                        <input
-                          type="number"
-                          min="1"
-                          max="20"
+                        <NumberInput
                           value={allocation.guestCount}
-                          onChange={(e) => updateRoomAllocation(allocation.id, {
-                            guestCount: parseInt(e.target.value) || 1
-                          })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-md bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
+                          onChange={(val) => updateRoomAllocation(allocation.id, { guestCount: val ?? 1 })}
+                          min={1}
+                          max={20}
+                          step={1}
+                          showButtons={true}
+                          allowDecimals={false}
+                          className="w-full"
                         />
                       </div>
                     </div>
@@ -1654,42 +1656,38 @@ const AdminReservation: React.FC = () => {
                       <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4 flex-wrap">
                         <div className="flex items-center gap-2">
                           <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">Amount:</span>
-                          <input
-                            type="number"
+                          <NumberInput
                             value={charge.amount}
-                            onChange={(e) => {
-                              // Update charge amount
+                            onChange={(val) => {
+                              if (isAutoSelected) return;
                               const updatedCharges = specialCharges.map(c =>
-                                c.id === charge.id
-                                  ? { ...c, amount: parseFloat(e.target.value) || 0 }
-                                  : c
+                                c.id === charge.id ? { ...c, amount: val ?? 0 } : c
                               );
                               setSpecialCharges(updatedCharges);
                             }}
+                            min={0}
+                            step={10}
+                            showButtons={true}
+                            allowDecimals={true}
                             disabled={isAutoSelected}
-                            className={`w-16 sm:w-20 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md text-center text-xs sm:text-sm text-gray-900 focus:border-gray-400 focus:outline-none transition-colors ${
-                              isAutoSelected ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                            }`}
-                            min="0"
+                            className="w-28 sm:w-32"
                           />
                           <span className="text-xs sm:text-sm text-gray-600">×</span>
-                          <input
-                            type="number"
+                          <NumberInput
                             value={charge.quantity || 1}
-                            onChange={(e) => {
-                              // Update charge quantity
+                            onChange={(val) => {
+                              if (isAutoSelected) return;
                               const updatedCharges = specialCharges.map(c =>
-                                c.id === charge.id
-                                  ? { ...c, quantity: parseInt(e.target.value) || 1 }
-                                  : c
+                                c.id === charge.id ? { ...c, quantity: val ?? 1 } : c
                               );
                               setSpecialCharges(updatedCharges);
                             }}
+                            min={1}
+                            step={1}
+                            showButtons={true}
+                            allowDecimals={false}
                             disabled={isAutoSelected}
-                            className={`w-12 sm:w-16 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md text-center text-xs sm:text-sm text-gray-900 focus:border-gray-400 focus:outline-none transition-colors ${
-                              isAutoSelected ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                            }`}
-                            min="1"
+                            className="w-20 sm:w-24"
                           />
                         </div>
                         <div className="font-semibold text-gray-900 min-w-[70px] sm:min-w-[80px] text-right text-sm sm:text-base">
@@ -1756,22 +1754,19 @@ const AdminReservation: React.FC = () => {
               {discountType !== 'none' && (
                 <div>
                   <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Discount Amount
+                    Discount Amount {discountType === 'percentage' ? '(%)' : '(₹)'}
                   </Label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="0"
-                      max={discountType === 'percentage' ? 100 : subtotal}
-                      value={discountValue}
-                      onChange={(e) => setDiscountValue(parseFloat(e.target.value) || 0)}
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-md bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
-                      placeholder="0"
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 text-sm">
-                      {discountType === 'percentage' ? '%' : '₹'}
-                    </div>
-                  </div>
+                  <NumberInput
+                    value={discountValue}
+                    onChange={(val) => setDiscountValue(val ?? 0)}
+                    min={0}
+                    max={discountType === 'percentage' ? 100 : subtotal}
+                    step={discountType === 'percentage' ? 1 : 10}
+                    showButtons={true}
+                    allowDecimals={true}
+                    className="w-full"
+                    placeholder="0"
+                  />
                 </div>
               )}
             </div>

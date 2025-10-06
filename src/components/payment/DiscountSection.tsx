@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Percent } from 'lucide-react'
+import { NumberInput } from '@/components/ui/number-input'
 
 interface DiscountSectionProps {
   discountType: 'percentage' | 'amount' | 'none'
@@ -45,15 +46,17 @@ export default function DiscountSection({
         {(discountType === 'percentage' || discountType === 'amount') && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {discountType === 'percentage' ? 'Discount Percentage' : 'Discount Amount'}
+              {discountType === 'percentage' ? 'Discount Percentage (%)' : 'Discount Amount (₹)'}
             </label>
-            <input
-              type="number"
+            <NumberInput
               value={discountValue}
-              onChange={(e) => onDiscountValueChange(parseFloat(e.target.value) || 0)}
-              min="0"
+              onChange={(val) => onDiscountValueChange(val ?? 0)}
+              min={0}
               max={discountType === 'percentage' ? 100 : undefined}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+              step={discountType === 'percentage' ? 1 : 10}
+              showButtons={true}
+              allowDecimals={true}
+              className="w-full"
               placeholder={discountType === 'percentage' ? 'Enter percentage' : 'Enter amount'}
             />
           </div>

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { DollarSign } from 'lucide-react'
 import { SpecialCharge } from '@/services/payment.service'
+import { NumberInput } from '@/components/ui/number-input'
 
 interface SpecialChargesSectionProps {
   specialCharges: SpecialCharge[]
@@ -85,22 +86,27 @@ export default function SpecialChargesSection({
                 placeholder="Charge name"
               />
             </div>
-            <div className="w-32">
-              <input
-                type="number"
+            <div className="w-36">
+              <NumberInput
                 value={charge.amount}
-                onChange={(e) => onUpdateCharge(charge.id, 'amount', parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                onChange={(val) => onUpdateCharge(charge.id, 'amount', val ?? 0)}
+                min={0}
+                step={10}
+                showButtons={true}
+                allowDecimals={true}
+                className="w-full"
                 placeholder="Rate"
               />
             </div>
-            <div className="w-20">
-              <input
-                type="number"
-                min="1"
+            <div className="w-28">
+              <NumberInput
                 value={charge.quantity || 1}
-                onChange={(e) => onUpdateCharge(charge.id, 'quantity', parseInt(e.target.value) || 1)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                onChange={(val) => onUpdateCharge(charge.id, 'quantity', val ?? 1)}
+                min={1}
+                step={1}
+                showButtons={true}
+                allowDecimals={false}
+                className="w-full"
                 placeholder="Qty"
               />
             </div>
