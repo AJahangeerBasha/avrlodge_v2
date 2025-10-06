@@ -274,7 +274,16 @@ export const useReservationStore = create<ReservationState>()(
         }, 0);
 
         const specialChargesTotal = state.specialCharges.reduce((total, charge) => {
-          return total + (charge.amount * (charge.quantity || 1));
+          // Check if this is an auto-selected Extra Person charge (by description)
+          const isExtraPersonCharge = charge.description && charge.description.includes('extra person(s) required');
+
+          if (isExtraPersonCharge) {
+            // Multiply by number of nights for extra person charges
+            return total + (charge.amount * (charge.quantity || 1) * numberOfDays);
+          } else {
+            // Other charges are not multiplied by nights
+            return total + (charge.amount * (charge.quantity || 1));
+          }
         }, 0);
 
         const subtotal = roomTariff + specialChargesTotal;

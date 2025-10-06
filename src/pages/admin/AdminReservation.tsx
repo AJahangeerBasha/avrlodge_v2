@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Calendar, Users, Plus, Trash2, X, MapPin, DollarSign, MessageCircle } from 'lucide-react';
-import { useReservationStore, type RoomAllocation, type SpecialCharge } from '@/stores/reservationStore';
+import { useReservationStore, type RoomAllocation, type SpecialCharge as SpecialChargeState } from '@/stores/reservationStore';
 import { validatePhoneNumber, formatPhoneNumber, getPhoneValidationError } from '@/utils/phoneValidation';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { StateDistrictDropdown } from '@/components/agents/StateDistrictDropdown';
@@ -45,6 +45,7 @@ import {
 import {
   getAllSpecialCharges
 } from '@/lib/specialCharges';
+import { SpecialCharge } from '@/lib/types/specialCharges';
 import {
   getAvailableRoomsForDateRange,
 } from '@/lib/utils/roomAvailability';
@@ -1404,7 +1405,7 @@ const AdminReservation: React.FC = () => {
       if (extraPersonsNeeded > 0) {
         if (!existingAutoCharge) {
           // Auto-add Extra Person charge
-          const newCharge: SpecialCharge = {
+          const newCharge: SpecialChargeState = {
             id: crypto.randomUUID(),
             masterId: extraPersonCharge.id,
             name: extraPersonCharge.chargeName,
@@ -1447,7 +1448,16 @@ const AdminReservation: React.FC = () => {
 
     // Calculate special charges total
     const specialChargesTotal = specialCharges.reduce((total, charge) => {
-      return total + (charge.amount * (charge.quantity || 1));
+      // Check if this is an auto-selected Extra Person charge (by description)
+      const isExtraPersonCharge = charge.description && charge.description.includes('extra person(s) required');
+
+      if (isExtraPersonCharge) {
+        // Multiply by number of nights for extra person charges
+        return total + (charge.amount * (charge.quantity || 1) * numberOfNights);
+      } else {
+        // Other charges are not multiplied by nights
+        return total + (charge.amount * (charge.quantity || 1));
+      }
     }, 0);
 
     const subtotal = roomTariffTotal + specialChargesTotal;
@@ -1464,7 +1474,7 @@ const AdminReservation: React.FC = () => {
     const finalTotal = subtotal - discount; // Agent fee excluded from customer total
 
     const addCustomCharge = () => {
-      const newCharge: SpecialCharge = {
+      const newCharge: SpecialChargeState = {
         id: crypto.randomUUID(),
         masterId: crypto.randomUUID(),
         name: 'Custom Charge',
@@ -1570,7 +1580,7 @@ const AdminReservation: React.FC = () => {
                       
                       if (isExtraPersonCharge) {
                         // For Extra Person charges, always allow adding new manual records
-                        const newCharge: SpecialCharge = {
+                        const newCharge: SpecialChargeState = {
                           id: crypto.randomUUID(),
                           masterId: masterCharge.id,
                           name: masterCharge.chargeName,
@@ -1601,13 +1611,13 @@ const AdminReservation: React.FC = () => {
                           setSpecialCharges(updatedCharges);
                         } else {
                           // Add new charge
-                          const newCharge: SpecialCharge = {
+                          const newCharge: SpecialChargeState = {
                             id: crypto.randomUUID(),
                             masterId: masterCharge.id,
                             name: masterCharge.chargeName,
                             amount: masterCharge.defaultRate,
                             quantity: 1,
-                            description: masterCharge.description
+                            description: masterCharge.description || undefined
                           };
                           addSpecialCharge(newCharge);
                         }
@@ -1624,79 +1634,88 @@ const AdminReservation: React.FC = () => {
             {/* Selected Charges - Vertical Layout (one below another) */}
             {specialCharges.length > 0 && (
               <div className="space-y-2 sm:space-y-3">
-                {specialCharges.map((charge) => (
-                  <div key={charge.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg">
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900 text-sm sm:text-base">{charge.name}</div>
-                    </div>
-                    <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4 flex-wrap">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">Amount:</span>
-                        <input
-                          type="number"
-                          value={charge.amount}
-                          onChange={(e) => {
-                            // Update charge amount
-                            const updatedCharges = specialCharges.map(c =>
-                              c.id === charge.id
-                                ? { ...c, amount: parseFloat(e.target.value) || 0 }
-                                : c
-                            );
-                            setSpecialCharges(updatedCharges);
-                          }}
-                          className="w-16 sm:w-20 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md text-center text-xs sm:text-sm bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
-                          min="0"
-                        />
-                        <span className="text-xs sm:text-sm text-gray-600">×</span>
-                        <input
-                          type="number"
-                          value={charge.quantity || 1}
-                          onChange={(e) => {
-                            // Update charge quantity
-                            const updatedCharges = specialCharges.map(c =>
-                              c.id === charge.id
-                                ? { ...c, quantity: parseInt(e.target.value) || 1 }
-                                : c
-                            );
-                            setSpecialCharges(updatedCharges);
-                          }}
-                          className="w-12 sm:w-16 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md text-center text-xs sm:text-sm bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
-                          min="1"
-                        />
+                {specialCharges.map((charge) => {
+                  // Check if this is an auto-selected Extra Person charge
+                  const masterCharge = specialChargesMaster.find(mc => mc.id === charge.masterId);
+                  const isExtraPersonCharge = masterCharge && (masterCharge.chargeName.toLowerCase().includes('extra person') ||
+                    (masterCharge.chargeName.toLowerCase().includes('extra') && masterCharge.chargeName.toLowerCase().includes('person')));
+                  const isAutoSelected = isExtraPersonCharge && charge.description && charge.description.includes('extra person(s) required');
+
+                  return (
+                    <div key={charge.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg">
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900 text-sm sm:text-base">{charge.name}</div>
+                        {isAutoSelected && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            ₹{charge.amount} × {charge.quantity} person(s) × {numberOfNights} night(s)
+                          </div>
+                        )}
                       </div>
-                      <div className="font-semibold text-gray-900 min-w-[70px] sm:min-w-[80px] text-right text-sm sm:text-base">
-                        ₹{((charge.amount || 0) * (charge.quantity || 1)).toLocaleString()}
-                      </div>
-                      {(() => {
-                        const masterCharge = specialChargesMaster.find(mc => mc.id === charge.masterId);
-                        const isExtraPersonCharge = masterCharge && (masterCharge.chargeName.toLowerCase().includes('extra person') || 
-                          (masterCharge.chargeName.toLowerCase().includes('extra') && masterCharge.chargeName.toLowerCase().includes('person')));
-                        // Auto-selected charges have specific description indicating they are required
-                        const isAutoSelected = isExtraPersonCharge && charge.description && charge.description.includes('extra person(s) required');
-                        
-                        return (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              if (!isAutoSelected) {
-                                removeSpecialCharge(charge.id);
-                              }
+                      <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">Amount:</span>
+                          <input
+                            type="number"
+                            value={charge.amount}
+                            onChange={(e) => {
+                              // Update charge amount
+                              const updatedCharges = specialCharges.map(c =>
+                                c.id === charge.id
+                                  ? { ...c, amount: parseFloat(e.target.value) || 0 }
+                                  : c
+                              );
+                              setSpecialCharges(updatedCharges);
                             }}
                             disabled={isAutoSelected}
-                            className={`${
-                              isAutoSelected 
-                                ? 'text-gray-400 cursor-not-allowed opacity-50' 
-                                : 'text-red-600 hover:text-red-800 hover:bg-red-50'
+                            className={`w-16 sm:w-20 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md text-center text-xs sm:text-sm text-gray-900 focus:border-gray-400 focus:outline-none transition-colors ${
+                              isAutoSelected ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
                             }`}
-                          >
-                            {isAutoSelected ? 'Required' : 'Remove'}
-                          </Button>
-                        );
-                      })()}
+                            min="0"
+                          />
+                          <span className="text-xs sm:text-sm text-gray-600">×</span>
+                          <input
+                            type="number"
+                            value={charge.quantity || 1}
+                            onChange={(e) => {
+                              // Update charge quantity
+                              const updatedCharges = specialCharges.map(c =>
+                                c.id === charge.id
+                                  ? { ...c, quantity: parseInt(e.target.value) || 1 }
+                                  : c
+                              );
+                              setSpecialCharges(updatedCharges);
+                            }}
+                            disabled={isAutoSelected}
+                            className={`w-12 sm:w-16 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md text-center text-xs sm:text-sm text-gray-900 focus:border-gray-400 focus:outline-none transition-colors ${
+                              isAutoSelected ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                            }`}
+                            min="1"
+                          />
+                        </div>
+                        <div className="font-semibold text-gray-900 min-w-[70px] sm:min-w-[80px] text-right text-sm sm:text-base">
+                          ₹{((charge.amount || 0) * (charge.quantity || 1) * (isAutoSelected ? numberOfNights : 1)).toLocaleString()}
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            if (!isAutoSelected) {
+                              removeSpecialCharge(charge.id);
+                            }
+                          }}
+                          disabled={isAutoSelected}
+                          className={`${
+                            isAutoSelected
+                              ? 'text-gray-400 cursor-not-allowed opacity-50'
+                              : 'text-red-600 hover:text-red-800 hover:bg-red-50'
+                          }`}
+                        >
+                          {isAutoSelected ? 'Required' : 'Remove'}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
