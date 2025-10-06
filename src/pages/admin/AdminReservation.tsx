@@ -1546,17 +1546,17 @@ const AdminReservation: React.FC = () => {
             )}
             
             {/* Master Special Charges - Single Line Layout */}
-            <div className="flex gap-4 mb-6 overflow-x-auto pb-2" style={{scrollbarWidth: 'thin'}}>
+            <div className="flex gap-3 sm:gap-4 mb-6 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0" style={{scrollbarWidth: 'thin'}}>
               {specialChargesMaster.map((masterCharge) => {
                 const isSelected = specialCharges.some(sc => sc.masterId === masterCharge.id);
-                const isExtraPersonCharge = masterCharge.chargeName.toLowerCase().includes('extra person') || 
+                const isExtraPersonCharge = masterCharge.chargeName.toLowerCase().includes('extra person') ||
                   (masterCharge.chargeName.toLowerCase().includes('extra') && masterCharge.chargeName.toLowerCase().includes('person'));
                 const isAutoSelected = isExtraPersonCharge && extraPersonsNeeded > 0;
-                
+
                 return (
-                  <div 
-                    key={masterCharge.id} 
-                    className={`flex flex-col items-center p-4 rounded-lg transition-colors cursor-pointer min-w-[140px] ${
+                  <div
+                    key={masterCharge.id}
+                    className={`flex flex-col items-center p-3 sm:p-4 rounded-lg transition-colors cursor-pointer min-w-[120px] sm:min-w-[140px] flex-shrink-0 ${
                       isSelected 
                         ? isAutoSelected 
                           ? 'bg-blue-100 border border-blue-300' 
@@ -1614,8 +1614,8 @@ const AdminReservation: React.FC = () => {
                       }
                     }}
                   >
-                    <div className="font-medium text-gray-900 text-center mb-1">{masterCharge.chargeName}</div>
-                    <div className="text-sm font-semibold text-blue-600">₹{masterCharge.defaultRate}</div>
+                    <div className="font-medium text-gray-900 text-center mb-1 text-xs sm:text-sm">{masterCharge.chargeName}</div>
+                    <div className="text-xs sm:text-sm font-semibold text-blue-600">₹{masterCharge.defaultRate}</div>
                   </div>
                 );
               })}
@@ -1623,46 +1623,48 @@ const AdminReservation: React.FC = () => {
 
             {/* Selected Charges - Vertical Layout (one below another) */}
             {specialCharges.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {specialCharges.map((charge) => (
-                  <div key={charge.id} className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
+                  <div key={charge.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg">
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900">{charge.name}</div>
+                      <div className="font-medium text-gray-900 text-sm sm:text-base">{charge.name}</div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-2">
-                        <input 
+                    <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">Amount:</span>
+                        <input
                           type="number"
                           value={charge.amount}
                           onChange={(e) => {
                             // Update charge amount
-                            const updatedCharges = specialCharges.map(c => 
-                              c.id === charge.id 
+                            const updatedCharges = specialCharges.map(c =>
+                              c.id === charge.id
                                 ? { ...c, amount: parseFloat(e.target.value) || 0 }
                                 : c
                             );
                             setSpecialCharges(updatedCharges);
                           }}
-                          className="w-20 px-3 py-2 border border-gray-300 rounded-md text-center text-sm bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
+                          className="w-16 sm:w-20 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md text-center text-xs sm:text-sm bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
                           min="0"
                         />
-                        <input 
+                        <span className="text-xs sm:text-sm text-gray-600">×</span>
+                        <input
                           type="number"
                           value={charge.quantity || 1}
                           onChange={(e) => {
                             // Update charge quantity
-                            const updatedCharges = specialCharges.map(c => 
-                              c.id === charge.id 
+                            const updatedCharges = specialCharges.map(c =>
+                              c.id === charge.id
                                 ? { ...c, quantity: parseInt(e.target.value) || 1 }
                                 : c
                             );
                             setSpecialCharges(updatedCharges);
                           }}
-                          className="w-16 px-3 py-2 border border-gray-300 rounded-md text-center text-sm bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
+                          className="w-12 sm:w-16 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md text-center text-xs sm:text-sm bg-white text-gray-900 focus:border-gray-400 focus:outline-none transition-colors"
                           min="1"
                         />
                       </div>
-                      <div className="font-semibold text-gray-900 min-w-[80px] text-right">
+                      <div className="font-semibold text-gray-900 min-w-[70px] sm:min-w-[80px] text-right text-sm sm:text-base">
                         ₹{((charge.amount || 0) * (charge.quantity || 1)).toLocaleString()}
                       </div>
                       {(() => {
@@ -1961,7 +1963,7 @@ const AdminReservation: React.FC = () => {
 
   return (
     <motion.div
-      className="space-y-8 p-6"
+      className="space-y-8 p-3 sm:p-4 md:p-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -1973,28 +1975,28 @@ const AdminReservation: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.5 }}
       >
-        <div className="flex items-center gap-3">
-          <Calendar className="h-8 w-8 text-gray-900" />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-gray-900 flex-shrink-0" />
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
               {isEditMode ? 'Edit Reservation' : 'Create Reservation'}
             </h1>
-            <p className="text-gray-600 mt-2">
+            <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">
               {isEditMode ? 'Update the reservation details below' : 'Complete the form to create a new guest reservation'}
             </p>
           </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="flex items-center gap-6 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-4">
-          <div className="text-center">
-            <div className="text-xl font-bold text-gray-900">{currentStep}</div>
-            <div className="text-sm text-gray-500">Current Step</div>
+        <div className="flex items-center gap-3 sm:gap-6 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-3 sm:p-4 w-full lg:w-auto">
+          <div className="text-center flex-1 sm:flex-initial">
+            <div className="text-lg sm:text-xl font-bold text-gray-900">{currentStep}</div>
+            <div className="text-xs sm:text-sm text-gray-500">Current Step</div>
           </div>
           <div className="h-8 w-px bg-gray-200"></div>
-          <div className="text-center">
-            <div className="text-xl font-bold text-green-600">₹{calculateTotalAmount().toLocaleString()}</div>
-            <div className="text-sm text-gray-500">Total Amount</div>
+          <div className="text-center flex-1 sm:flex-initial">
+            <div className="text-lg sm:text-xl font-bold text-green-600">₹{calculateTotalAmount().toLocaleString()}</div>
+            <div className="text-xs sm:text-sm text-gray-500">Total Amount</div>
           </div>
         </div>
       </motion.div>
@@ -2014,18 +2016,18 @@ const AdminReservation: React.FC = () => {
           transition={{ delay: 0.5, duration: 0.6 }}
         >
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-3 sm:p-4 md:p-6">
               <div className="flex items-center justify-between relative">
-                {/* Progress Line */}
-                <div className="absolute top-6 left-6 right-6 h-0.5 bg-gray-200">
-                  <motion.div 
+                {/* Progress Line - Hidden on mobile */}
+                <div className="absolute top-5 sm:top-6 left-6 right-6 h-0.5 bg-gray-200 hidden sm:block">
+                  <motion.div
                     className="h-full bg-gradient-to-r from-black to-gray-800"
                     initial={{ width: '0%' }}
                     animate={{ width: `${((currentStep - 1) / 3) * 100}%` }}
                     transition={{ duration: 0.8, delay: 0.2 }}
                   />
                 </div>
-                
+
                 {[1, 2, 3, 4].map((step, index) => {
                   const stepData = [
                     { title: 'Guest Details', icon: '👤', description: 'Personal information' },
@@ -2033,18 +2035,18 @@ const AdminReservation: React.FC = () => {
                     { title: 'Room Allocation', icon: '🏠', description: 'Room selection' },
                     { title: 'Payment & Confirm', icon: '💳', description: 'Final review' }
                   ][index];
-                  
+
                   return (
-                    <motion.div 
-                      key={step} 
+                    <motion.div
+                      key={step}
                       className="flex flex-col items-center relative z-10"
                       whileHover={{ scale: 1.05 }}
                       transition={{ type: "spring", stiffness: 300 }}
                     >
-                      <motion.div 
-                        className={`w-12 h-12 rounded-full flex items-center justify-center font-medium text-lg border-4 transition-all duration-300 ${
-                          step <= currentStep 
-                            ? 'bg-black text-white border-black shadow-lg' 
+                      <motion.div
+                        className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-medium text-sm sm:text-base md:text-lg border-2 sm:border-4 transition-all duration-300 ${
+                          step <= currentStep
+                            ? 'bg-black text-white border-black shadow-lg'
                             : step === currentStep + 1
                             ? 'bg-white border-gray-300 text-gray-600 shadow-md'
                             : 'bg-gray-100 border-gray-200 text-gray-400'
@@ -2053,14 +2055,14 @@ const AdminReservation: React.FC = () => {
                       >
                         {step <= currentStep ? '✓' : step}
                       </motion.div>
-                      
-                      <div className="text-center mt-3 max-w-[120px]">
-                        <span className={`text-sm font-medium block ${
+
+                      <div className="text-center mt-2 sm:mt-3 max-w-[60px] sm:max-w-[80px] md:max-w-[120px]">
+                        <span className={`text-[10px] sm:text-xs md:text-sm font-medium block ${
                           step <= currentStep ? 'text-black' : 'text-gray-500'
                         }`}>
                           {stepData.title}
                         </span>
-                        <span className="text-xs text-gray-400 mt-1 block">
+                        <span className="text-[9px] sm:text-xs text-gray-400 mt-1 hidden sm:block">
                           {stepData.description}
                         </span>
                       </div>
