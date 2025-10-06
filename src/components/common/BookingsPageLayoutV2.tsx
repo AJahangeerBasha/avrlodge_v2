@@ -141,33 +141,33 @@ export default function BookingsPageLayoutV2({ role }: BookingsPageLayoutV2Props
 
   return (
     <motion.div
-      className="space-y-8 p-6"
+      className="space-y-4 sm:space-y-6 md:space-y-8 p-3 sm:p-4 md:p-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
       {/* Header */}
       <motion.div
-        className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"
+        className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 sm:gap-4 md:gap-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.5 }}
       >
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Booking Management</h1>
-          <p className="text-gray-600 mt-2">Search and manage all bookings</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Booking Management</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Search and manage all bookings</p>
         </div>
 
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 w-full lg:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
           {/* Load Bookings Button - Only show when nothing has been loaded yet */}
           {!hasLoadedOnce && bookings.length === 0 && !loading && (
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
               <Button
                 onClick={handleLoadBookings}
-                className="bg-black hover:bg-gray-800 text-white px-6 py-3"
+                className="bg-black hover:bg-gray-800 text-white px-4 sm:px-6 py-2 sm:py-3 w-full sm:w-auto text-sm sm:text-base"
                 disabled={!currentUser}
               >
-                <FileText className="w-4 h-4 mr-2" />
+                <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                 Load Bookings
               </Button>
             </motion.div>
@@ -177,7 +177,7 @@ export default function BookingsPageLayoutV2({ role }: BookingsPageLayoutV2Props
           {(hasLoadedOnce || bookings.length > 0 || isSearchMode) && (
             <>
               <div className="relative flex-1 lg:flex-initial lg:w-96">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
                 <Input
                   type="text"
                   value={searchQuery}
@@ -187,43 +187,46 @@ export default function BookingsPageLayoutV2({ role }: BookingsPageLayoutV2Props
                   }}
                   onKeyPress={handleSearchKeyPress}
                   placeholder="Search by guest name, booking ID, room number, or status..."
-                  className="pl-10 bg-white/95 backdrop-blur-sm border-black/20"
+                  className="pl-8 sm:pl-10 text-sm sm:text-base py-2 bg-white/95 backdrop-blur-sm border-black/20"
                   disabled={loading}
                 />
               </div>
 
-              <div className="flex gap-2">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1 sm:flex-initial">
                   <Button
                     onClick={isSearchMode ? handleClearSearch : handleSearchClick}
                     variant="outline"
-                    className="bg-white/95 backdrop-blur-sm border-black/20"
+                    className="bg-white/95 backdrop-blur-sm border-black/20 w-full text-sm sm:text-base"
                     disabled={loading}
                   >
                     {isSearchMode ? (
                       <>
-                        <X className="h-4 w-4 mr-2" />
-                        Clear
+                        <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">Clear</span>
+                        <X className="sm:hidden h-4 w-4" />
                       </>
                     ) : (
                       <>
-                        <Search className="h-4 w-4 mr-2" />
-                        Search
+                        <Search className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">Search</span>
+                        <Search className="sm:hidden h-4 w-4" />
                       </>
                     )}
                   </Button>
                 </motion.div>
 
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1 sm:flex-initial">
                   <Button
                     onClick={handleRefresh}
                     variant="outline"
-                    className="border-gray-300 hover:bg-gray-50"
+                    className="border-gray-300 hover:bg-gray-50 w-full text-sm sm:text-base"
                     title="Refresh bookings"
                     disabled={loading}
                   >
-                    <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                    Refresh
+                    <RefreshCw className={`mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 ${loading ? 'animate-spin' : ''}`} />
+                    <span className="hidden sm:inline">Refresh</span>
+                    <RefreshCw className="sm:hidden h-4 w-4" />
                   </Button>
                 </motion.div>
               </div>
@@ -240,20 +243,20 @@ export default function BookingsPageLayoutV2({ role }: BookingsPageLayoutV2Props
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <Card className="bg-white/95 backdrop-blur-sm border-black/10">
-            <CardHeader className="pb-4">
+            <CardHeader className="pb-3 sm:pb-4">
               <div className="flex items-center gap-2">
-                <Filter className="w-5 h-5 text-gray-600" />
-                <CardTitle className="text-lg font-semibold text-gray-900">Filters</CardTitle>
+                <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                <CardTitle className="text-base sm:text-lg font-semibold text-gray-900">Filters</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {/* Date Filter */}
                 <div>
-                  <label className="text-sm font-medium text-gray-700 block mb-3">
+                  <label className="text-xs sm:text-sm font-medium text-gray-700 block mb-2 sm:mb-3">
                     Filter by Date Range
                   </label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 sm:gap-2 mb-2 sm:mb-3">
                     {[
                       { key: 'today' as DateFilterType, label: 'Today' },
                       { key: 'yesterday' as DateFilterType, label: 'Yesterday' },
@@ -268,7 +271,7 @@ export default function BookingsPageLayoutV2({ role }: BookingsPageLayoutV2Props
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setDateFilter(filter.key)}
                         disabled={isSearchMode}
-                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                           dateFilter === filter.key && !isSearchMode
                             ? 'bg-gray-900 text-white'
                             : isSearchMode
@@ -306,10 +309,10 @@ export default function BookingsPageLayoutV2({ role }: BookingsPageLayoutV2Props
 
                 {/* Status Filter */}
                 <div>
-                  <label className="text-sm font-medium text-gray-700 block mb-3">
+                  <label className="text-xs sm:text-sm font-medium text-gray-700 block mb-2 sm:mb-3">
                     Filter by Status
                   </label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
                     {[
                       { key: 'all_status' as StatusFilterType, label: 'All Status' },
                       { key: 'reservation' as StatusFilterType, label: 'Reservation' },
@@ -325,7 +328,7 @@ export default function BookingsPageLayoutV2({ role }: BookingsPageLayoutV2Props
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setStatusFilter(filter.key)}
                         disabled={isSearchMode}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        className={`px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                           statusFilter === filter.key && !isSearchMode
                             ? 'bg-gray-900 text-white'
                             : isSearchMode
@@ -368,18 +371,18 @@ export default function BookingsPageLayoutV2({ role }: BookingsPageLayoutV2Props
         >
           <Card className="bg-white/95 backdrop-blur-sm border-black/10">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-gray-900">
+              <CardTitle className="text-base sm:text-lg font-semibold text-gray-900">
                 {isSearchMode
                   ? `Search Results (${bookings.length})`
                   : `${bookingsService.getDateRangeText(dateFilter)} • ${bookingsService.getStatusFilterText(statusFilter)} (${bookings.length})`
                 }
               </CardTitle>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600">
                 {`${bookings.length} booking${bookings.length !== 1 ? 's' : ''} sorted by today's check-ins first`}
               </p>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                 {memoizedBookingsList}
               </div>
             </CardContent>
