@@ -257,7 +257,7 @@ const AdminCalendar: React.FC = () => {
 
   return (
     <motion.div
-      className="space-y-8 p-6"
+      className="space-y-4 sm:space-y-6 md:space-y-8 p-3 sm:p-4 md:p-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -269,48 +269,53 @@ const AdminCalendar: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.5 }}
       >
-        <div className="flex items-center gap-3">
-          <Calendar className="h-8 w-8 text-gray-900" />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-gray-900 flex-shrink-0" />
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Admin Calendar</h1>
-            <p className="text-gray-600 mt-2">Manage room availability and view all bookings</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Admin Calendar</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Manage room availability and view all bookings</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <CalendarViewModeSelector viewMode={viewMode} onViewModeChange={setViewMode} />
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
+          <div className="w-full sm:w-auto">
+            <CalendarViewModeSelector viewMode={viewMode} onViewModeChange={setViewMode} />
+          </div>
 
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1 sm:flex-initial">
             <Button
               onClick={handleRefresh}
               disabled={isRefreshing}
               variant="outline"
-              className="border-gray-300 hover:bg-gray-50"
+              className="border-gray-300 hover:bg-gray-50 w-full sm:w-auto text-sm"
               title={`${isSubscribed ? 'Real-time updates active' : 'Click to enable real-time updates'}${lastRefreshTime ? ` • Last updated: ${new Date(lastRefreshTime).toLocaleTimeString()}` : ''}`}
             >
-              <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              {isRefreshing ? 'Refreshing...' : 'Refresh'}
+              <RefreshCw className={`mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+              <RefreshCw className="sm:hidden h-4 w-4" />
             </Button>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1 sm:flex-initial">
             <Button
               onClick={() => setShowFilters(!showFilters)}
               variant="outline"
-              className="bg-white/95 backdrop-blur-sm border-black/20"
+              className="bg-white/95 backdrop-blur-sm border-black/20 w-full sm:w-auto text-sm"
             >
-              <Filter className="mr-2 h-4 w-4" />
-              Filters
+              <Filter className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Filters</span>
+              <Filter className="sm:hidden h-4 w-4" />
             </Button>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1 sm:flex-initial">
             <Button
               onClick={handleExportData}
-              className="bg-black hover:bg-gray-800 text-white"
+              className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto text-sm"
             >
-              <Download className="mr-2 h-4 w-4" />
-              Export
+              <Download className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Export</span>
+              <Download className="sm:hidden h-4 w-4" />
             </Button>
           </motion.div>
         </div>
