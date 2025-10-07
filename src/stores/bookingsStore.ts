@@ -70,6 +70,9 @@ interface BookingsState {
     checkIn: { isOpen: boolean; booking: Booking | null; room: any | null }
     checkOut: { isOpen: boolean; booking: Booking | null; room: any | null }
     roomChange: { isOpen: boolean; booking: Booking | null; room: any | null }
+    cancel: { isOpen: boolean; booking: Booking | null }
+    editGuest: { isOpen: boolean; booking: Booking | null }
+    additionalOptions: { isOpen: boolean; booking: Booking | null }
   }
 }
 
@@ -101,6 +104,12 @@ interface BookingsActions {
   closeCheckOutModal: () => void
   openRoomChangeModal: (booking: Booking, room: any) => void
   closeRoomChangeModal: () => void
+  openCancelModal: (booking: Booking) => void
+  closeCancelModal: () => void
+  openEditGuestModal: (booking: Booking) => void
+  closeEditGuestModal: () => void
+  openAdditionalOptionsModal: (booking: Booking) => void
+  closeAdditionalOptionsModal: () => void
 
   // Search Actions
   searchBookings: (query: string) => Promise<void>
@@ -146,7 +155,10 @@ export const useBookingsStore = create<BookingsStore>()(
             payment: { isOpen: false, booking: null },
             checkIn: { isOpen: false, booking: null, room: null },
             checkOut: { isOpen: false, booking: null, room: null },
-            roomChange: { isOpen: false, booking: null, room: null }
+            roomChange: { isOpen: false, booking: null, room: null },
+            cancel: { isOpen: false, booking: null },
+            editGuest: { isOpen: false, booking: null },
+            additionalOptions: { isOpen: false, booking: null }
           },
 
           // Data Actions
@@ -279,6 +291,30 @@ export const useBookingsStore = create<BookingsStore>()(
             state.modals.roomChange = { isOpen: false, booking: null, room: null }
           }),
 
+          openCancelModal: (booking) => set((state) => {
+            state.modals.cancel = { isOpen: true, booking }
+          }),
+
+          closeCancelModal: () => set((state) => {
+            state.modals.cancel = { isOpen: false, booking: null }
+          }),
+
+          openEditGuestModal: (booking) => set((state) => {
+            state.modals.editGuest = { isOpen: true, booking }
+          }),
+
+          closeEditGuestModal: () => set((state) => {
+            state.modals.editGuest = { isOpen: false, booking: null }
+          }),
+
+          openAdditionalOptionsModal: (booking) => set((state) => {
+            state.modals.additionalOptions = { isOpen: true, booking }
+          }),
+
+          closeAdditionalOptionsModal: () => set((state) => {
+            state.modals.additionalOptions = { isOpen: false, booking: null }
+          }),
+
           // Search Actions
           searchBookings: async (query) => {
             set((state) => {
@@ -370,10 +406,18 @@ export const useBookingsModals = () => {
   const closeCheckOutModal = useBookingsStore((state) => state.closeCheckOutModal)
   const openRoomChangeModal = useBookingsStore((state) => state.openRoomChangeModal)
   const closeRoomChangeModal = useBookingsStore((state) => state.closeRoomChangeModal)
+  const openCancelModal = useBookingsStore((state) => state.openCancelModal)
+  const closeCancelModal = useBookingsStore((state) => state.closeCancelModal)
+  const openEditGuestModal = useBookingsStore((state) => state.openEditGuestModal)
+  const closeEditGuestModal = useBookingsStore((state) => state.closeEditGuestModal)
+  const openAdditionalOptionsModal = useBookingsStore((state) => state.openAdditionalOptionsModal)
+  const closeAdditionalOptionsModal = useBookingsStore((state) => state.closeAdditionalOptionsModal)
 
   return {
     modals, openPaymentModal, closePaymentModal, openCheckInModal, closeCheckInModal,
-    openCheckOutModal, closeCheckOutModal, openRoomChangeModal, closeRoomChangeModal
+    openCheckOutModal, closeCheckOutModal, openRoomChangeModal, closeRoomChangeModal,
+    openCancelModal, closeCancelModal, openEditGuestModal, closeEditGuestModal,
+    openAdditionalOptionsModal, closeAdditionalOptionsModal
   }
 }
 

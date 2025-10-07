@@ -3,9 +3,21 @@ import { PaymentModal } from './PaymentModal'
 import RoomCheckInModal from './RoomCheckInModal'
 import RoomCheckOutModal from './RoomCheckOutModal'
 import RoomChangeModal from './RoomChangeModal'
+import CancelReservationModal from './CancelReservationModal'
+import EditPrimaryGuestModal from './EditPrimaryGuestModal'
+import { AdditionalOptionsModal } from './AdditionalOptionsModal'
 
 export function BookingModalManager() {
-  const { modals, openPaymentModal, closePaymentModal, openCheckInModal, closeCheckInModal, openCheckOutModal, closeCheckOutModal, openRoomChangeModal, closeRoomChangeModal } = useBookingsModals()
+  const {
+    modals,
+    closePaymentModal,
+    closeCheckInModal,
+    closeCheckOutModal,
+    closeRoomChangeModal,
+    closeCancelModal,
+    closeEditGuestModal,
+    closeAdditionalOptionsModal
+  } = useBookingsModals()
   const { refreshBookings } = useBookingsActions()
 
   return (
@@ -60,6 +72,45 @@ export function BookingModalManager() {
           onClose={closeRoomChangeModal}
           onSuccess={() => {
             closeRoomChangeModal()
+            refreshBookings()
+          }}
+        />
+      )}
+
+      {/* Cancel Reservation Modal */}
+      {modals.cancel.booking && modals.cancel.isOpen && (
+        <CancelReservationModal
+          booking={modals.cancel.booking}
+          isOpen={modals.cancel.isOpen}
+          onClose={closeCancelModal}
+          onCancelComplete={() => {
+            closeCancelModal()
+            refreshBookings()
+          }}
+        />
+      )}
+
+      {/* Edit Primary Guest Modal */}
+      {modals.editGuest.booking && modals.editGuest.isOpen && (
+        <EditPrimaryGuestModal
+          booking={modals.editGuest.booking}
+          isOpen={modals.editGuest.isOpen}
+          onClose={closeEditGuestModal}
+          onUpdateComplete={() => {
+            closeEditGuestModal()
+            refreshBookings()
+          }}
+        />
+      )}
+
+      {/* Additional Options Modal */}
+      {modals.additionalOptions.booking && modals.additionalOptions.isOpen && (
+        <AdditionalOptionsModal
+          booking={modals.additionalOptions.booking}
+          isOpen={modals.additionalOptions.isOpen}
+          onClose={closeAdditionalOptionsModal}
+          onUpdate={() => {
+            closeAdditionalOptionsModal()
             refreshBookings()
           }}
         />

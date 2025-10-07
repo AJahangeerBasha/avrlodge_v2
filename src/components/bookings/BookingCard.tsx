@@ -9,16 +9,11 @@ import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { Payment } from '@/lib/types/payments'
 import { RoomCheckinDocument } from '@/lib/types/roomCheckinDocuments'
-import { cancelReservation, updateReservation } from '@/lib/reservations'
 import { getPaymentsByReservationId } from '@/lib/payments'
 import { getRoomCheckinDocumentsByReservationId } from '@/lib/roomCheckinDocuments'
 import { getReservationSpecialChargesByReservationId } from '@/lib/reservationSpecialCharges'
 import { ReservationSpecialCharge } from '@/lib/types/reservationSpecialCharges'
 import { supabase } from '@/lib/supabase'
-import { AdditionalOptionsModal } from './AdditionalOptionsModal'
-import { getPrimaryGuestByReservationId, updateGuest } from '@/lib/guests'
-import { Guest } from '@/lib/types/guests'
-import { validatePhoneNumber, formatPhoneNumber, getPhoneValidationError } from '@/utils/phoneValidation'
 
 
 interface BookingCardProps {
@@ -34,12 +29,8 @@ export default function BookingCard({
   showRoomStatus = false,
   onPaymentUpdate,
 }: BookingCardProps) {
-  const [showCancellationModal, setShowCancellationModal] = useState(false)
-  const [cancellationConfirmation, setCancellationConfirmation] = useState('')
   const [showDocuments, setShowDocuments] = useState(false)
   const [showPaymentHistory, setShowPaymentHistory] = useState(false)
-  const [showAdditionalOptions, setShowAdditionalOptions] = useState(false)
-  const [showPrimaryGuestEdit, setShowPrimaryGuestEdit] = useState(false)
   const [selectedDocument, setSelectedDocument] = useState<RoomCheckinDocument | null>(null)
   const [payments, setPayments] = useState<Payment[]>([])
   const [documents, setDocuments] = useState<RoomCheckinDocument[]>([])
@@ -49,21 +40,7 @@ export default function BookingCard({
   const [documentsCount, setDocumentsCount] = useState(0)
   const [loadingSpecialCharges, setLoadingSpecialCharges] = useState(true)
   const [showSpecialCharges, setShowSpecialCharges] = useState(false)
-  const [processing, setProcessing] = useState(false)
-  const [primaryGuest, setPrimaryGuest] = useState<Guest | null>(null)
-  const [guestForm, setGuestForm] = useState({
-    name: '',
-    phone: '',
-    whatsapp: '',
-    usePhoneForWhatsapp: true
-  })
-  const [guestFormErrors, setGuestFormErrors] = useState({
-    name: '',
-    phone: '',
-    whatsapp: ''
-  })
-  const [loadingGuestUpdate, setLoadingGuestUpdate] = useState(false)
-  const { openPaymentModal, openCheckInModal, openCheckOutModal, openRoomChangeModal } = useBookingsModals()
+  const { openPaymentModal, openCheckInModal, openCheckOutModal, openRoomChangeModal, openCancelModal, openEditGuestModal, openAdditionalOptionsModal } = useBookingsModals()
   const { refreshBookings } = useBookingsActions()
   const { toast } = useToast()
   const { currentUser, userRole } = useAuth()
@@ -152,63 +129,6 @@ export default function BookingCard({
     return 'reservation'
   };
 
-  // Get last 3 digits of reference number for confirmation
-  const getLastThreeDigits = (): string => {
-    return booking.reference_number.slice(-3)
-  };
-
-  // Handle cancellation with confirmation
-  const handleCancellation = async () => {
-    if (!currentUser) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to cancel a reservation.",
-        variant: "destructive",
-      })
-      return
-    }
-
-    const expectedConfirmation = getLastThreeDigits()
-    if (cancellationConfirmation !== expectedConfirmation) {
-      toast({
-        title: "Confirmation Required",
-        description: `Please type "${expectedConfirmation}" to confirm cancellation.`,
-        variant: "destructive",
-      })
-      return
-    }
-
-    try {
-      setProcessing(true)
-
-      await cancelReservation(booking.id, currentUser.uid, 'Cancelled via booking management interface')
-
-      toast({
-        title: "Reservation Cancelled",
-        description: `Reservation ${booking.reference_number} has been cancelled successfully.`,
-      })
-
-      setShowCancellationModal(false)
-      setCancellationConfirmation('')
-
-      // Refresh the bookings list from store
-      await refreshBookings()
-
-      // Also call the parent callback if provided
-      if (onPaymentUpdate) {
-        onPaymentUpdate()
-      }
-    } catch (error) {
-      console.error('Error cancelling reservation:', error)
-      toast({
-        title: "Cancellation Failed",
-        description: error instanceof Error ? error.message : "Failed to cancel reservation. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setProcessing(false)
-    }
-  };
 
   // Load payment history
   const loadPaymentHistory = useCallback(async () => {
@@ -595,7 +515,7 @@ export default function BookingCard({
               </span>
               {showActions && (
                 <button
-                  onClick={handleOpenPrimaryGuestEdit}
+                  onClick={() => openEditGuestModal(booking)}
                   className="ml-1 p-1 text-gray-400 hover:text-blue-600 transition-colors flex-shrink-0"
                   title="Edit guest details"
                 >
@@ -1038,7 +958,7 @@ export default function BookingCard({
               {/* Additional Options Button - Only show when there's remaining balance and user is admin */}
               {calculatePaymentTotals().remainingBalance > 0 && getCalculatedStatus() !== 'cancelled' && userRole === 'admin' && (
                 <Button
-                  onClick={() => setShowAdditionalOptions(true)}
+                  onClick={() => openAdditionalOptionsModal(booking)}
                   variant="outline"
                   className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 hover:border-purple-300 transition-colors"
                   size="sm"
@@ -1051,7 +971,7 @@ export default function BookingCard({
               {/* Cancel Reservation Button */}
               {getCalculatedStatus() !== 'cancelled' && (
                 <Button
-                  onClick={() => setShowCancellationModal(true)}
+                  onClick={() => openCancelModal(booking)}
                   variant="outline"
                   className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors"
                   size="sm"
@@ -1349,273 +1269,6 @@ export default function BookingCard({
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Cancellation Confirmation Modal */}
-      <AnimatePresence>
-        {showCancellationModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-            onClick={() => {
-              setShowCancellationModal(false)
-              setCancellationConfirmation('')
-            }}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                    <AlertTriangle className="w-5 h-5 text-red-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      Cancel Reservation
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                      {booking.guest_name} • {booking.reference_number}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowCancellationModal(false)
-                    setCancellationConfirmation('')
-                  }}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto p-6">
-                {/* Warning */}
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-gray-700">
-                    <strong>Warning:</strong> This action cannot be undone. The reservation will be permanently cancelled.
-                  </p>
-                </div>
-
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Type the last 3 digits of reference number to confirm
-                </Label>
-                <p className="text-xs text-gray-500 mb-2">
-                  Reference: {booking.reference_number} → Type: <strong>{getLastThreeDigits()}</strong>
-                </p>
-                <Input
-                  value={cancellationConfirmation}
-                  onChange={(e) => setCancellationConfirmation(e.target.value)}
-                  placeholder="Enter last 3 digits"
-                  className="mb-2"
-                  maxLength={3}
-                />
-              </div>
-
-              {/* Footer */}
-              <div className="flex gap-3 p-6 border-t border-gray-200 flex-shrink-0">
-                <Button
-                  onClick={() => {
-                    setShowCancellationModal(false)
-                    setCancellationConfirmation('')
-                  }}
-                  variant="outline"
-                  className="flex-1"
-                  disabled={processing}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleCancellation}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-                  disabled={processing || cancellationConfirmation !== getLastThreeDigits()}
-                >
-                  {processing ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Cancelling...
-                    </div>
-                  ) : (
-                    'Confirm Cancellation'
-                  )}
-                </Button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Primary Guest Edit Modal */}
-      <AnimatePresence>
-        {showPrimaryGuestEdit && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-            onClick={() => setShowPrimaryGuestEdit(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      Edit Primary Guest
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                      {booking.guest_name} • {booking.reference_number}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowPrimaryGuestEdit(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto p-6">
-                <div className="space-y-4">
-                {/* Full Name */}
-                <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Full Name *
-                  </Label>
-                  <Input
-                    type="text"
-                    value={guestForm.name}
-                    onChange={(e) => handleGuestFormChange('name', e.target.value)}
-                    placeholder="Enter full name"
-                    className={`w-full ${
-                      guestFormErrors.name ? 'border-red-500 focus:border-red-500' : ''
-                    }`}
-                  />
-                  {guestFormErrors.name && (
-                    <p className="text-sm text-red-600 mt-1">{guestFormErrors.name}</p>
-                  )}
-                </div>
-
-                {/* Phone Number */}
-                <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Phone Number *
-                  </Label>
-                  <Input
-                    type="tel"
-                    value={guestForm.phone}
-                    onChange={(e) => handleGuestFormChange('phone', e.target.value)}
-                    placeholder="Enter 10-digit phone number starting with 6-9"
-                    maxLength={10}
-                    className={`w-full ${
-                      guestFormErrors.phone ? 'border-red-500 focus:border-red-500' : ''
-                    }`}
-                  />
-                  {guestFormErrors.phone && (
-                    <p className="text-sm text-red-600 mt-1">{guestFormErrors.phone}</p>
-                  )}
-                </div>
-
-                {/* WhatsApp */}
-                <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                    WhatsApp (Optional)
-                  </Label>
-
-                  {/* Same as phone number checkbox */}
-                  <div className="mb-3">
-                    <label className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={guestForm.usePhoneForWhatsapp}
-                        onChange={(e) => handleGuestFormChange('usePhoneForWhatsapp', e.target.checked.toString())}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">Same as phone number</span>
-                    </label>
-                  </div>
-
-                  {!guestForm.usePhoneForWhatsapp && (
-                    <Input
-                      type="tel"
-                      value={guestForm.whatsapp}
-                      onChange={(e) => handleGuestFormChange('whatsapp', e.target.value)}
-                      placeholder="Enter 10-digit WhatsApp number starting with 6-9"
-                      maxLength={10}
-                      className={`w-full ${
-                        guestFormErrors.whatsapp ? 'border-red-500 focus:border-red-500' : ''
-                      }`}
-                    />
-                  )}
-
-                  {guestFormErrors.whatsapp && (
-                    <p className="text-sm text-red-600 mt-1">{guestFormErrors.whatsapp}</p>
-                  )}
-                </div>
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="flex gap-3 p-6 border-t border-gray-200 flex-shrink-0">
-                <Button
-                  onClick={() => setShowPrimaryGuestEdit(false)}
-                  variant="outline"
-                  className="flex-1"
-                  disabled={loadingGuestUpdate}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleUpdatePrimaryGuest}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                  disabled={loadingGuestUpdate}
-                >
-                  {loadingGuestUpdate ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Updating...
-                    </div>
-                  ) : (
-                    'Update'
-                  )}
-                </Button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Additional Options Modal */}
-      <AdditionalOptionsModal
-        booking={booking}
-        isOpen={showAdditionalOptions}
-        onClose={() => setShowAdditionalOptions(false)}
-        onUpdate={() => {
-          // Reload local data to reflect changes
-          loadPaymentHistory()
-          loadSpecialCharges()
-          loadDocuments()
-        }}
-      />
 
     </motion.div>
   )
