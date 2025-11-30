@@ -28,7 +28,8 @@
     "delete-reservation": "tsx scripts/deleteReservationData.ts",
     "generate-schema": "node scripts/generateDatabaseSchema.js",
     "update-schema": "node scripts/generateDatabaseSchema.js",
-    "extract-data": "tsx scripts/extractComments.ts"
+    "extract-data": "tsx scripts/extractComments.ts",
+    "mergeAndValidateReservations": "tsx scripts/mergeAndValidateReservations.ts"
   },
   "dependencies": {
     "@dataconnect/generated": "file:src/dataconnect-generated",

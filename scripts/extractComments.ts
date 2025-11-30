@@ -92,6 +92,11 @@ function parseComment(rawComment: string): {
     }
   }
 
+  // Set default phone if empty
+  if (!phone) {
+    phone = '9999999999';
+  }
+
   return {
     agent,
     guestName,
