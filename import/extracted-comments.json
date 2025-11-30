@@ -1,0 +1,1738 @@
+[
+  {
+    "roomNumber": "101",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Srinivasaperumal",
+      "phone": "9566100599",
+      "payment": "Rs. 2500 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSrinivasaperumal\n9566100599\nRs. 2500 cash"
+    }
+  },
+  {
+    "roomNumber": "102",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Vigneshwaran",
+      "phone": "7598650635",
+      "payment": "Rs. 4600 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVigneshwaran\n7598650635\nRs. 4600 jbqr"
+    }
+  },
+  {
+    "roomNumber": "103",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Vigneshwaran",
+      "phone": "7598650635",
+      "payment": "Rs. 4600 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVigneshwaran\n7598650635\nRs. 4600 jbqr"
+    }
+  },
+  {
+    "roomNumber": "104",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Vigneshwaran",
+      "phone": "7598650635",
+      "payment": "Rs. 4600 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVigneshwaran\n7598650635\nRs. 4600 jbqr"
+    }
+  },
+  {
+    "roomNumber": "105",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Gopalakrishnana",
+      "phone": "9840168459",
+      "payment": "Rs. 2200 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nGopalakrishnana\n9840168459\nRs. 2200 jbqr"
+    }
+  },
+  {
+    "roomNumber": "106",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Sureshbabu",
+      "phone": "9442398331",
+      "payment": "Rs. 1000 jbqr | Rs. 1200 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSureshbabu\n9442398331\nRs. 1000 jbqr\nRs. 1200 jbqr"
+    }
+  },
+  {
+    "roomNumber": "201",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Pandiyan. C",
+      "phone": "9994681665",
+      "payment": "Rs. 2000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nPandiyan. C\n9994681665\nRs. 2000 cash"
+    }
+  },
+  {
+    "roomNumber": "202",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Navina",
+      "phone": "8650459508",
+      "payment": "Rs. 4000 cash",
+      "pax": "",
+      "otherRooms": "202, 205",
+      "notes": "",
+      "raw": "Jubair:\nNavina\n8650459508\n202, 205\nRs. 4000 cash"
+    }
+  },
+  {
+    "roomNumber": "203",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Binuraj",
+      "phone": "9442582955",
+      "payment": "Rs. 2000 jbqr | Rs. 4600 jbqr",
+      "pax": "",
+      "otherRooms": "203, 204, 208",
+      "notes": "",
+      "raw": "Jubair:\nBinuraj\n9442582955\n203, 204, 208\nRs. 2000 jbqr\nRs. 4600 jbqr"
+    }
+  },
+  {
+    "roomNumber": "204",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Binuraj",
+      "phone": "9442582955",
+      "payment": "Rs. 2000 jbqr | Rs. 4600 jbqr",
+      "pax": "",
+      "otherRooms": "203, 204, 208",
+      "notes": "",
+      "raw": "Jubair:\nBinuraj\n9442582955\n203, 204, 208\nRs. 2000 jbqr\nRs. 4600 jbqr"
+    }
+  },
+  {
+    "roomNumber": "205",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "",
+      "phone": "",
+      "payment": "",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "See 202",
+      "raw": "Jubair:\nSee 202"
+    }
+  },
+  {
+    "roomNumber": "206",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Sarathraj",
+      "phone": "996497660",
+      "payment": "Rs. 4000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSarathraj\n996497660\nRs. 4000 cash"
+    }
+  },
+  {
+    "roomNumber": "207",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Sarathraj",
+      "phone": "996497660",
+      "payment": "Rs. 4000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSarathraj\n996497660\nRs. 4000 cash"
+    }
+  },
+  {
+    "roomNumber": "208",
+    "date": "2025-11-01",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "",
+      "phone": "",
+      "payment": "",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "See 203",
+      "raw": "Jubair:\nSee 203"
+    }
+  },
+  {
+    "roomNumber": "102",
+    "date": "2025-11-02",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Vigneswaran",
+      "phone": "",
+      "payment": "Rs. 2000 (cash)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVigneswaran\nRs. 2000 (cash)\nPrevipous day extention - 1 room only"
+    }
+  },
+  {
+    "roomNumber": "103",
+    "date": "2025-11-02",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Viswanathan",
+      "phone": "9449371403",
+      "payment": "Rs. 1300 cash",
+      "pax": "2A+1C",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nViswanathan\n9449371403\n2A+1C\nRs. 1300 cash"
+    }
+  },
+  {
+    "roomNumber": "103",
+    "date": "2025-11-04",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Sivananthan",
+      "phone": "9614261300",
+      "payment": "Rs, 1000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSivananthan\n9614261300\nRs, 1000 cash"
+    }
+  },
+  {
+    "roomNumber": "110",
+    "date": "2025-11-04",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Abinash",
+      "phone": "6369538651",
+      "payment": "Rs. 1400 jbqr | Rs. 1000 cash",
+      "pax": "8 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nAbinash\n6369538651\n8 pax\nRs. 1400 jbqr\nRs. 1000 cash"
+    }
+  },
+  {
+    "roomNumber": "202",
+    "date": "2025-11-04",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Senthil Nathan",
+      "phone": "9944141742",
+      "payment": "Rs 2000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSenthil Nathan\n9944141742\nRs 2000 cash"
+    }
+  },
+  {
+    "roomNumber": "203",
+    "date": "2025-11-04",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Ganesan",
+      "phone": "9629091116",
+      "payment": "Rs. 1800 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nGanesan\n9629091116\nRs. 1800 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-05",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Suresh Babu",
+      "phone": "9080625260",
+      "payment": "Rs. 1000 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSuresh Babu\n9080625260\nRs. 1000 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "110",
+    "date": "2025-11-05",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Mugilan",
+      "phone": "9585828889",
+      "payment": "Rs, 1500 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nMugilan\n9585828889\nRs, 1500 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "203",
+    "date": "2025-11-05",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Murgugesan",
+      "phone": "9486516272",
+      "payment": "Rs. 2000 (cash)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nMurgugesan\n9486516272\nRs. 2000 (cash)"
+    }
+  },
+  {
+    "roomNumber": "204",
+    "date": "2025-11-05",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Keerithivasan",
+      "phone": "9789113989",
+      "payment": "Rs. 2000 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nKeerithivasan\n9789113989\nRs. 2000 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "105",
+    "date": "2025-11-09",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Kathiresan",
+      "phone": "9845010895",
+      "payment": "Rs. 1200 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nKathiresan\n9845010895\nRs. 1200 jbqr"
+    }
+  },
+  {
+    "roomNumber": "101",
+    "date": "2025-11-11",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Muruganantham",
+      "phone": "9944501514",
+      "payment": "Rs 2700 (cash)",
+      "pax": "6 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nMuruganantham\n9944501514\n6 pax\nRs 2700 (cash)"
+    }
+  },
+  {
+    "roomNumber": "103",
+    "date": "2025-11-11",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Ramesh",
+      "phone": "9365863145",
+      "payment": "Rs. 1000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nRamesh \n9365863145\nRs. 1000 cash"
+    }
+  },
+  {
+    "roomNumber": "110",
+    "date": "2025-11-11",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Selvi",
+      "phone": "9380712023",
+      "payment": "Rs. 1000 cash",
+      "pax": "4 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSelvi \n9380712023\n4 pax\nRs. 1000 cash"
+    }
+  },
+  {
+    "roomNumber": "201",
+    "date": "2025-11-11",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Rathinavel",
+      "phone": "9566004810",
+      "payment": "Rs. 3000 jbqr | Rs. 2200 jbqr | Rs. 8000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "family of 16",
+      "raw": "Jubair:\nRathinavel \n9566004810\nfamily of 16\nRs. 3000 jbqr\nRs. 2200 jbqr\nRs. 8000 cash"
+    }
+  },
+  {
+    "roomNumber": "202",
+    "date": "2025-11-11",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Rathinavel",
+      "phone": "9566004810",
+      "payment": "Rs. 3000 jbqr | Rs. 2200 jbqr | Rs. 8000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "family of 16",
+      "raw": "Jubair:\nRathinavel \n9566004810\nfamily of 16\nRs. 3000 jbqr\nRs. 2200 jbqr\nRs. 8000 cash"
+    }
+  },
+  {
+    "roomNumber": "203",
+    "date": "2025-11-11",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Rathinavel",
+      "phone": "9566004810",
+      "payment": "Rs. 3000 jbqr | Rs. 2200 jbqr | Rs. 8000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "family of 16",
+      "raw": "Jubair:\nRathinavel \n9566004810\nfamily of 16\nRs. 3000 jbqr\nRs. 2200 jbqr\nRs. 8000 cash"
+    }
+  },
+  {
+    "roomNumber": "204",
+    "date": "2025-11-11",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Rathinavel",
+      "phone": "9566004810",
+      "payment": "Rs. 3000 jbqr | Rs. 2200 jbqr | Rs. 8000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "family of 16",
+      "raw": "Jubair:\nRathinavel \n9566004810\nfamily of 16\nRs. 3000 jbqr\nRs. 2200 jbqr\nRs. 8000 cash"
+    }
+  },
+  {
+    "roomNumber": "205",
+    "date": "2025-11-11",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Rathinavel",
+      "phone": "9566004810",
+      "payment": "Rs. 3000 jbqr | Rs. 2200 jbqr | Rs. 8000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "family of 16",
+      "raw": "Jubair:\nRathinavel \n9566004810\nfamily of 16\nRs. 3000 jbqr\nRs. 2200 jbqr\nRs. 8000 cash"
+    }
+  },
+  {
+    "roomNumber": "206",
+    "date": "2025-11-11",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Rathinavel",
+      "phone": "9566004810",
+      "payment": "Rs. 3000 jbqr | Rs. 2200 jbqr | Rs. 8000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "family of 16",
+      "raw": "Jubair:\nRathinavel \n9566004810\nfamily of 16\nRs. 3000 jbqr\nRs. 2200 jbqr\nRs. 8000 cash"
+    }
+  },
+  {
+    "roomNumber": "101",
+    "date": "2025-11-12",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Laksmanan",
+      "phone": "9486261619",
+      "payment": "Rs. 5400 cash",
+      "pax": "11 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nLaksmanan\n9486261619\n11 pax\nRs. 5400 cash"
+    }
+  },
+  {
+    "roomNumber": "103",
+    "date": "2025-11-12",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Sarathkumar",
+      "phone": "8220218590",
+      "payment": "Rs. 1000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSarathkumar\n8220218590\nRs. 1000 cash"
+    }
+  },
+  {
+    "roomNumber": "106",
+    "date": "2025-11-12",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "See room 101",
+      "phone": "",
+      "payment": "",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSee room 101"
+    }
+  },
+  {
+    "roomNumber": "110",
+    "date": "2025-11-12",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Kubayaran",
+      "phone": "8754638820",
+      "payment": "Rs. 2000 jbqr",
+      "pax": "7 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nKubayaran\n8754638820\n7 pax\nRs. 2000 jbqr"
+    }
+  },
+  {
+    "roomNumber": "206",
+    "date": "2025-11-12",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Saravanakumar",
+      "phone": "7373416679",
+      "payment": "Rs. 2000 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSaravanakumar\n7373416679\nRs. 2000 jbqr"
+    }
+  },
+  {
+    "roomNumber": "105",
+    "date": "2025-11-13",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Premkumar",
+      "phone": "9842125554",
+      "payment": "Rs. 1500 cash (2 hr)",
+      "pax": "4 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nPremkumar\n9842125554\n4 pax\nRs. 1500 cash (2 hr)"
+    }
+  },
+  {
+    "roomNumber": "106",
+    "date": "2025-11-13",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Gunasekaran",
+      "phone": "9865560999",
+      "payment": "Rs. 2700 cash",
+      "pax": "5 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nGunasekaran\n9865560999\n5 pax\nRs. 2700 cash"
+    }
+  },
+  {
+    "roomNumber": "106",
+    "date": "2025-11-14",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Solamanraj",
+      "phone": "9840168459",
+      "payment": "Rs. 5600 (jbqr)",
+      "pax": "6 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSolamanraj\n9840168459\n6 pax\nRs. 5600 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-14",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Sivaprakash",
+      "phone": "9442466625",
+      "payment": "Rs. 1000 (cash)",
+      "pax": "2 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSivaprakash\n9442466625\n2 pax\nRs. 1000 (cash)"
+    }
+  },
+  {
+    "roomNumber": "108",
+    "date": "2025-11-14",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Boobathi",
+      "phone": "9597452646",
+      "payment": "Rs. 1100 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nBoobathi\n9597452646\nRs. 1100 cash"
+    }
+  },
+  {
+    "roomNumber": "109",
+    "date": "2025-11-14",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Amarnath",
+      "phone": "6329971968",
+      "payment": "Rs. 1000 (jbqr)",
+      "pax": "5 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nAmarnath\n6329971968\n5 pax\nRs. 1000 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "110",
+    "date": "2025-11-14",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Mani",
+      "phone": "9994384832",
+      "payment": "Rs. 1500 (cash)",
+      "pax": "6 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nMani \n9994384832\n6 pax\nRs. 1500 (cash)"
+    }
+  },
+  {
+    "roomNumber": "102",
+    "date": "2025-11-15",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Shankar",
+      "phone": "7708745445",
+      "payment": "Rs. 2200 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nShankar\n7708745445\nRs. 2200 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "105",
+    "date": "2025-11-15",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Vijayan",
+      "phone": "9787807087",
+      "payment": "Rs. 2200 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVijayan\n9787807087\nRs. 2200 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "106",
+    "date": "2025-11-15",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Solamanraj",
+      "phone": "9840168459",
+      "payment": "Rs. 5600 (jbqr)",
+      "pax": "6 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSolamanraj\n9840168459\n6 pax\nRs. 5600 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-15",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Madeswaran",
+      "phone": "9677445007",
+      "payment": "Rs. 1200 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nMadeswaran\n9677445007\nRs. 1200 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "201",
+    "date": "2025-11-15",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Shrish",
+      "phone": "8940410846",
+      "payment": "Rs. 6600 (cash)",
+      "pax": "12 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nShrish\n8940410846\n12 pax\nRs. 6600 (cash)"
+    }
+  },
+  {
+    "roomNumber": "202",
+    "date": "2025-11-15",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Shrish",
+      "phone": "8940410846",
+      "payment": "Rs. 6600 (cash)",
+      "pax": "12 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nShrish\n8940410846\n12 pax\nRs. 6600 (cash)"
+    }
+  },
+  {
+    "roomNumber": "203",
+    "date": "2025-11-15",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Shrish",
+      "phone": "8940410846",
+      "payment": "Rs. 6600 (cash)",
+      "pax": "12 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nShrish\n8940410846\n12 pax\nRs. 6600 (cash)"
+    }
+  },
+  {
+    "roomNumber": "207",
+    "date": "2025-11-15",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Saran",
+      "phone": "7418835552",
+      "payment": "Rs. 4400 (jbqr)",
+      "pax": "8 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSaran\n7418835552\n8 pax\nRs. 4400 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "208",
+    "date": "2025-11-15",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Saran",
+      "phone": "7418835552",
+      "payment": "Rs. 4400 (jbqr)",
+      "pax": "8 pax",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSaran\n7418835552\n8 pax\nRs. 4400 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "103",
+    "date": "2025-11-16",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Balaji",
+      "phone": "9384467955",
+      "payment": "1200 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nBalaji\n9384467955\n1200 jbqr"
+    }
+  },
+  {
+    "roomNumber": "103",
+    "date": "2025-11-17",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Perumal Munusami",
+      "phone": "9443334811",
+      "payment": "Rs. 3000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "2000 + 1000",
+      "raw": "Jubair:\nPerumal Munusami\n9443334811\n2000 + 1000\nRs. 3000 cash"
+    }
+  },
+  {
+    "roomNumber": "104",
+    "date": "2025-11-17",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Karthikeyan",
+      "phone": "9952495561",
+      "payment": "Rs. 1000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nKarthikeyan\n9952495561\nRs. 1000 cash"
+    }
+  },
+  {
+    "roomNumber": "105",
+    "date": "2025-11-17",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "",
+      "phone": "",
+      "payment": "",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "see 101",
+      "raw": "Jubair:\nsee 101"
+    }
+  },
+  {
+    "roomNumber": "203",
+    "date": "2025-11-17",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Pasubathi",
+      "phone": "76038830629",
+      "payment": "Rs. 2000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nPasubathi\n76038830629\nRs. 2000 cash"
+    }
+  },
+  {
+    "roomNumber": "103",
+    "date": "2025-11-18",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Balakrishan",
+      "phone": "8667203991",
+      "payment": "Rs. 1200 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nBalakrishan\n8667203991\nRs. 1200 cash"
+    }
+  },
+  {
+    "roomNumber": "105",
+    "date": "2025-11-18",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Prakash",
+      "phone": "9791411594",
+      "payment": "Rs. 2000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nPrakash\n9791411594\nRs. 2000 cash"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-18",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Arul Kumar",
+      "phone": "7502212772",
+      "payment": "Rs. 1200 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nArul Kumar\n7502212772\nRs. 1200 cash"
+    }
+  },
+  {
+    "roomNumber": "206",
+    "date": "2025-11-18",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Rohit",
+      "phone": "8428751158",
+      "payment": "Rs. 6000 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nRohit\n8428751158\nRs. 6000 jbqr"
+    }
+  },
+  {
+    "roomNumber": "207",
+    "date": "2025-11-18",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Rohit",
+      "phone": "8428751158",
+      "payment": "Rs. 6000 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nRohit\n8428751158\nRs. 6000 jbqr"
+    }
+  },
+  {
+    "roomNumber": "208",
+    "date": "2025-11-18",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Rohit",
+      "phone": "8428751158",
+      "payment": "Rs. 6000 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nRohit\n8428751158\nRs. 6000 jbqr"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-19",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Mumtaj",
+      "phone": "8148714178",
+      "payment": "Rs. 1000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nMumtaj\n8148714178\nRs. 1000 cash"
+    }
+  },
+  {
+    "roomNumber": "108",
+    "date": "2025-11-19",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Subitha",
+      "phone": "9790525891",
+      "payment": "Rs. 1000 (cash)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSubitha\n9790525891\nRs. 1000 (cash)"
+    }
+  },
+  {
+    "roomNumber": "101",
+    "date": "2025-11-20",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Shanmugam",
+      "phone": "9965507779",
+      "payment": "Rs. 2800 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nShanmugam\n9965507779\nRs. 2800 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "103",
+    "date": "2025-11-20",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Nithiya barathi",
+      "phone": "9500636323",
+      "payment": "Rs. 1100 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nNithiya barathi\n9500636323\nRs. 1100 cash"
+    }
+  },
+  {
+    "roomNumber": "104",
+    "date": "2025-11-20",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Mani kandan",
+      "phone": "9843490399",
+      "payment": "Rs, 2000 (cash)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nMani kandan\n9843490399\nRs, 2000 (cash)"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-20",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "107",
+      "phone": "",
+      "payment": "",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\n107"
+    }
+  },
+  {
+    "roomNumber": "108",
+    "date": "2025-11-20",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Delhiganesh",
+      "phone": "9500354090",
+      "payment": "Rs. 1200 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nDelhiganesh\n9500354090\nRs. 1200 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "203",
+    "date": "2025-11-20",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Moorthi",
+      "phone": "9945788748",
+      "payment": "Rs. 3000 (cash)",
+      "pax": "",
+      "otherRooms": "203, 107",
+      "notes": "2000 + 1000",
+      "raw": "Jubair:\nMoorthi\n9945788748\n2000 + 1000 \n203, 107\nRs. 3000 (cash)"
+    }
+  },
+  {
+    "roomNumber": "204",
+    "date": "2025-11-20",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Sundaran",
+      "phone": "7738612301",
+      "payment": "Rs. 1600 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSundaran\n7738612301\nRs. 1600 jbqr"
+    }
+  },
+  {
+    "roomNumber": "206",
+    "date": "2025-11-20",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Basi",
+      "phone": "9388603948",
+      "payment": "Rs. 3200 (cash)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "1600 x 2",
+      "raw": "Jubair:\nBasi\n9388603948\n1600 x 2\nRs. 3200 (cash)"
+    }
+  },
+  {
+    "roomNumber": "207",
+    "date": "2025-11-20",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Basi",
+      "phone": "9388603948",
+      "payment": "Rs. 3200 (cash)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "1600 x 2",
+      "raw": "Jubair:\nBasi\n9388603948\n1600 x 2\nRs. 3200 (cash)"
+    }
+  },
+  {
+    "roomNumber": "101",
+    "date": "2025-11-21",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Vetrivel",
+      "phone": "9791210889",
+      "payment": "Rs. 2700 (cash)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVetrivel\n9791210889\nRs. 2700 (cash)"
+    }
+  },
+  {
+    "roomNumber": "103",
+    "date": "2025-11-21",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Prabu",
+      "phone": "7010335277",
+      "payment": "Rs. 3000 (cash)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nPrabu\n7010335277\nRs. 3000 (cash)"
+    }
+  },
+  {
+    "roomNumber": "105",
+    "date": "2025-11-21",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "",
+      "phone": "",
+      "payment": "",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "See 105",
+      "raw": "Jubair:\nSee 105"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-21",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Raja",
+      "phone": "9791217421",
+      "payment": "Rs. 2400 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nRaja\n9791217421\nRs. 2400 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "201",
+    "date": "2025-11-21",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Senthamilan",
+      "phone": "9360883633",
+      "payment": "Rs. 2200 (cash)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSenthamilan\n9360883633\nRs. 2200 (cash)"
+    }
+  },
+  {
+    "roomNumber": "205",
+    "date": "2025-11-21",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Vijayakumar",
+      "phone": "9884800770",
+      "payment": "Rs. 2000 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVijayakumar\n9884800770\nRs. 2000 jbqr"
+    }
+  },
+  {
+    "roomNumber": "207",
+    "date": "2025-11-21",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Vishva",
+      "phone": "9047334066",
+      "payment": "Rs. 8400 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVishva\n9047334066\nRs. 8400 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "208",
+    "date": "2025-11-21",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Vishva",
+      "phone": "9047334066",
+      "payment": "Rs. 8400 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVishva\n9047334066\nRs. 8400 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "105",
+    "date": "2025-11-22",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Sivakumar",
+      "phone": "9943377679",
+      "payment": "Rs. 2000 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSivakumar\n9943377679\nRs. 2000 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-22",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Raja",
+      "phone": "9791217421",
+      "payment": "Rs. 2400 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nRaja\n9791217421\nRs. 2400 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "203",
+    "date": "2025-11-22",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Venkatesan",
+      "phone": "8015542562",
+      "payment": "Rs. 2200 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVenkatesan\n8015542562\nRs. 2200 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "204",
+    "date": "2025-11-22",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Mohan",
+      "phone": "9952424242",
+      "payment": "Rs. 4000 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nMohan\n9952424242\nRs. 4000 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "205",
+    "date": "2025-11-22",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Mohan",
+      "phone": "9952424242",
+      "payment": "Rs. 4000 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nMohan\n9952424242\nRs. 4000 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "206",
+    "date": "2025-11-22",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Narendar kumar",
+      "phone": "6384133144",
+      "payment": "Rs. 2200 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nNarendar kumar\n6384133144\nRs. 2200 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "207",
+    "date": "2025-11-22",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Vishva",
+      "phone": "9047334066",
+      "payment": "Rs. 8400 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVishva\n9047334066\nRs. 8400 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "208",
+    "date": "2025-11-22",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Vishva",
+      "phone": "9047334066",
+      "payment": "Rs. 8400 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVishva\n9047334066\nRs. 8400 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "108",
+    "date": "2025-11-23",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Parthasarathi",
+      "phone": "9840510822",
+      "payment": "Rs. 1100 (cash)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nParthasarathi\n9840510822\nRs. 1100 (cash)"
+    }
+  },
+  {
+    "roomNumber": "204",
+    "date": "2025-11-23",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Mohan",
+      "phone": "9952424242",
+      "payment": "Rs. 4000 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nMohan\n9952424242\nRs. 4000 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "205",
+    "date": "2025-11-23",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Mohan",
+      "phone": "9952424242",
+      "payment": "Rs. 4000 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nMohan\n9952424242\nRs. 4000 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "104",
+    "date": "2025-11-24",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Ragavendaran",
+      "phone": "9611961555",
+      "payment": "Rs. 1000 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nRagavendaran\n9611961555\nRs. 1000 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-24",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Buvenswaran",
+      "phone": "81482301180",
+      "payment": "Rs. 800 (cash)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nBuvenswaran \n81482301180\nRs. 800 (cash)"
+    }
+  },
+  {
+    "roomNumber": "108",
+    "date": "2025-11-24",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Sarathkumar",
+      "phone": "8220718570",
+      "payment": "Rs. 1100 (cash)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSarathkumar\n8220718570\nRs. 1100 (cash)"
+    }
+  },
+  {
+    "roomNumber": "101",
+    "date": "2025-11-25",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Radhakrishana",
+      "phone": "8036017937",
+      "payment": "Rs. 3700 cash",
+      "pax": "",
+      "otherRooms": "101, 107",
+      "notes": "2700 + 1000",
+      "raw": "Jubair:\nRadhakrishana\n8036017937\n101, 107\n2700 + 1000\nRs. 3700 cash"
+    }
+  },
+  {
+    "roomNumber": "106",
+    "date": "2025-11-25",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Shanmugam",
+      "phone": "7010071802",
+      "payment": "Rs. 2700 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nShanmugam\n7010071802\nRs. 2700 cash"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-25",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "See room 101",
+      "phone": "",
+      "payment": "",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nSee room 101"
+    }
+  },
+  {
+    "roomNumber": "108",
+    "date": "2025-11-25",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Ragavendaran",
+      "phone": "9611961555",
+      "payment": "Rs. 1000 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nRagavendaran\n9611961555\nRs. 1000 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "110",
+    "date": "2025-11-25",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Arun",
+      "phone": "8870832192",
+      "payment": "Rs. 1500 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nArun\n8870832192\nRs. 1500 cash"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-26",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Dinesh",
+      "phone": "9448362901",
+      "payment": "Rs. 2000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nDinesh\n9448362901\nRs. 2000 cash"
+    }
+  },
+  {
+    "roomNumber": "108",
+    "date": "2025-11-26",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Ragavendaran",
+      "phone": "9611961555",
+      "payment": "Rs. 1000 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nRagavendaran\n9611961555\nRs. 1000 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "104",
+    "date": "2025-11-27",
+    "comment": {
+      "agent": "",
+      "guestName": "",
+      "phone": "",
+      "payment": "",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "See room 108"
+    }
+  },
+  {
+    "roomNumber": "105",
+    "date": "2025-11-27",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Vadivelu",
+      "phone": "9677835295",
+      "payment": "Rs. 2200 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nVadivelu\n9677835295\nRs. 2200 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "108",
+    "date": "2025-11-27",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Ragavendaran",
+      "phone": "9611961555",
+      "payment": "Rs. 2000 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nRagavendaran\n9611961555\nRs. 2000 (jbqr)"
+    }
+  },
+  {
+    "roomNumber": "102",
+    "date": "2025-11-28",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Yogalaksmanan",
+      "phone": "7358668992",
+      "payment": "Rs. 3200 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nYogalaksmanan\n7358668992\nRs. 3200 jbqr"
+    }
+  },
+  {
+    "roomNumber": "103",
+    "date": "2025-11-28",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Yogalaksmanan",
+      "phone": "7358668992",
+      "payment": "Rs. 3200 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nYogalaksmanan\n7358668992\nRs. 3200 jbqr"
+    }
+  },
+  {
+    "roomNumber": "104",
+    "date": "2025-11-28",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Kishore Kumar",
+      "phone": "9751893629",
+      "payment": "Rs. 1200 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nKishore Kumar\n9751893629\nRs. 1200 cash"
+    }
+  },
+  {
+    "roomNumber": "105",
+    "date": "2025-11-28",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Narayanan",
+      "phone": "9946177168",
+      "payment": "Rs. 1200 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nNarayanan\n9946177168\nRs. 1200 jbqr"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-28",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Manoj",
+      "phone": "8778785957",
+      "payment": "Adv 1000 (jbqr) | Rs. 3200 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nManoj\n8778785957\nAdv 1000 (jbqr)\nRs. 3200 (jbqr)\nTotal 4200"
+    }
+  },
+  {
+    "roomNumber": "108",
+    "date": "2025-11-28",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Manoj",
+      "phone": "8778785957",
+      "payment": "Adv 1000 (jbqr) | Rs. 3200 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nManoj\n8778785957\nAdv 1000 (jbqr)\nRs. 3200 (jbqr)\nTotal 4200"
+    }
+  },
+  {
+    "roomNumber": "110",
+    "date": "2025-11-28",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Dinesh",
+      "phone": "",
+      "payment": "Rs. 600 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nDinesh \nRs. 600 cash"
+    }
+  },
+  {
+    "roomNumber": "205",
+    "date": "2025-11-28",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Darmalingam",
+      "phone": "9442170380",
+      "payment": "Rs. 1800 jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nDarmalingam\n9442170380\nRs. 1800 jbqr"
+    }
+  },
+  {
+    "roomNumber": "208",
+    "date": "2025-11-28",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Kalaikumar",
+      "phone": "9994708305",
+      "payment": "Rs. 1500 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nKalaikumar\n9994708305\nRs. 1500 cash"
+    }
+  },
+  {
+    "roomNumber": "102",
+    "date": "2025-11-29",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Danalakshmi",
+      "phone": "6379810172",
+      "payment": "Rs. 1000 (jbqr) | Rs. 200 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nDanalakshmi\n6379810172\nRs. 1000 (jbqr)\nRs. 200 cash\nTotal 1200"
+    }
+  },
+  {
+    "roomNumber": "104",
+    "date": "2025-11-29",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Kishore",
+      "phone": "9751893629",
+      "payment": "Rs. 1000 cash",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nKishore\n9751893629\nRs. 1000 cash"
+    }
+  },
+  {
+    "roomNumber": "105",
+    "date": "2025-11-29",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "",
+      "phone": "",
+      "payment": "",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "See 201",
+      "raw": "Jubair:\nSee 201"
+    }
+  },
+  {
+    "roomNumber": "107",
+    "date": "2025-11-29",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Manoj",
+      "phone": "8778785957",
+      "payment": "Adv 1000 (jbqr) | Rs. 3200 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nManoj\n8778785957\nAdv 1000 (jbqr)\nRs. 3200 (jbqr)\nTotal 4200"
+    }
+  },
+  {
+    "roomNumber": "108",
+    "date": "2025-11-29",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "Manoj",
+      "phone": "8778785957",
+      "payment": "Adv 1000 (jbqr) | Rs. 3200 (jbqr)",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "",
+      "raw": "Jubair:\nManoj\n8778785957\nAdv 1000 (jbqr)\nRs. 3200 (jbqr)\nTotal 4200"
+    }
+  },
+  {
+    "roomNumber": "201",
+    "date": "2025-11-29",
+    "comment": {
+      "agent": "Jubair",
+      "guestName": "",
+      "phone": "9080998574",
+      "payment": "Rs. 2000 (jqbr) | Rs. 800 (jbqr",
+      "pax": "",
+      "otherRooms": "",
+      "notes": "See 105 | Mailsamay",
+      "raw": "Jubair:\nSee 105\nMailsamay\n9080998574\nRs. 2000 (jqbr)\nRs. 800 (jbqr\nTotal 2800"
+    }
+  }
+]
