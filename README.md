@@ -34,3 +34,20 @@ npm run build
 npx vercel login
 npx vercel link
 npx vercel --prod
+
+
+1. Re-extract comments:
+npx tsx scripts/extractComments.ts
+
+2. Re-merge reservations:
+npx tsx scripts/mergeAndValidateReservations.ts
+
+3. Clean old data:
+npx tsx scripts/cleanupImportedData.ts
+
+4. Re-import with updated data:
+npx tsx scripts/importReservationsComplete.ts
+
+npx tsx scripts/getReservationData.ts <reservationId>
+npx tsx scripts/getReservationData.ts zrn6xhxsNVyT0E8cdAWS
+npx tsx scripts/getReservationData.ts x5GaEF6lu2US1v2IFAXn
