@@ -27,7 +27,9 @@
     "add-rooms": "tsx scripts/addRooms.ts",
     "delete-reservation": "tsx scripts/deleteReservationData.ts",
     "generate-schema": "node scripts/generateDatabaseSchema.js",
-    "update-schema": "node scripts/generateDatabaseSchema.js"
+    "update-schema": "node scripts/generateDatabaseSchema.js",
+    "extract-data": "tsx scripts/extractComments.ts",
+    "mergeAndValidateReservations": "tsx scripts/mergeAndValidateReservations.ts"
   },
   "dependencies": {
     "@dataconnect/generated": "file:src/dataconnect-generated",
@@ -71,6 +73,7 @@
     "clsx": "^2.1.0",
     "date-fns": "^3.6.0",
     "dotenv": "^17.2.2",
+    "exceljs": "^4.4.0",
     "firebase": "^12.2.1",
     "framer-motion": "^11.18.2",
     "immer": "^10.1.3",
