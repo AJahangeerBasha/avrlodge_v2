@@ -1274,11 +1274,20 @@ const AdminReservation: React.FC = () => {
                             if (selectedRoom) {
                               // Find the room type to get the correct tariff
                               const selectedRoomType = roomTypes.find(rt => rt.id === selectedRoom.roomTypeId);
-                              const roomTariff = selectedRoomType ? selectedRoomType.pricePerNight : allocation.tariff;
-                              
+
+                              // Check if this is a dormitory room type
+                              const isDormitory = selectedRoomType &&
+                                (selectedRoomType.name === "Dormitory Two Stay" ||
+                                 selectedRoomType.name === "Dormitory One Stay");
+
+                              // Calculate tariff: for dormitories, multiply by guest count
+                              const basePrice = selectedRoomType ? selectedRoomType.pricePerNight : allocation.tariff;
+                              const roomTariff = isDormitory ? (basePrice * allocation.guestCount) : basePrice;
+
                               updateRoomAllocation(allocation.id, {
                                 roomId: selectedRoom.id,
                                 roomNumber: selectedRoom.roomNumber,
+                                roomTypeId: selectedRoom.roomTypeId,
                                 tariff: roomTariff,
                                 roomType: selectedRoomType ? selectedRoomType.name : allocation.roomType,
                                 capacity: selectedRoomType ? selectedRoomType.maxGuests : allocation.capacity
@@ -1306,7 +1315,26 @@ const AdminReservation: React.FC = () => {
                         <Label className="text-sm font-medium text-gray-700 mb-2 block">Pax Count</Label>
                         <NumberInput
                           value={allocation.guestCount}
-                          onChange={(val) => updateRoomAllocation(allocation.id, { guestCount: val ?? 1 })}
+                          onChange={(val) => {
+                            const newGuestCount = val ?? 1;
+
+                            // Find the room type to check if it's a dormitory
+                            const roomType = roomTypes.find(rt => rt.id === allocation.roomTypeId);
+                            const isDormitory = roomType &&
+                              (roomType.name === "Dormitory Two Stay" ||
+                               roomType.name === "Dormitory One Stay");
+
+                            // For dormitory rooms, recalculate tariff based on guest count
+                            if (isDormitory && roomType) {
+                              const newTariff = roomType.pricePerNight * newGuestCount;
+                              updateRoomAllocation(allocation.id, {
+                                guestCount: newGuestCount,
+                                tariff: newTariff
+                              });
+                            } else {
+                              updateRoomAllocation(allocation.id, { guestCount: newGuestCount });
+                            }
+                          }}
                           min={1}
                           max={20}
                           step={1}
