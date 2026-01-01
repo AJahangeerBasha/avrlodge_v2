@@ -12,3 +12,4 @@ vite.config.ts.*
 /ui-design
 /.vite
 /import
+.env*.local
